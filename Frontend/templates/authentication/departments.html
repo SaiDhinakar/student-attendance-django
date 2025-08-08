@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% block title %}Departments - Student Attendance{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Departments</h1>
+    <p class="text-gray-600">Manage all departments in the institute</p>
+  </div>
+  <button onclick="openModal('addDepartmentModal')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+    Add Department
+  </button>
+</div>
+
+<!-- Search and Filter -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+  <div class="flex flex-col sm:flex-row gap-4">
+    <div class="flex-1">
+      <input type="text" placeholder="Search departments..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    </div>
+    <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+      <option>All Status</option>
+      <option>Active</option>
+      <option>Inactive</option>
+    </select>
+  </div>
+</div>
+
+<!-- Departments Table -->
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <!-- Computer Science -->
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span class="text-blue-600 font-semibold">CS</span>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">Computer Science Engineering</div>
+              <div class="text-sm text-gray-500">Est. 2010</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CSE</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Dr. Rajesh Kumar</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">425</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-2">
+            <button onclick="editDepartment(1)" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+            <button onclick="deleteDepartment(1)" class="text-red-600 hover:text-red-900">Delete</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Electronics and Communication -->
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <span class="text-green-600 font-semibold">EC</span>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">Electronics & Communication Engineering</div>
+              <div class="text-sm text-gray-500">Est. 2008</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">ECE</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Dr. Priya Sharma</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">380</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-2">
+            <button onclick="editDepartment(2)" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+            <button onclick="deleteDepartment(2)" class="text-red-600 hover:text-red-900">Delete</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Mechanical Engineering -->
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <span class="text-purple-600 font-semibold">ME</span>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">Mechanical Engineering</div>
+              <div class="text-sm text-gray-500">Est. 2005</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">MECH</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Dr. Arun Patel</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">295</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-2">
+            <button onclick="editDepartment(3)" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+            <button onclick="deleteDepartment(3)" class="text-red-600 hover:text-red-900">Delete</button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Civil Engineering -->
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <div class="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <span class="text-orange-600 font-semibold">CE</span>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">Civil Engineering</div>
+              <div class="text-sm text-gray-500">Est. 2012</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CIVIL</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Dr. Meera Singh</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">210</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-2">
+            <button onclick="editDepartment(4)" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+            <button onclick="deleteDepartment(4)" class="text-red-600 hover:text-red-900">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6 rounded-lg">
+  <div class="flex-1 flex justify-between sm:hidden">
+    <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</button>
+    <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</button>
+  </div>
+  <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+    <div>
+      <p class="text-sm text-gray-700">Showing <span class="font-medium">1</span> to <span class="font-medium">4</span> of <span class="font-medium">4</span> results</p>
+    </div>
+    <div>
+      <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+        <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Previous</button>
+        <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-green-50 text-sm font-medium text-green-600">1</button>
+        <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Next</button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Add Department Modal -->
+<div id="addDepartmentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Add New Department</h3>
+      </div>
+      <form class="px-6 py-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+          <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Enter department name">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department Code</label>
+          <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Enter department code">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Department Head</label>
+          <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Enter department head">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+          <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="2024">
+        </div>
+      </form>
+      <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
+        <button onclick="closeModal('addDepartmentModal')" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+        <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Add Department</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openModal(modalId) {
+  document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+}
+
+function editDepartment(id) {
+  alert('Edit department with ID: ' + id);
+}
+
+function deleteDepartment(id) {
+  if (confirm('Are you sure you want to delete this department?')) {
+    alert('Department deleted: ' + id);
+  }
+}
+</script>
+{% endblock %}
