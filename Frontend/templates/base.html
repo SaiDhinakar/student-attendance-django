@@ -5,14 +5,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Student Attendance{% endblock %}</title>
+    
+    <!-- Client's Icon Pack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
+    
+    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    
+    <!-- Client's Custom Theme -->
+    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+    
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     {% block extra_css %}{% endblock %}
   </head>
-  <body class="min-h-screen bg-gray-50 text-gray-900">
+  <body class="min-h-screen text-primary-custom" style="background-color: var(--background);"">
 
     <!-- HEADER -->
-    <header class="fixed top-0 z-50 w-full bg-white shadow-lg border-b border-gray-200">
+    <header class="fixed top-0 z-50 w-full header-bg shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
           
@@ -21,76 +30,89 @@
             <!-- Mobile menu button -->
             <button
               id="sidebarToggle"
-              class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+              class="md:hidden inline-flex items-center justify-center p-2 rounded-md nav-link hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
               aria-label="Open menu"
             >
-              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <i class="iconoir-menu text-xl"></i>
             </button>
 
             <!-- Logo -->
             <a href="{% url 'dashboard' %}" class="flex items-center">
-              <!-- Placeholder logo - replace with actual image -->
-              <!-- <div class="h-10 w-10 md:h-12 md:w-12 bg-green-600 rounded-lg flex items-center justify-center">
-                <span class="text-white font-bold text-lg md:text-xl">S</span>
-              </div> -->
               <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
             </a>
           </div>
 
           <!-- Center: College Info -->
           <div class="flex-1 text-center px-4 md:px-8">
-            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-green-800 leading-tight">
+            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-primary-custom leading-tight">
               SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
             </h1>
-            <p class="text-xs md:text-sm text-gray-600 font-medium mt-1">
+            <p class="text-xs md:text-sm text-secondary-custom font-medium mt-1">
               Student Attendance System
             </p>
           </div>
 
-          <!-- Right: Desktop Navigation -->
-          <nav class="hidden md:flex items-center space-x-6">
-            {% if user.is_authenticated %}
-              <a href="{% url 'dashboard' %}" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Dashboard
-              </a>
-              <a href="{% url 'departments' %}" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Departments
-              </a>
-              <a href="{% url 'batches' %}" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Batches
-              </a>
-              <a href="{% url 'students' %}" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Students
-              </a>
-              <a href="{% url 'subjects' %}" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Subjects
-              </a>
-              <a href="/admin/" 
-                 class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Admin
-              </a>
-              <form method="post" action="{% url 'logout' %}" class="inline">
-                {% csrf_token %}
-                <button type="submit" 
-                        class="text-gray-700 hover:text-green-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer">
-                  Logout
-                </button>
-              </form>
-            {% else %}
-              <a href="{% url 'login' %}" 
-                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Login
-              </a>
-            {% endif %}
-          </nav>
-        </div>
+          <!-- Right: Theme Toggle + Desktop Navigation -->
+          <div class="flex items-center space-x-4">
+            <!-- Theme Toggle Button -->
+            <button
+              id="themeToggle"
+              class="theme-toggle hidden md:inline-flex items-center justify-center p-2 text-sm font-medium"
+              aria-label="Toggle theme"
+            >
+              <i class="iconoir-sun-light text-lg" id="lightIcon"></i>
+              <i class="iconoir-moon text-lg hidden" id="darkIcon"></i>
+            </button>
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6">
+              {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-dashboard mr-2"></i>
+                  Dashboard
+                </a>
+                <a href="{% url 'departments' %}" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-building mr-2"></i>
+                  Departments
+                </a>
+                <a href="{% url 'batches' %}" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-group mr-2"></i>
+                  Batches
+                </a>
+                <a href="{% url 'students' %}" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-user mr-2"></i>
+                  Students
+                </a>
+                <a href="{% url 'subjects' %}" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-book mr-2"></i>
+                  Subjects
+                </a>
+                <a href="/admin/" 
+                   class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                  <i class="iconoir-settings mr-2"></i>
+                  Admin
+                </a>
+                <form method="post" action="{% url 'logout' %}" class="inline">
+                  {% csrf_token %}
+                  <button type="submit" 
+                          class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
+                    <i class="iconoir-log-out mr-2"></i>
+                    Logout
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" 
+                   class="btn-primary flex items-center">
+                  <i class="iconoir-log-in mr-2"></i>
+                  Login
+                </a>
+              {% endif %}
+            </nav>
+          </div>
       </div>
     </header>
 
@@ -102,22 +124,19 @@
       </div>
 
       <!-- Sidebar Panel -->
-      <div class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="fixed top-0 left-0 h-full w-64 section-bg shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
         
         <!-- Sidebar Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-green-50">
+        <div class="flex items-center justify-between p-4 border-b border-primary bg-primary-custom">
           <div class="flex items-center space-x-3">
-            <!-- Placeholder logo -->
-            <div class="h-8 w-8 bg-green-600 rounded flex items-center justify-center">
-              <span class="text-white font-bold text-sm">S</span>
+            <div class="h-8 w-8 bg-accent rounded flex items-center justify-center">
+              <i class="iconoir-apps text-white"></i>
             </div>
-            <span class="text-lg font-semibold text-green-800">Menu</span>
+            <span class="text-lg font-semibold text-white">Menu</span>
           </div>
           <button id="sidebarClose" 
-                  class="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+                  class="p-2 rounded-md text-white hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent">
+            <i class="iconoir-cancel text-lg"></i>
           </button>
         </div>
 
@@ -125,61 +144,59 @@
         <nav class="p-4 space-y-2">
           {% if user.is_authenticated %}
             <a href="{% url 'dashboard' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-dashboard mr-3"></i>
               Dashboard
             </a>
             <a href="{% url 'departments' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h4a1 1 0 011 1v5m-6 0V9a1 1 0 011-1h4a1 1 0 011 1v13" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-building mr-3"></i>
               Departments
             </a>
             <a href="{% url 'batches' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-group mr-3"></i>
               Batches
             </a>
             <a href="{% url 'students' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-user mr-3"></i>
               Students
             </a>
             <a href="{% url 'subjects' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-book mr-3"></i>
               Subjects
             </a>
             <a href="/admin/" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-green-700 font-medium transition-colors duration-200">
-              <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+               class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
+              <i class="iconoir-settings mr-3"></i>
               Admin
             </a>
+            
+            <!-- Mobile Theme Toggle -->
+            <button
+              id="mobileThemeToggle"
+              class="w-full flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200"
+              aria-label="Toggle theme"
+            >
+              <i class="iconoir-sun-light mr-3" id="mobileLightIcon"></i>
+              <i class="iconoir-moon mr-3 hidden" id="mobileDarkIcon"></i>
+              <span id="themeText">Light Mode</span>
+            </button>
+            
             <form method="post" action="{% url 'logout' %}" class="block">
               {% csrf_token %}
               <button type="submit" 
-                      class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-red-600 font-medium transition-colors duration-200">
-                <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                      class="w-full text-left px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
+                <i class="iconoir-log-out mr-3"></i>
                 Logout
               </button>
             </form>
           {% else %}
             <a href="{% url 'login' %}" 
-               class="block px-4 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-medium text-center transition-colors duration-200">
+               class="flex items-center justify-center px-4 py-3 rounded-lg btn-primary text-center">
+              <i class="iconoir-log-in mr-3"></i>
               Login
             </a>
           {% endif %}
@@ -195,7 +212,7 @@
         {% if messages %}
           <div class="mb-6 space-y-3">
             {% for message in messages %}
-              <div class="rounded-lg border p-4 {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+              <div class="rounded-lg border p-4 {% if message.tags == 'success' %}section-bg border-primary text-primary{% elif message.tags == 'error' %}bg-red-50 border-red-400 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-400 text-yellow-800{% else %}section-bg border-accent text-primary{% endif %}">
                 <div class="flex">
                   <div class="ml-3">
                     <p class="text-sm font-medium">{{ message }}</p>
@@ -209,27 +226,27 @@
         <!-- Page Content -->
         {% block content %}
         <!-- Default content - override this in child templates -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Student Attendance System</h2>
-          <p class="text-gray-600">This is the main content area. Replace this with your actual page content.</p>
+        <div class="card">
+          <h2 class="text-2xl font-bold text-primary-custom mb-4">Welcome to Student Attendance System</h2>
+          <p class="text-secondary-custom">This is the main content area. Replace this with your actual page content.</p>
         </div>
         {% endblock %}
       </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
+    <footer class="section-bg border-t border-primary mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="text-center text-sm text-gray-600">
-          <!-- <p class="mt-1">Student Attendance Management System</p> -->
-          <p class="mt-1">Design and developed by <b style="font-weight: bold;">AIML students</b></p>
+        <div class="text-center text-sm text-secondary-custom">
+          <p class="mt-1">Design and developed by <b style="font-weight: bold; color: var(--primary);">AIML students</b></p>
         </div>
       </div>
     </footer>
 
-    <!-- JavaScript for Mobile Sidebar -->
+    <!-- JavaScript for Mobile Sidebar and Theme Toggle -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
+        // Mobile Sidebar Functionality
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -251,7 +268,7 @@
           }
         }
 
-        // Event listeners
+        // Event listeners for sidebar
         if (sidebarToggle) {
           sidebarToggle.addEventListener('click', openSidebar);
         }
@@ -274,6 +291,71 @@
             closeSidebar();
           }
         });
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+        const lightIcon = document.getElementById('lightIcon');
+        const darkIcon = document.getElementById('darkIcon');
+        const mobileLightIcon = document.getElementById('mobileLightIcon');
+        const mobileDarkIcon = document.getElementById('mobileDarkIcon');
+        const themeText = document.getElementById('themeText');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+          html.setAttribute('data-theme', 'dark');
+          updateThemeIcons(true);
+        }
+
+        function updateThemeIcons(isDark) {
+          if (lightIcon && darkIcon) {
+            if (isDark) {
+              lightIcon.classList.add('hidden');
+              darkIcon.classList.remove('hidden');
+            } else {
+              lightIcon.classList.remove('hidden');
+              darkIcon.classList.add('hidden');
+            }
+          }
+
+          if (mobileLightIcon && mobileDarkIcon && themeText) {
+            if (isDark) {
+              mobileLightIcon.classList.add('hidden');
+              mobileDarkIcon.classList.remove('hidden');
+              themeText.textContent = 'Dark Mode';
+            } else {
+              mobileLightIcon.classList.remove('hidden');
+              mobileDarkIcon.classList.add('hidden');
+              themeText.textContent = 'Light Mode';
+            }
+          }
+        }
+
+        function toggleTheme() {
+          const isDark = html.getAttribute('data-theme') === 'dark';
+          if (isDark) {
+            html.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            updateThemeIcons(false);
+          } else {
+            html.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeIcons(true);
+          }
+        }
+
+        // Event listeners for theme toggle
+        if (themeToggle) {
+          themeToggle.addEventListener('click', toggleTheme);
+        }
+        if (mobileThemeToggle) {
+          mobileThemeToggle.addEventListener('click', toggleTheme);
+        }
+
+        // Add smooth transition effects
+        html.style.transition = 'background-color 0.3s ease, color 0.3s ease';
       });
     </script>
 

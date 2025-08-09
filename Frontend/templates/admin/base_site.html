@@ -7,8 +7,8 @@
 <div class="flex items-center space-x-3 px-6 py-4">
     <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10" />
     <div>
-        <h1 class="text-xl font-bold text-black">SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY</h1>
-        <p class="text-sm text-gray-600">Admin Dashboard</p>
+        <h1 class="text-xl font-bold" style="color: var(--primary);">SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">Admin Dashboard</p>
     </div>
 </div>
 {% endblock %}
@@ -17,15 +17,47 @@
 
 {% block extrahead %}
 {{ block.super }}
+<!-- Client's Icon Pack -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
+
+<!-- Client's Custom Theme -->
+<link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-    /* Reset and override all Django admin styles */
+    /* Apply client's color scheme to admin */
+    :root {
+        --accent: #A7C957;
+        --primary: #386641; 
+        --secondary: #6A994E;
+        --background: #f4f0e7;
+        --section-bg: #e4f2cf;
+        --text-primary: #2A2D34;
+        --text-secondary: #6E7081;
+        --button-primary: #386641;
+        --button-secondary: #6A994E;
+    }
+
+    [data-theme="dark"] {
+        --accent: #A7C957;
+        --primary: #386641;
+        --secondary: #6A994E;
+        --background: #18181e;
+        --section-bg: #232832;
+        --text-primary: #F2E8CF;
+        --text-secondary: #B0C4DE;
+        --button-primary: #BC4749;
+        --button-secondary: #6A994E;
+    }
+    
+    /* Reset and override all Django admin styles with client theme */
     * {
         box-sizing: border-box;
     }
     
     body {
-        background-color: #f9fafb !important;
+        background-color: var(--background) !important;
+        color: var(--text-primary) !important;
         font-family: system-ui, -apple-system, sans-serif !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -33,9 +65,9 @@
     
     /* Header styling */
     #header {
-        background: white !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-        border-bottom: 1px solid #e5e7eb !important;
+        background: var(--section-bg) !important;
+        box-shadow: 0 10px 15px -3px rgba(56, 102, 65, 0.1), 0 4px 6px -2px rgba(56, 102, 65, 0.05) !important;
+        border-bottom: 2px solid var(--primary) !important;
         padding: 0 !important;
     }
     

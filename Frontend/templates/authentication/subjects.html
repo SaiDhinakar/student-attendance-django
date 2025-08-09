@@ -4,31 +4,29 @@
 {% block content %}
 <div class="flex justify-between items-center mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-gray-900">Subjects</h1>
-    <p class="text-gray-600">Manage all subjects and course curriculum</p>
+    <h1 class="text-2xl font-bold text-primary-custom">Subjects</h1>
+    <p class="text-secondary-custom">Manage all subjects and course curriculum</p>
   </div>
-  <button onclick="openModal('addSubjectModal')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-    </svg>
+  <button onclick="openModal('addSubjectModal')" class="btn-primary flex items-center gap-2">
+    <i class="iconoir-plus"></i>
     Add Subject
   </button>
 </div>
 
 <!-- Search and Filter -->
-<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+<div class="card mb-6">
   <div class="flex flex-col sm:flex-row gap-4">
     <div class="flex-1">
-      <input type="text" id="searchSubjects" placeholder="Search subjects..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+      <input type="text" id="searchSubjects" placeholder="Search subjects..." class="form-input w-full">
     </div>
-    <select id="departmentFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select id="departmentFilter" class="form-input">
       <option value="">All Departments</option>
       <option value="Computer Science">Computer Science</option>
       <option value="Mechanical Engineering">Mechanical Engineering</option>
       <option value="Electrical Engineering">Electrical Engineering</option>
       <option value="Civil Engineering">Civil Engineering</option>
     </select>
-    <select id="semesterFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select id="semesterFilter" class="form-input">
       <option value="">All Semesters</option>
       <option value="1">1st Semester</option>
       <option value="2">2nd Semester</option>
@@ -39,7 +37,7 @@
       <option value="7">7th Semester</option>
       <option value="8">8th Semester</option>
     </select>
-    <select id="typeFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select id="typeFilter" class="form-input">
       <option value="">All Types</option>
       <option value="Core">Core</option>
       <option value="Elective">Elective</option>

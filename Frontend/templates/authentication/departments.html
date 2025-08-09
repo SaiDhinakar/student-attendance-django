@@ -4,24 +4,22 @@
 {% block content %}
 <div class="flex justify-between items-center mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-gray-900">Departments</h1>
-    <p class="text-gray-600">Manage all departments in the institute</p>
+    <h1 class="text-2xl font-bold text-primary-custom">Departments</h1>
+    <p class="text-secondary-custom">Manage all departments in the institute</p>
   </div>
-  <button onclick="openModal('addDepartmentModal')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-    </svg>
+  <button onclick="openModal('addDepartmentModal')" class="btn-primary flex items-center gap-2">
+    <i class="iconoir-plus"></i>
     Add Department
   </button>
 </div>
 
 <!-- Search and Filter -->
-<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+<div class="card mb-6">
   <div class="flex flex-col sm:flex-row gap-4">
     <div class="flex-1">
-      <input type="text" placeholder="Search departments..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+      <input type="text" placeholder="Search departments..." class="form-input w-full">
     </div>
-    <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select class="form-input">
       <option>All Status</option>
       <option>Active</option>
       <option>Inactive</option>
@@ -30,34 +28,34 @@
 </div>
 
 <!-- Departments Table -->
-<div class="bg-white rounded-lg shadow-sm overflow-hidden">
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
+<div class="card overflow-hidden p-0">
+  <table class="min-w-full divide-y divide-primary">
+    <thead class="table-header">
       <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Department</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Code</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Head</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Students</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
+    <tbody class="section-bg divide-y divide-primary">
       <!-- Computer Science -->
-      <tr class="hover:bg-gray-50">
+      <tr class="table-row">
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
-            <div class="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span class="text-blue-600 font-semibold">CS</span>
+            <div class="h-10 w-10 bg-primary-custom rounded-lg flex items-center justify-center">
+              <span class="text-white font-semibold">CS</span>
             </div>
             <div class="ml-4">
-              <div class="text-sm font-medium text-gray-900">Computer Science Engineering</div>
-              <div class="text-sm text-gray-500">Est. 2010</div>
+              <div class="text-sm font-medium text-primary-custom">Computer Science Engineering</div>
+              <div class="text-sm text-secondary-custom">Est. 2010</div>
             </div>
           </div>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CSE</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Dr. Rajesh Kumar</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-primary-custom">CSE</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-primary-custom">Dr. Rajesh Kumar</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">425</td>
         <td class="px-6 py-4 whitespace-nowrap">
           <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>

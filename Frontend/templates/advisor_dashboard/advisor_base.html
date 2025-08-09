@@ -5,14 +5,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Advisor Dashboard - Student Attendance{% endblock %}</title>
+    
+    <!-- Client's Icon Pack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
+    
+    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    
+    <!-- Client's Custom Theme -->
+    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+    
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     {% block extra_css %}{% endblock %}
   </head>
-  <body class="min-h-screen bg-gray-50 text-gray-900">
+  <body class="min-h-screen text-primary-custom" style="background-color: var(--background);">
 
     <!-- HEADER -->
-    <header class="fixed top-0 z-50 w-full bg-white shadow-lg border-b border-gray-200">
+    <header class="fixed top-0 z-50 w-full header-bg shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
           
@@ -21,12 +30,10 @@
             <!-- Mobile menu button -->
             <button
               id="sidebarToggle"
-              class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+              class="md:hidden inline-flex items-center justify-center p-2 rounded-md nav-link hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
               aria-label="Open menu"
             >
-              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <i class="iconoir-menu text-xl"></i>
             </button>
 
             <!-- Logo -->
@@ -37,10 +44,10 @@
 
           <!-- Center: College Info -->
           <div class="flex-1 text-center px-4 md:px-8">
-            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-purple-800 leading-tight">
+            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-primary-custom leading-tight">
               SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
             </h1>
-            <p class="text-xs md:text-sm text-gray-600 font-medium mt-1">
+            <p class="text-xs md:text-sm text-secondary-custom font-medium mt-1">
               Advisor Dashboard
             </p>
           </div>

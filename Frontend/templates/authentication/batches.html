@@ -4,31 +4,29 @@
 {% block content %}
 <div class="flex justify-between items-center mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-gray-900">Batches</h1>
-    <p class="text-gray-600">Manage all batches and their schedules</p>
+    <h1 class="text-2xl font-bold text-primary-custom">Batches</h1>
+    <p class="text-secondary-custom">Manage all batches and their schedules</p>
   </div>
-  <button onclick="openModal('addBatchModal')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-    </svg>
+  <button onclick="openModal('addBatchModal')" class="btn-primary flex items-center gap-2">
+    <i class="iconoir-plus"></i>
     Add Batch
   </button>
 </div>
 
 <!-- Search and Filter -->
-<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+<div class="card mb-6">
   <div class="flex flex-col sm:flex-row gap-4">
     <div class="flex-1">
-      <input type="text" id="searchBatches" placeholder="Search batches..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+      <input type="text" id="searchBatches" placeholder="Search batches..." class="form-input w-full">
     </div>
-    <select id="departmentFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select id="departmentFilter" class="form-input">
       <option value="">All Departments</option>
       <option value="Computer Science">Computer Science</option>
       <option value="Mechanical Engineering">Mechanical Engineering</option>
       <option value="Electrical Engineering">Electrical Engineering</option>
       <option value="Civil Engineering">Civil Engineering</option>
     </select>
-    <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+    <select id="statusFilter" class="form-input">
       <option value="">All Status</option>
       <option value="Active">Active</option>
       <option value="Completed">Completed</option>
@@ -38,16 +36,16 @@
 </div>
 
 <!-- Batches Table -->
-<div class="bg-white rounded-lg shadow-sm overflow-hidden">
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
+<div class="card overflow-hidden p-0">
+  <table class="min-w-full divide-y divide-primary">
+    <thead class="table-header">
       <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch Name</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year/Semester</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Batch Name</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Department</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Year/Semester</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Students</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Start Date</th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
