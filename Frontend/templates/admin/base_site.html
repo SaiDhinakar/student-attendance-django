@@ -1,0 +1,470 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Student Attendance Admin{% endblock %}
+
+{% block branding %}
+<div class="flex items-center space-x-3 px-6 py-4">
+    <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10" />
+    <div>
+        <h1 class="text-xl font-bold text-black">SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY</h1>
+        <p class="text-sm text-gray-600">Admin Dashboard</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Reset and override all Django admin styles */
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        background-color: #f9fafb !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Header styling */
+    #header {
+        background: white !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        padding: 0 !important;
+    }
+    
+    #branding {
+        background: transparent !important;
+        color: inherit !important;
+        float: none !important;
+        padding: 0 !important;
+    }
+    
+    #branding h1 {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: inherit !important;
+        color: inherit !important;
+        font-weight: inherit !important;
+    }
+    
+    #user-tools {
+        background: transparent !important;
+        color: #374151 !important;
+        float: right !important;
+        padding: 1rem 1.5rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    #user-tools a {
+        color: #6b7280 !important;
+        text-decoration: none !important;
+        margin-left: 1rem !important;
+    }
+    
+    #user-tools a:hover {
+        color: #374151 !important;
+    }
+    
+    /* Content area */
+    #content {
+        padding: 1.5rem !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    
+    #content-main {
+        float: none !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+    
+    /* Module styling */
+    .module {
+        background: white !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid #e5e7eb !important;
+        margin-bottom: 1.5rem !important;
+        overflow: hidden !important;
+    }
+    
+    .module h2, .module caption {
+        background: white !important;
+        color: #374151 !important;
+        padding: 0.75rem 1rem !important;
+        margin: 0 !important;
+        font-weight: 600 !important;
+        font-size: 1.125rem !important;
+        border: none !important;
+        border-bottom: 1px solid #e5e7eb !important;
+    }
+    
+    .module table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 0 !important;
+    }
+    
+    .module th {
+        background: #f9fafb !important;
+        padding: 0.75rem 1rem !important;
+        text-align: left !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    
+    .module td {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    
+    .module tbody tr:hover {
+        background: #f9fafb !important;
+    }
+    
+    /* Links and buttons */
+    .addlink, .add-another {
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 0.5rem 1rem !important;
+        background: #374151 !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+        text-decoration: none !important;
+        transition: background-color 0.2s !important;
+        border: none !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .addlink:hover, .add-another:hover {
+        background: #1f2937 !important;
+        color: white !important;
+    }
+    
+    .addlink:before {
+        content: '+' !important;
+        margin-right: 0.5rem !important;
+        font-weight: bold !important;
+    }
+    
+    .changelink {
+        color: #2563eb !important;
+        text-decoration: none !important;
+    }
+    
+    .changelink:hover {
+        color: #1d4ed8 !important;
+    }
+    
+    .deletelink {
+        color: #dc2626 !important;
+        text-decoration: none !important;
+    }
+    
+    .deletelink:hover {
+        color: #b91c1c !important;
+    }
+    
+    /* Form buttons */
+    .button, input[type=submit], input[type=button], .submit-row input, button {
+        background: #374151 !important;
+        color: white !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 0.5rem !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s !important;
+        font-size: 0.875rem !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+    }
+    
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, button:hover {
+        background: #1f2937 !important;
+        color: white !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: #2563eb !important;
+    }
+    
+    .button.default:hover, input[type=submit].default:hover {
+        background: #1d4ed8 !important;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: #f3f4f6 !important;
+        padding: 0.75rem 1.5rem !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        margin: 0 !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .breadcrumbs a {
+        color: #6b7280 !important;
+        text-decoration: none !important;
+    }
+    
+    .breadcrumbs a:hover {
+        color: #374151 !important;
+    }
+    
+    /* Object tools */
+    .object-tools {
+        display: flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 1rem !important;
+        float: none !important;
+    }
+    
+    .object-tools li {
+        list-style: none !important;
+        margin: 0 !important;
+    }
+    
+    .object-tools a {
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 0.5rem 1rem !important;
+        background: #374151 !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+        text-decoration: none !important;
+        transition: background-color 0.2s !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .object-tools a:hover {
+        background: #1f2937 !important;
+        color: white !important;
+    }
+    
+    /* Results table */
+    .results {
+        background: white !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid #e5e7eb !important;
+        overflow: hidden !important;
+    }
+    
+    .results table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+    
+    .results th {
+        background: #f9fafb !important;
+        padding: 0.75rem 1rem !important;
+        text-align: left !important;
+        font-weight: 600 !important;
+        color: #374151 !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    
+    .results td {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    
+    .results tbody tr:hover {
+        background: #f9fafb !important;
+    }
+    
+    /* Form styling */
+    .form-row {
+        margin-bottom: 1rem !important;
+        clear: both !important;
+    }
+    
+    .form-row label {
+        display: block !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+        margin-bottom: 0.5rem !important;
+        float: none !important;
+        width: auto !important;
+    }
+    
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100% !important;
+        padding: 0.75rem !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+        font-size: 0.875rem !important;
+        background: white !important;
+    }
+    
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 2px #6b7280 !important;
+        border-color: #6b7280 !important;
+    }
+    
+    /* Error styling */
+    .errorlist {
+        background: #fef2f2 !important;
+        border: 1px solid #fecaca !important;
+        border-radius: 0.5rem !important;
+        padding: 0.75rem !important;
+        margin-bottom: 1rem !important;
+        list-style: none !important;
+    }
+    
+    .errorlist li {
+        color: #b91c1c !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Search form */
+    .search-form {
+        margin-bottom: 1rem !important;
+    }
+    
+    .search-form input {
+        padding: 0.5rem 1rem !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem 0 0 0.5rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .search-form button {
+        padding: 0.5rem 1rem !important;
+        background: #374151 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 0 0.5rem 0.5rem 0 !important;
+        cursor: pointer !important;
+    }
+    
+    /* Pagination */
+    .paginator {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-top: 1.5rem !important;
+        padding: 1rem !important;
+        background: white !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #e5e7eb !important;
+    }
+    
+    .paginator .this-page {
+        padding: 0.5rem 0.75rem !important;
+        background: #374151 !important;
+        color: white !important;
+        border-radius: 0.25rem !important;
+    }
+    
+    .paginator a {
+        padding: 0.5rem 0.75rem !important;
+        color: #374151 !important;
+        text-decoration: none !important;
+        border-radius: 0.25rem !important;
+        margin: 0 0.25rem !important;
+    }
+    
+    .paginator a:hover {
+        color: #1f2937 !important;
+        background: #f3f4f6 !important;
+    }
+    
+    /* Hide Django's default styling */
+    .selector, .selector-available, .selector-chosen {
+        background: white !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+    }
+    
+    /* Actions */
+    .actions {
+        margin-bottom: 1rem !important;
+        background: #f9fafb !important;
+        padding: 1rem !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #e5e7eb !important;
+    }
+    
+    .actions select {
+        padding: 0.5rem !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important;
+        margin-right: 0.5rem !important;
+    }
+    
+    .actions button {
+        padding: 0.5rem 1rem !important;
+        background: #2563eb !important;
+        color: white !important;
+        border-radius: 0.5rem !important;
+        border: none !important;
+        cursor: pointer !important;
+    }
+    
+    .actions button:hover {
+        background: #1d4ed8 !important;
+    }
+    
+    /* Messages */
+    .messagelist {
+        margin: 0 0 1rem 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+    
+    .messagelist li {
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid !important;
+    }
+    
+    .messagelist .success {
+        background: #f0fdf4 !important;
+        border-color: #bbf7d0 !important;
+        color: #166534 !important;
+    }
+    
+    .messagelist .error {
+        background: #fef2f2 !important;
+        border-color: #fecaca !important;
+        color: #b91c1c !important;
+    }
+    
+    .messagelist .warning {
+        background: #fffbeb !important;
+        border-color: #fed7aa !important;
+        color: #92400e !important;
+    }
+    
+    .messagelist .info {
+        background: #eff6ff !important;
+        border-color: #bfdbfe !important;
+        color: #1e40af !important;
+    }
+</style>
+{% endblock %}

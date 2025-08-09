@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "Authentication",  
+    "Authentication",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -120,7 +121,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"
+LOGIN_REDIRECT_URL = "admin:index"  # Redirect to admin dashboard
 LOGOUT_REDIRECT_URL = "login"
 
 # Default primary key field type

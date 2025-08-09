@@ -17,8 +17,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", include("Authentication.urls")),
+    path("", lambda request: redirect('admin:index'), name="home"),  # Redirect to admin
+    path("auth/", include("Authentication.urls")),  # Keep auth URLs for login
+    # TODO: Add URL patterns for core app models when views are created
+    # path("departments/", include("departments.urls")),
+    # path("students/", include("students.urls")),
+    # path("batches/", include("batches.urls")),
+    # path("subjects/", include("subjects.urls")),
+    # path("attendance/", include("attendance.urls")),
 ]

@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 # Create your views here.
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("admin:index")
 
     next_url = request.GET.get("next") or request.POST.get("next")
 
@@ -18,7 +18,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, "Logged in successfully")
-            return redirect(next_url or "dashboard")
+            return redirect(next_url or "admin:index")
         else:
             messages.error(request, "Invalid username or password")
 
@@ -34,24 +34,5 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    return render(request, "authentication/dashboard.html")
-
-
-@login_required
-def departments(request):
-    return render(request, "authentication/departments.html")
-
-
-@login_required
-def students(request):
-    return render(request, "authentication/students.html")
-
-
-@login_required
-def batches(request):
-    return render(request, "authentication/batches.html")
-
-
-@login_required
-def subjects(request):
-    return render(request, "authentication/subjects.html")
+    """Redirect to Django admin dashboard"""
+    return redirect("admin:index")
