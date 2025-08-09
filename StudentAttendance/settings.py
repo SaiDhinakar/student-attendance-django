@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "Authentication",
     "core",
+    "attendance_dashboard",
+    "advisor_dashboard",
 ]
 
 MIDDLEWARE = [
@@ -121,7 +123,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "admin:index"  # Redirect to admin dashboard
+LOGIN_REDIRECT_URL = "dashboard"  # This will redirect to the dashboard view which handles role-based redirection
 LOGOUT_REDIRECT_URL = "login"
 
 # Default primary key field type

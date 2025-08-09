@@ -23,6 +23,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", lambda request: redirect('admin:index'), name="home"),  # Redirect to admin
     path("auth/", include("Authentication.urls")),  # Keep auth URLs for login
+    path("staff/", include("attendance_dashboard.urls")),  # Staff attendance dashboard
+    path("advisor/", include("advisor_dashboard.urls")),  # Advisor dashboard
     # TODO: Add URL patterns for core app models when views are created
     # path("departments/", include("departments.urls")),
     # path("students/", include("students.urls")),

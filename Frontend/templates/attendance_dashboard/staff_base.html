@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Staff Dashboard - Student Attendance{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 z-50 w-full bg-white shadow-lg border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 md:h-20">
+          
+          <!-- Left: Mobile Menu Button + Logo -->
+          <div class="flex items-center space-x-3">
+            <!-- Mobile menu button -->
+            <button
+              id="sidebarToggle"
+              class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              aria-label="Open menu"
+            >
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <!-- Logo -->
+            <a href="{% url 'attendance_dashboard:dashboard' %}" class="flex items-center">
+              <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
+            </a>
+          </div>
+
+          <!-- Center: College Info -->
+          <div class="flex-1 text-center px-4 md:px-8">
+            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-blue-800 leading-tight">
+              SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
+            </h1>
+            <p class="text-xs md:text-sm text-gray-600 font-medium mt-1">
+              Staff Attendance Dashboard
+            </p>
+          </div>
+
+          <!-- Right: Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-6">
+            {% if user.is_authenticated %}
+              <a href="{% url 'attendance_dashboard:dashboard' %}" 
+                 class="text-gray-700 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                Dashboard
+              </a>
+              <a href="{% url 'attendance_dashboard:attendance' %}" 
+                 class="text-gray-700 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                Mark Attendance
+              </a>
+              <a href="{% url 'attendance_dashboard:reports' %}" 
+                 class="text-gray-700 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                Reports
+              </a>
+              
+              <!-- User Info -->
+              <div class="flex items-center space-x-3 px-3 py-2 rounded-md bg-blue-50">
+                <div class="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                </div>
+                <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
+              </div>
+              
+              <form method="post" action="{% url 'logout' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="text-gray-700 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer">
+                  Logout
+                </button>
+              </form>
+            {% endif %}
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="md:hidden">
+      <!-- Overlay -->
+      <div id="sidebarOverlay" 
+           class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300">
+      </div>
+
+      <!-- Sidebar Panel -->
+      <div class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+        
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50">
+          <div class="flex items-center space-x-3">
+            <div class="h-8 w-8 bg-blue-600 rounded flex items-center justify-center">
+              <span class="text-white font-bold text-sm">S</span>
+            </div>
+            <span class="text-lg font-semibold text-blue-800">Staff Menu</span>
+          </div>
+          <button id="sidebarClose" 
+                  class="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- User Info in Sidebar -->
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+          <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <span class="text-white font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+              <p class="text-xs text-gray-500">Staff Member</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <nav class="p-4 space-y-2">
+          <a href="{% url 'attendance_dashboard:dashboard' %}" 
+             class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium transition-colors duration-200">
+            <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+            </svg>
+            Dashboard
+          </a>
+          <a href="{% url 'attendance_dashboard:attendance' %}" 
+             class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium transition-colors duration-200">
+            <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Mark Attendance
+          </a>
+          <a href="{% url 'attendance_dashboard:reports' %}" 
+             class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-700 font-medium transition-colors duration-200">
+            <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Reports
+          </a>
+          
+          <div class="pt-4 border-t border-gray-200">
+            <form method="post" action="{% url 'logout' %}" class="block">
+              {% csrf_token %}
+              <button type="submit" 
+                      class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-red-600 font-medium transition-colors duration-200">
+                <svg class="inline-block w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </form>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-20 md:pt-24 pb-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Messages -->
+        {% if messages %}
+          <div class="mb-6 space-y-3">
+            {% for message in messages %}
+              <div class="rounded-lg border p-4 {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                <div class="flex">
+                  <div class="ml-3">
+                    <p class="text-sm font-medium">{{ message }}</p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        {% block content %}
+        <!-- Default content - override this in child templates -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Staff Dashboard</h2>
+          <p class="text-gray-600">This is the staff dashboard content area.</p>
+        </div>
+        {% endblock %}
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="text-center text-sm text-gray-600">
+          <p class="mt-1">Staff Dashboard - Design and developed by <b style="font-weight: bold;">AIML students</b></p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript for Mobile Sidebar -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarPanel = document.querySelector('#mobileSidebar > div:last-child');
+
+        function openSidebar() {
+          if (sidebarOverlay && sidebarPanel) {
+            sidebarOverlay.classList.remove('hidden');
+            sidebarPanel.classList.remove('-translate-x-full');
+            document.body.classList.add('overflow-hidden');
+          }
+        }
+
+        function closeSidebar() {
+          if (sidebarOverlay && sidebarPanel) {
+            sidebarOverlay.classList.add('hidden');
+            sidebarPanel.classList.add('-translate-x-full');
+            document.body.classList.remove('overflow-hidden');
+          }
+        }
+
+        // Event listeners
+        if (sidebarToggle) {
+          sidebarToggle.addEventListener('click', openSidebar);
+        }
+        if (sidebarClose) {
+          sidebarClose.addEventListener('click', closeSidebar);
+        }
+        if (sidebarOverlay) {
+          sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar when clicking navigation links
+        const sidebarLinks = document.querySelectorAll('#mobileSidebar a, #mobileSidebar button[type="submit"]');
+        sidebarLinks.forEach(link => {
+          link.addEventListener('click', closeSidebar);
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && sidebarOverlay && !sidebarOverlay.classList.contains('hidden')) {
+            closeSidebar();
+          }
+        });
+      });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
