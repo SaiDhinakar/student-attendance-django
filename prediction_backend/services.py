@@ -23,6 +23,7 @@ import time
 from django.conf import settings
 from django.core.cache import cache
 from core.models import Student, Department, Batch, Section
+from asgiref.sync import sync_to_async
 
 # Import the LightCNN model
 try:
@@ -83,12 +84,12 @@ class PredictionService:
         if self.initialized:
             logger.info("✅ PredictionService already initialized")
             return
-            
+        
         with self._init_lock:
             if self.initialized:  # Double-check pattern
                 logger.info("✅ PredictionService already initialized (double-check)")
                 return
-                
+            
             try:
                 with TimedLogger(logger, "PredictionService initialization"):
                     logger.info("🔧 Starting PredictionService initialization...")
@@ -103,7 +104,8 @@ class PredictionService:
                     
                     # Load face recognition model
                     model_path = "backend/checkpoints/LightCNN_29Layers_V2_checkpoint.pth.tar"
-                    logger.info(f"🔍 Attempting to load face model from: {model_path}")
+                    abs_model_path = os.path.abspath(model_path)
+                    logger.info(f"🔍 Attempting to load face model from: {model_path} (abs: {abs_model_path})")
                     
                     if os.path.exists(model_path) and LightCNN_29Layers_v2:
                         with TimedLogger(logger, "Face model loading"):
@@ -120,11 +122,12 @@ class PredictionService:
                             self.face_model.eval()
                             logger.info("✅ Face recognition model loaded successfully")
                     else:
-                        logger.warning(f"⚠️  Face recognition model not found at {model_path} or LightCNN not available, using mock predictions")
+                        logger.warning(f"⚠️  Face recognition model not found at {model_path} (abs: {abs_model_path}) or LightCNN not available, using mock predictions")
                         
                     # Load YOLO model
                     yolo_path = "backend/yolo/weights/yolo11n-face.pt"
-                    logger.info(f"🔍 Attempting to load YOLO model from: {yolo_path}")
+                    abs_yolo_path = os.path.abspath(yolo_path)
+                    logger.info(f"🔍 Attempting to load YOLO model from: {yolo_path} (abs: {abs_yolo_path})")
                     
                     if os.path.exists(yolo_path):
                         with TimedLogger(logger, "YOLO model loading"):
@@ -132,8 +135,8 @@ class PredictionService:
                             self.yolo_model = YOLO(yolo_path)
                             logger.info("✅ YOLO face detection model loaded successfully")
                     else:
-                        logger.warning(f"⚠️  YOLO model not found at {yolo_path}, using mock face detection")
-                        
+                        logger.warning(f"⚠️  YOLO model not found at {yolo_path} (abs: {abs_yolo_path}), using mock face detection")
+                    
                     # Set up transforms
                     self.transform = transforms.Compose([
                         transforms.Resize((128, 128)),
@@ -144,12 +147,12 @@ class PredictionService:
                     
                     self.initialized = True
                     logger.info("🎉 PredictionService initialized successfully")
-                
+            
             except Exception as e:
                 logger.error(f"❌ Error initializing PredictionService: {e}")
                 logger.exception("Full exception details:")
                 self.initialized = False
-            
+
     def load_gallery(self, department_name: str, batch_year: int, section_names: List[str] = None) -> Dict[str, np.ndarray]:
         """Load student gallery embeddings from .pth files with thread-safe caching"""
         try:
@@ -166,18 +169,36 @@ class PredictionService:
                     return self._filter_gallery_by_sections(gallery, department_name, batch_year, section_names)
             
             # Load from file system
-            gallery_path = f"./gallery/gallery_{department_name}_{batch_year}.pth"
-            logger.info(f"🔍 Attempting to load gallery from: {gallery_path}")
+            gallery_path = f"gallery/gallery_{department_name}_{batch_year}.pth"
+            abs_gallery_path = os.path.abspath(gallery_path)
+            logger.info(f"🔍 Attempting to load gallery from: {gallery_path} (abs: {abs_gallery_path})")
             
-            if not Path(gallery_path).exists():
-                logger.warning(f"⚠️  Gallery file {gallery_path} not found")
+            if not Path(abs_gallery_path).exists():
+                logger.warning(f"⚠️  Gallery file {gallery_path} not found (abs: {abs_gallery_path})")
                 return {}
-                
+            
             # Load gallery data
             with TimedLogger(logger, f"Gallery loading from {gallery_path}"):
-                logger.info(f"📄 Loading gallery data from {gallery_path}")
-                gallery_data = torch.load(gallery_path, map_location='cpu')
-                
+                logger.info(f"📄 Loading gallery data from {gallery_path} (abs: {abs_gallery_path})")
+                # Try safe loading first: allowlist numpy reconstruct and ndarray
+                try:
+                    try:
+                        from numpy._core import multiarray as _multiarray
+                        torch.serialization.add_safe_globals([_multiarray._reconstruct, np.ndarray])
+                        logger.debug("Added numpy._core.multiarray._reconstruct and numpy.ndarray to torch safe globals")
+                    except Exception as ge:
+                        logger.debug(f"Could not add safe globals: {ge}")
+                    gallery_data = torch.load(abs_gallery_path, map_location='cpu')
+                except Exception as e:
+                    logger.warning(
+                        "Safe torch.load failed, falling back to weights_only=False as the gallery file is trusted: %s",
+                        e,
+                    )
+                    try:
+                        gallery_data = torch.load(abs_gallery_path, map_location='cpu', weights_only=False)
+                    except TypeError:
+                        gallery_data = torch.load(abs_gallery_path, map_location='cpu')
+            
                 # Handle np.ndarray or tensor values
                 gallery = {}
                 for k, v in gallery_data.items():
@@ -196,12 +217,12 @@ class PredictionService:
             
             # Filter by sections if provided
             return self._filter_gallery_by_sections(gallery, department_name, batch_year, section_names)
-                
+            
         except Exception as e:
             logger.error(f"❌ Error loading gallery {gallery_path}: {e}")
             logger.exception("Gallery loading exception details:")
             return {}
-    
+
     def _filter_gallery_by_sections(self, gallery: Dict[str, np.ndarray], 
                                    department_name: str, batch_year: int, 
                                    section_names: List[str] = None) -> Dict[str, np.ndarray]:
@@ -272,20 +293,21 @@ class PredictionService:
                 logger.info(f"📊 Processing section group {i+1}: {dept_name} {batch_year} - {section_names}")
                 
                 if dept_name and batch_year:
-                    # Load gallery for this department/batch/sections
-                    gallery = self.load_gallery(dept_name, batch_year, section_names)
+                    # Load gallery for this department/batch/sections via sync_to_async
+                    gallery = await sync_to_async(self.load_gallery)(dept_name, batch_year, section_names)
                     combined_gallery.update(gallery)
                     logger.info(f"📚 Added {len(gallery)} embeddings to combined gallery")
                     
-                    # Get students for these sections
+                    # Get students for these sections using sync_to_async
                     for section_name in section_names:
                         try:
-                            students = Student.objects.filter(
-                                section__section_name=section_name,
-                                section__batch__batch_year=batch_year,
-                                section__batch__dept__dept_name=dept_name
-                            ).values_list('student_regno', flat=True)
-                            student_list = list(students)
+                            student_list = await sync_to_async(list)(
+                                Student.objects.filter(
+                                    section__section_name=section_name,
+                                    section__batch__batch_year=batch_year,
+                                    section__batch__dept__dept_name=dept_name
+                                ).values_list('student_regno', flat=True)
+                            )
                             all_section_students.update(student_list)
                             logger.info(f"👥 Added {len(student_list)} students from section {section_name}")
                         except Exception as e:
