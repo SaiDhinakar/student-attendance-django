@@ -26,6 +26,7 @@ urlpatterns = [
     path("staff/", include("attendance_dashboard.urls")),  # Staff attendance dashboard
     path("advisor/", include("advisor_dashboard.urls")),  # Advisor dashboard
     path("api/", include("core.urls")),  # Core API endpoints
+    path("api/prediction/", include("prediction_backend.urls")),  # Prediction API
     # TODO: Add URL patterns for core app models when views are created
     # path("departments/", include("departments.urls")),
     # path("students/", include("students.urls")),

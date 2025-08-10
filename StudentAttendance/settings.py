@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "core",
     "attendance_dashboard",
     "advisor_dashboard",
+    "prediction_backend",
 ]
 
 MIDDLEWARE = [

@@ -442,9 +442,9 @@ class AttendanceTaking {
     this.ctx = this.canvas?.getContext('2d');
     this.capturedImages = [];
     this.detectedStudents = new Map();
+    this.sessionData = this.getSessionData();
     this.sessionId = null;
     this.debug = new DebugLogger();
-    this.sessionData = this.getSessionData();
     
     this.init();
   }
@@ -871,31 +871,13 @@ class AttendanceTaking {
       
       if (result.success) {
         this.debug.log('Attendance submitted successfully', 'success');
-        
-        // Show detailed success message
-        let message = `✅ Attendance submitted successfully!\n`;
-        message += `📊 ${result.submissions_count} students processed\n`;
-        message += `✏️ ${result.edited_count} manually edited\n`;
-        
-        if (result.attendance_records_created) {
-          message += `📝 ${result.attendance_records_created} attendance records created\n`;
-        }
-        if (result.attendance_records_updated) {
-          message += `🔄 ${result.attendance_records_updated} attendance records updated\n`;
-        }
-        if (result.timetable_id) {
-          message += `📅 Timetable ID: ${result.timetable_id}`;
-        }
-        
-        this.showNotification(message, 'success');
-        
-        // Also log debug URL for checking attendance
-        this.debug.log(`Check attendance records at: /api/prediction/debug/session/${this.sessionId}/`, 'info');
-        this.debug.log(`Check all attendance records at: /api/prediction/debug/attendance-records/`, 'info');
-        
+        this.showNotification(
+          `Attendance submitted successfully! ${result.submissions_count} students processed, ${result.edited_count} manually edited.`, 
+          'success'
+        );
         setTimeout(() => {
           this.goBack();
-        }, 3000);
+        }, 2000);
       } else {
         throw new Error(result.error || 'Failed to submit attendance');
       }
