@@ -172,11 +172,11 @@ class Student(TimestampedModel):
 
 class TimeBlock(TimestampedModel):
     """
-    Model representing time blocks for different academic years
+    Model representing time blocks for different batches
     """
     time_block_id = models.AutoField(primary_key=True)
     batch_year = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(4)]
+        help_text="Graduation year (e.g., 2025, 2026, 2027, 2028) or 0 for all batches"
     )
     block_number = models.PositiveIntegerField()
     start_time = models.TimeField()
@@ -186,9 +186,12 @@ class TimeBlock(TimestampedModel):
         db_table = 'TimeBlocks'
         verbose_name = 'Time Block'
         verbose_name_plural = 'Time Blocks'
+        unique_together = ['batch_year', 'block_number']
     
     def __str__(self):
-        return f"Year {self.batch_year} - Block {self.block_number} ({self.start_time}-{self.end_time})"
+        if self.batch_year == 0:
+            return f"All Batches - Block {self.block_number} ({self.start_time}-{self.end_time})"
+        return f"Batch {self.batch_year} - Block {self.block_number} ({self.start_time}-{self.end_time})"
 
 
 class Timetable(TimestampedModel):

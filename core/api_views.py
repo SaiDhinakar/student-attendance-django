@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from core.models import Department, Batch, Subject, TimeBlock
+from core.models import Department, Batch, Subject, TimeBlock, Student, Section
 from datetime import datetime, time
 import json
 
@@ -137,19 +137,24 @@ class AttendanceFormAPIView(View):
             if not batch_year:
                 return JsonResponse({'error': 'Batch year is required'}, status=400)
             
-            # Get the current year for this batch
-            try:
-                batch = Batch.objects.get(batch_year=int(batch_year))
-                current_year = batch.current_year
-            except Batch.DoesNotExist:
+            # Verify that at least one batch exists for this year
+            batch_exists = Batch.objects.filter(batch_year=int(batch_year)).exists()
+            if not batch_exists:
                 return JsonResponse({'error': 'Batch not found'}, status=404)
             
             current_time = datetime.now().time()
             
-            # Get time blocks for this year
+            # Get time blocks for this specific batch year, or fall back to general time blocks (batch_year=0)
             time_blocks = TimeBlock.objects.filter(
-                batch_year=current_year
-            ).order_by('block_number')
+                batch_year__in=[int(batch_year), 0]
+            ).order_by('-batch_year', 'block_number')  # Prefer specific batch over general
+            
+            if not time_blocks.exists():
+                return JsonResponse({
+                    'current_time_slot': None,
+                    'current_time': current_time.strftime('%H:%M'),
+                    'message': f'No time blocks configured for batch {batch_year}'
+                })
             
             current_block = None
             next_block = None
@@ -169,7 +174,8 @@ class AttendanceFormAPIView(View):
                         'end_time': current_block.end_time.strftime('%H:%M'),
                         'status': 'active'
                     },
-                    'current_time': current_time.strftime('%H:%M')
+                    'current_time': current_time.strftime('%H:%M'),
+                    'batch_year': int(batch_year)
                 })
             elif next_block:
                 return JsonResponse({
@@ -179,15 +185,80 @@ class AttendanceFormAPIView(View):
                         'end_time': next_block.end_time.strftime('%H:%M'),
                         'status': 'upcoming'
                     },
-                    'current_time': current_time.strftime('%H:%M')
+                    'current_time': current_time.strftime('%H:%M'),
+                    'batch_year': int(batch_year)
                 })
             else:
                 return JsonResponse({
                     'current_time_slot': None,
                     'current_time': current_time.strftime('%H:%M'),
-                    'message': 'No active or upcoming classes'
+                    'message': f'No active or upcoming classes for batch {batch_year}',
+                    'batch_year': int(batch_year)
                 })
                 
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def get_students(self, departments, batch_year, sections):
+        """Get students for specified departments, batch year, and sections"""
+        try:
+            if not departments or not batch_year:
+                return JsonResponse({'error': 'Departments and batch year are required'}, status=400)
+            
+            # Remove empty strings from departments and sections
+            departments = [dept for dept in departments if dept.strip()]
+            sections = [section for section in sections if section.strip()]
+            
+            if not departments:
+                return JsonResponse({'error': 'At least one department is required'}, status=400)
+            
+            # Get students from the specified departments, batch year, and sections
+            students_query = Student.objects.select_related('section', 'section__batch', 'section__batch__dept')
+            
+            # Filter by departments
+            students_query = students_query.filter(
+                section__batch__dept__dept_name__in=departments
+            )
+            
+            # Filter by batch year
+            students_query = students_query.filter(
+                section__batch__batch_year=int(batch_year)
+            )
+            
+            # Filter by sections if specified
+            if sections and sections != ['A']:  # Default to all sections if only 'A' is specified
+                # Handle both "A" format and "DeptName-A" format
+                section_names = []
+                for section in sections:
+                    if '-' in section:
+                        section_names.append(section.split('-')[-1])
+                    else:
+                        section_names.append(section)
+                
+                students_query = students_query.filter(
+                    section__section_name__in=section_names
+                )
+            
+            students = students_query.order_by('section__section_name', 'register_number')
+            
+            students_list = []
+            for student in students:
+                students_list.append({
+                    'id': student.student_id,
+                    'student_id': student.student_id,
+                    'name': student.name,
+                    'register_number': student.register_number,
+                    'department': student.section.batch.dept.dept_name,
+                    'section': student.section.section_name,
+                    'batch_year': student.section.batch.batch_year,
+                    'display_year': student.section.batch.display_year
+                })
+            
+            return JsonResponse({
+                'students': students_list,
+                'count': len(students_list)
+            })
+            
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
@@ -212,80 +283,5 @@ class TimeBlocksAPIView(View):
                 })
             
             return JsonResponse({'time_blocks': blocks_data})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-    def get_students(self, departments, batch_year, sections):
-        """Get students for selected departments, batch and sections"""
-        try:
-            if not departments or not batch_year:
-                return JsonResponse({'error': 'Departments and batch year are required'}, status=400)
-            
-            # Remove empty strings from lists
-            departments = [d.strip() for d in departments if d.strip()]
-            sections = [s.strip() for s in sections if s.strip()]
-            
-            if not departments:
-                return JsonResponse({'error': 'At least one department is required'}, status=400)
-            
-            from core.models import Student, Section, Batch
-            
-            students = []
-            
-            for dept_name in departments:
-                try:
-                    # Get the batch for this department
-                    batch = Batch.objects.get(dept__dept_name=dept_name, batch_year=int(batch_year))
-                    
-                    # If no sections specified, get all sections for this batch
-                    if not sections:
-                        batch_sections = Section.objects.filter(batch=batch)
-                    else:
-                        # Filter sections based on provided list
-                        section_names = []
-                        for section_val in sections:
-                            if "-" in section_val:
-                                # Format: Department-Section (e.g., "Computer Science-A")
-                                dept_part, section_part = section_val.split("-", 1)
-                                if dept_part.strip() == dept_name:
-                                    section_names.append(section_part.strip())
-                            else:
-                                # Simple section name (e.g., "A")
-                                section_names.append(section_val)
-                        
-                        if section_names:
-                            batch_sections = Section.objects.filter(
-                                batch=batch, 
-                                section_name__in=section_names
-                            )
-                        else:
-                            batch_sections = Section.objects.filter(batch=batch)
-                    
-                    # Get students for these sections
-                    for section in batch_sections:
-                        section_students = Student.objects.filter(section=section).order_by('name')
-                        
-                        for student in section_students:
-                            students.append({
-                                'id': student.student_id,
-                                'student_id': student.student_id,
-                                'name': student.name,
-                                'register_number': student.register_number,
-                                'department': dept_name,
-                                'section': section.section_name,
-                                'batch_year': batch_year
-                            })
-                            
-                except Batch.DoesNotExist:
-                    continue  # Skip this department if batch not found
-                except Exception as e:
-                    print(f"Error processing department {dept_name}: {str(e)}")
-                    continue
-            
-            return JsonResponse({
-                'students': students,
-                'count': len(students)
-            })
-            
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
