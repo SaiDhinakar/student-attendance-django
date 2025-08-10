@@ -104,7 +104,7 @@ class AttendanceFormAPIView(View):
             if not dept_param or not batch_year:
                 return JsonResponse({'error': 'Department parameter and batch year are required'}, status=400)
             
-            # Get the current year for this batch
+            # Get the batch for this department and batch year
             try:
                 # Try to convert to int (dept_id), otherwise treat as dept_name
                 try:
@@ -114,16 +114,11 @@ class AttendanceFormAPIView(View):
                     # It's a dept_name
                     batch = Batch.objects.get(dept__dept_name=dept_param, batch_year=int(batch_year))
                 
-                current_year = batch.current_year
             except Batch.DoesNotExist:
                 return JsonResponse({'error': 'Batch not found'}, status=404)
             
-            # Get subjects for this department and year
-            try:
-                dept_id = int(dept_param)
-                subjects = Subject.objects.filter(departments__dept_id=dept_id, year=current_year)
-            except ValueError:
-                subjects = Subject.objects.filter(departments__dept_name=dept_param, year=current_year)
+            # Get subjects for this specific batch
+            subjects = Subject.objects.filter(batch=batch)
             
             subjects_list = subjects.values('subject_code', 'subject_name').order_by('subject_name')
             
@@ -213,16 +208,16 @@ class AttendanceFormAPIView(View):
                 return JsonResponse({'error': 'At least one department is required'}, status=400)
             
             # Get students from the specified departments, batch year, and sections
-            students_query = Student.objects.select_related('section', 'section__batch', 'section__batch__dept')
+            students_query = Student.objects.select_related('department', 'batch', 'section')
             
             # Filter by departments
             students_query = students_query.filter(
-                section__batch__dept__dept_name__in=departments
+                department__dept_name__in=departments
             )
             
             # Filter by batch year
             students_query = students_query.filter(
-                section__batch__batch_year=int(batch_year)
+                batch__batch_year=int(batch_year)
             )
             
             # Filter by sections if specified
@@ -239,19 +234,19 @@ class AttendanceFormAPIView(View):
                     section__section_name__in=section_names
                 )
             
-            students = students_query.order_by('section__section_name', 'register_number')
+            students = students_query.order_by('section__section_name', 'student_regno')
             
             students_list = []
             for student in students:
                 students_list.append({
-                    'id': student.student_id,
-                    'student_id': student.student_id,
+                    'id': student.student_regno,
+                    'student_id': student.student_regno,
                     'name': student.name,
-                    'register_number': student.register_number,
-                    'department': student.section.batch.dept.dept_name,
+                    'register_number': student.student_regno,
+                    'department': student.department.dept_name,
                     'section': student.section.section_name,
-                    'batch_year': student.section.batch.batch_year,
-                    'display_year': student.section.batch.display_year
+                    'batch_year': student.batch.batch_year,
+                    'display_year': student.batch.display_year
                 })
             
             return JsonResponse({

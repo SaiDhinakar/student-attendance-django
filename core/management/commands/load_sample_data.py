@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from core.models import Department, Batch, Subject, TimeBlock, Section, Student
+from core.models import Department, Batch, Subject, TimeBlock, Student, Section
 from datetime import time
 
 
@@ -65,14 +65,14 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(f'Created time block: {time_block}')
         
-        # Create sample subjects
-        subjects_data = [
+        # Create sample subjects for each batch
+        subjects_base_data = [
             # Year 1 subjects
             {'subject_code': 'CS101', 'subject_name': 'Programming Fundamentals', 'year': 1},
             {'subject_code': 'MA101', 'subject_name': 'Engineering Mathematics I', 'year': 1},
             {'subject_code': 'PH101', 'subject_name': 'Engineering Physics', 'year': 1},
             {'subject_code': 'CH101', 'subject_name': 'Engineering Chemistry', 'year': 1},
-            
+
             # Year 2 subjects
             {'subject_code': 'CS201', 'subject_name': 'Data Structures', 'year': 2},
             {'subject_code': 'CS202', 'subject_name': 'Object Oriented Programming', 'year': 2},
@@ -84,29 +84,36 @@ class Command(BaseCommand):
             {'subject_code': 'CS302', 'subject_name': 'Computer Networks', 'year': 3},
             {'subject_code': 'CS303', 'subject_name': 'Operating Systems', 'year': 3},
             {'subject_code': 'CS304', 'subject_name': 'Software Engineering', 'year': 3},
-            
+
             # Year 4 subjects
             {'subject_code': 'CS401', 'subject_name': 'Machine Learning', 'year': 4},
             {'subject_code': 'CS402', 'subject_name': 'Distributed Systems', 'year': 4},
             {'subject_code': 'CS403', 'subject_name': 'Capstone Project', 'year': 4},
         ]
         
-        for subject_data in subjects_data:
-            subject, created = Subject.objects.get_or_create(
-                subject_code=subject_data['subject_code'],
-                defaults={
-                    'subject_name': subject_data['subject_name'],
-                    'year': subject_data['year']
-                }
-            )
-            if created:
-                # Add all departments to each subject
-                subject.departments.set(Department.objects.all())
-                self.stdout.write(f'Created subject: {subject}')
+        # Create subjects for each batch based on their current year
+        for batch in Batch.objects.all():
+            current_year = batch.current_year
+            # Create subjects for the current year of each batch
+            for subject_data in subjects_base_data:
+                if subject_data['year'] == current_year:
+                    subject_code = f"{subject_data['subject_code']}-{batch.batch_year}"
+                    subject_name = f"{subject_data['subject_name']} ({batch.dept.dept_name} - {batch.batch_year})"
+                    subject, created = Subject.objects.get_or_create(
+                        subject_code=subject_code,
+                        defaults={
+                            'subject_name': subject_name,
+                            'batch': batch
+                        }
+                    )
+                    if created:
+                        # Add relevant departments to each subject
+                        subject.departments.set(Department.objects.all())
+                        self.stdout.write(f'Created subject: {subject}')
         
         # Create sample sections
         for batch in Batch.objects.all():
-            for section_name in ['A', 'B', 'C']:
+            for section_name in ['A', 'B']:
                 section, created = Section.objects.get_or_create(
                     batch=batch,
                     section_name=section_name
@@ -117,11 +124,13 @@ class Command(BaseCommand):
         # Create sample students
         for section in Section.objects.all():
             for i in range(1, 6):  # 5 students per section
-                register_number = f"{section.batch.batch_year}{section.batch.dept.dept_name[:2].upper()}{section.section_name}{i:03d}"
+                student_regno = f"{section.batch.batch_year}{section.batch.dept.dept_name[:2].upper()}{section.section_name}{i:03d}"
                 student, created = Student.objects.get_or_create(
-                    register_number=register_number,
+                    student_regno=student_regno,
                     defaults={
-                        'name': f'Student {register_number}',
+                        'name': f'Student {student_regno}',
+                        'department': section.batch.dept,
+                        'batch': section.batch,
                         'section': section
                     }
                 )

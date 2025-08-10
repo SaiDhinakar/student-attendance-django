@@ -129,9 +129,11 @@ class Subject(TimestampedModel):
         related_name='subjects',
         help_text="Departments that offer this subject"
     )
-    year = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(4)],
-        help_text="Academic year (1-4)"
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.CASCADE,
+        db_column='batch_id',
+        help_text="Batch this subject is applicable to"
     )
     
     class Meta:
@@ -140,7 +142,7 @@ class Subject(TimestampedModel):
         verbose_name_plural = 'Subjects'
     
     def __str__(self):
-        return f"{self.subject_code} - {self.subject_name}"
+        return f"{self.subject_code} - {self.subject_name} ({self.batch})"
     
     def get_departments_display(self):
         """Return comma-separated list of department names"""
@@ -151,9 +153,18 @@ class Student(TimestampedModel):
     """
     Model representing students
     """
-    student_id = models.AutoField(primary_key=True)
-    register_number = models.CharField(max_length=50, unique=True)
+    student_regno = models.CharField(max_length=50, primary_key=True, help_text="Student registration number")
     name = models.CharField(max_length=200)
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        db_column='dept_id'
+    )
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.CASCADE,
+        db_column='batch_id'
+    )
     section = models.ForeignKey(
         Section,
         on_delete=models.CASCADE,
@@ -167,7 +178,7 @@ class Student(TimestampedModel):
         verbose_name_plural = 'Students'
     
     def __str__(self):
-        return f"{self.register_number} - {self.name}"
+        return f"{self.student_regno} - {self.name}"
 
 
 class TimeBlock(TimestampedModel):
@@ -230,7 +241,7 @@ class Attendance(TimestampedModel):
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
-        db_column='student_id'
+        db_column='student_regno'
     )
     timetable = models.ForeignKey(
         Timetable,

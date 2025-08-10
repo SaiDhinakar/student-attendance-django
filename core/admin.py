@@ -38,10 +38,10 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ['subject_code', 'subject_name', 'get_departments_display', 'year']
-    list_filter = ['departments', 'year']
-    search_fields = ['subject_code', 'subject_name', 'departments__dept_name']
-    ordering = ['subject_code']
+    list_display = ['subject_code', 'subject_name', 'batch', 'get_departments_display']
+    list_filter = ['batch__dept', 'batch__batch_year', 'departments']
+    search_fields = ['subject_code', 'subject_name', 'departments__dept_name', 'batch__batch_year']
+    ordering = ['batch__batch_year', 'subject_code']
     filter_horizontal = ['departments']  # Makes it easier to select multiple departments
     
     def get_departments_display(self, obj):
@@ -52,10 +52,10 @@ class SubjectAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['register_number', 'name', 'section', 'created_at']
-    list_filter = ['section__batch__dept', 'section__batch__batch_year', 'section']
-    search_fields = ['register_number', 'name', 'section__section_name']
-    ordering = ['register_number']
+    list_display = ['student_regno', 'name', 'department', 'batch', 'section', 'created_at']
+    list_filter = ['department', 'batch__batch_year', 'section__section_name']
+    search_fields = ['student_regno', 'name', 'department__dept_name', 'section__section_name']
+    ordering = ['student_regno']
 
 
 @admin.register(TimeBlock)
@@ -77,7 +77,7 @@ class TimetableAdmin(admin.ModelAdmin):
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ['student', 'timetable', 'is_present', 'created_at']
     list_filter = ['is_present', 'timetable__date', 'timetable__subject']
-    search_fields = ['student__name', 'student__register_number']
+    search_fields = ['student__name', 'student__student_regno']
     ordering = ['-timetable__date', 'student__name']
 
 
