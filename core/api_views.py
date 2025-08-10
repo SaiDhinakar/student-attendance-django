@@ -280,3 +280,54 @@ class TimeBlocksAPIView(View):
             return JsonResponse({'time_blocks': blocks_data})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+@login_required
+def process_image_api(request):
+    """API endpoint for processing images and detecting students"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method allowed'}, status=405)
+    
+    try:
+        # Get the uploaded image
+        if 'image' not in request.FILES:
+            return JsonResponse({'error': 'No image file provided'}, status=400)
+        
+        image_file = request.FILES['image']
+        threshold = float(request.POST.get('threshold', 0.45))
+        section_id = request.POST.get('section_id')
+        
+        # For now, return a mock response since we need to integrate the face recognition logic
+        # In a real implementation, you would:
+        # 1. Load the face recognition model
+        # 2. Process the image to detect faces
+        # 3. Compare faces with student database
+        # 4. Return detected students with confidence scores
+        
+        # Mock detected students for testing
+        mock_students = [
+            {
+                'register_number': '2027CS001A001',
+                'name': 'Student 2027CS001A001',
+                'confidence': 0.85,
+                'department': 'Computer Science',
+                'section': 'A'
+            },
+            {
+                'register_number': '2027CS001A002',
+                'name': 'Student 2027CS001A002', 
+                'confidence': 0.72,
+                'department': 'Computer Science',
+                'section': 'A'
+            }
+        ]
+        
+        return JsonResponse({
+            'success': True,
+            'detected_students': mock_students,
+            'total_faces_detected': len(mock_students),
+            'message': f'Detected {len(mock_students)} students in the image'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

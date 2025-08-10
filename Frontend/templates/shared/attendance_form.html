@@ -549,9 +549,15 @@
 
       <!-- Submit Button -->
       <div class="text-center mt-6">
-        <button type="submit" id="loadStudentsBtn" disabled class="btn-primary w-full sm:w-auto">
-          <i class="iconoir-user-list mr-2"></i>Load Students
-        </button>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <button type="submit" id="loadStudentsBtn" disabled class="btn-primary w-full sm:w-auto">
+            <i class="iconoir-user-list mr-2"></i>Load Students (Manual)
+          </button>
+          <div class="text-sm text-[var(--text-secondary)]">or</div>
+          <button type="button" id="cameraAttendanceBtn" disabled class="btn btn-secondary w-full sm:w-auto">
+            <i class="iconoir-camera mr-2"></i>Take Attendance with Camera
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -1061,10 +1067,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const batch = batchSelect.value;
     const subject = subjectSelect.value;
     const timeSlot = timeSlotSelect.value;
+    const cameraAttendanceBtn = document.getElementById("cameraAttendanceBtn");
+    
     if (selectedDepartments.length > 0 && batch && subject && timeSlot) {
       loadStudentsBtn.disabled = false;
+      cameraAttendanceBtn.disabled = false;
     } else {
       loadStudentsBtn.disabled = true;
+      cameraAttendanceBtn.disabled = true;
     }
   }
 
@@ -1073,6 +1083,35 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     loadStudents();
   });
+
+  // Camera attendance button click
+  const cameraAttendanceBtn = document.getElementById("cameraAttendanceBtn");
+  cameraAttendanceBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    openCameraAttendance();
+  });
+
+  // Open camera attendance page
+  function openCameraAttendance() {
+    const formData = {
+      dept: selectedDepartments.join(','),
+      batch: batchSelect.value,
+      subject: subjectSelect.value,
+      sections: selectedSections.length > 0 ? selectedSections.join(',') : "A",
+      time: timeSlotSelect.value,
+    };
+
+    // Store in localStorage for the camera page
+    localStorage.setItem('attendance_dept', formData.dept);
+    localStorage.setItem('attendance_batch', formData.batch);
+    localStorage.setItem('attendance_subject', formData.subject);
+    localStorage.setItem('attendance_sections', formData.sections);
+    localStorage.setItem('attendance_time', formData.time);
+
+    // Build URL with parameters
+    const params = new URLSearchParams(formData);
+    window.location.href = `/staff/camera/?${params.toString()}`;
+  }
 
   // Load students for attendance
   function loadStudents() {

@@ -82,3 +82,26 @@ def reports_view(request):
         'user': request.user,
     }
     return render(request, 'attendance_dashboard/reports.html', context)
+
+@login_required
+def camera_attendance_view(request):
+    """View for camera-based attendance taking"""
+    if not check_staff_permission(request.user):
+        if request.user.is_superuser:
+            messages.error(request, "Access denied. Admins should use the admin panel.")
+            return redirect("admin:index")
+        elif request.user.groups.filter(name='Advisors').exists():
+            messages.error(request, "Access denied. Advisors should use the advisor dashboard.")
+            return redirect("advisor_dashboard:dashboard")
+        else:
+            messages.error(request, "Access denied. You don't have staff permissions.")
+            return redirect("login")
+    
+    context = {
+        'user': request.user,
+        'user_role': 'staff',
+        'base_template': 'attendance_dashboard/staff_base.html',
+        'user_department': None,  # Staff can access all departments
+        'user_group': 'Staffs' if request.user.groups.filter(name='Staffs').exists() else 'General Staff',
+    }
+    return render(request, 'shared/attendance_taking.html', context)

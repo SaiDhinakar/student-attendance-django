@@ -1,0 +1,642 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Take Attendance{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--background-primary)] p-4">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-[var(--text-primary)] mb-2">Take Attendance</h1>
+          <p class="text-[var(--text-secondary)]">Capture images to automatically detect student attendance</p>
+        </div>
+        <a href="{% url 'attendance_dashboard:dashboard' %}" 
+           class="bg-[var(--background-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--background-tertiary)] transition-colors">
+          <i class="iconoir-arrow-left mr-2"></i>Back to Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Session Info -->
+    <div class="bg-[var(--background-secondary)] p-4 rounded-lg mb-6" id="sessionInfo">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div>
+          <span class="text-[var(--text-secondary)]">Department:</span>
+          <span class="text-[var(--text-primary)] font-medium ml-2" id="sessionDept">-</span>
+        </div>
+        <div>
+          <span class="text-[var(--text-secondary)]">Batch:</span>
+          <span class="text-[var(--text-primary)] font-medium ml-2" id="sessionBatch">-</span>
+        </div>
+        <div>
+          <span class="text-[var(--text-secondary)]">Section:</span>
+          <span class="text-[var(--text-primary)] font-medium ml-2" id="sessionSection">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Camera Section -->
+      <div class="bg-[var(--background-secondary)] p-6 rounded-lg">
+        <h2 class="text-lg font-semibold text-[var(--text-primary)] mb-4">
+          <i class="iconoir-camera mr-2"></i>Camera Capture
+        </h2>
+        
+        <!-- Camera Controls -->
+        <div class="space-y-4 mb-4">
+          <div class="flex gap-2">
+            <button id="startCamera" class="bg-[var(--accent)] text-white px-4 py-2 rounded-lg hover:bg-[var(--accent-hover)] transition-colors">
+              <i class="iconoir-play mr-2"></i>Start Camera
+            </button>
+            <button id="stopCamera" class="bg-[var(--error)] text-white px-4 py-2 rounded-lg hover:bg-[var(--error-hover)] transition-colors" disabled>
+              <i class="iconoir-pause mr-2"></i>Stop Camera
+            </button>
+            <button id="captureImage" class="bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors" disabled>
+              <i class="iconoir-camera-plus mr-2"></i>Capture
+            </button>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <label class="text-sm text-[var(--text-secondary)]">Recognition Threshold:</label>
+            <input type="range" id="thresholdSlider" min="0.3" max="0.9" step="0.05" value="0.45" 
+                   class="flex-1 accent-[var(--accent)]">
+            <span id="thresholdValue" class="text-sm text-[var(--text-primary)] min-w-[3rem]">0.45</span>
+          </div>
+        </div>
+
+        <!-- Camera Preview -->
+        <div class="relative bg-[var(--background-tertiary)] rounded-lg overflow-hidden" style="aspect-ratio: 4/3;">
+          <video id="cameraPreview" class="w-full h-full object-cover" autoplay muted></video>
+          <div id="cameraPlaceholder" class="absolute inset-0 flex items-center justify-center text-[var(--text-secondary)]">
+            <div class="text-center">
+              <i class="iconoir-camera text-4xl mb-2"></i>
+              <p>Click "Start Camera" to begin</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processing Status -->
+        <div id="processingStatus" class="mt-4 hidden">
+          <div class="flex items-center text-[var(--accent)]">
+            <i class="iconoir-loading animate-spin mr-2"></i>
+            <span>Processing images...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Captured Images -->
+      <div class="bg-[var(--background-secondary)] p-6 rounded-lg">
+        <h2 class="text-lg font-semibold text-[var(--text-primary)] mb-4">
+          <i class="iconoir-media-image mr-2"></i>Captured Images
+        </h2>
+        
+        <div id="capturedImages" class="space-y-4 max-h-96 overflow-y-auto">
+          <div class="text-center text-[var(--text-secondary)] py-8">
+            <i class="iconoir-media-image text-3xl mb-2"></i>
+            <p>No images captured yet</p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex gap-2">
+          <button id="processImages" class="bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors flex-1" disabled>
+            <i class="iconoir-brain mr-2"></i>Process Images
+          </button>
+          <button id="clearImages" class="bg-[var(--error)] text-white px-4 py-2 rounded-lg hover:bg-[var(--error-hover)] transition-colors">
+            <i class="iconoir-trash mr-2"></i>Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detected Students -->
+    <div id="detectedStudentsSection" class="mt-6 bg-[var(--background-secondary)] p-6 rounded-lg hidden">
+      <h2 class="text-lg font-semibold text-[var(--text-primary)] mb-4">
+        <i class="iconoir-group mr-2"></i>Detected Students
+      </h2>
+      
+      <div id="detectedStudents" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Student cards will be populated here -->
+      </div>
+
+      <div class="mt-6 flex gap-4">
+        <button id="submitAttendance" class="bg-[var(--success)] text-white px-6 py-3 rounded-lg hover:bg-[var(--success-hover)] transition-colors flex-1">
+          <i class="iconoir-check-circle mr-2"></i>Submit Attendance
+        </button>
+        <button id="editManually" class="bg-[var(--accent)] text-white px-6 py-3 rounded-lg hover:bg-[var(--accent-hover)] transition-colors">
+          <i class="iconoir-edit mr-2"></i>Edit Manually
+        </button>
+      </div>
+    </div>
+
+    <!-- Processing Results -->
+    <div id="processedImages" class="mt-6 hidden">
+      <h2 class="text-lg font-semibold text-[var(--text-primary)] mb-4">
+        <i class="iconoir-eye mr-2"></i>Processed Images
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="processedImageContainer">
+        <!-- Processed images will be shown here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+  <div class="bg-[var(--background-secondary)] rounded-lg max-w-4xl max-h-[90vh] overflow-auto">
+    <div class="p-4 border-b border-[var(--border-color)]">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-[var(--text-primary)]">Image Preview</h3>
+        <button id="closeModal" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <i class="iconoir-cancel text-xl"></i>
+        </button>
+      </div>
+    </div>
+    <div class="p-4">
+      <img id="modalImage" class="max-w-full h-auto" src="" alt="Preview">
+    </div>
+  </div>
+</div>
+
+<script>
+// Global variables
+let mediaStream = null;
+let capturedImages = [];
+let currentSessionData = null;
+let detectedStudentsData = [];
+
+// Get session data from URL parameters
+function getSessionData() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    department: params.get('department') || '',
+    batch_year: params.get('batch_year') || '',
+    sections: params.get('sections') ? params.get('sections').split(',') : [],
+    subject: params.get('subject') || '',
+    time_slot: params.get('time_slot') || ''
+  };
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  currentSessionData = getSessionData();
+  displaySessionInfo();
+  setupEventListeners();
+});
+
+function displaySessionInfo() {
+  document.getElementById('sessionDept').textContent = currentSessionData.department;
+  document.getElementById('sessionBatch').textContent = currentSessionData.batch_year;
+  document.getElementById('sessionSection').textContent = currentSessionData.sections.join(', ');
+}
+
+function setupEventListeners() {
+  // Camera controls
+  document.getElementById('startCamera').addEventListener('click', startCamera);
+  document.getElementById('stopCamera').addEventListener('click', stopCamera);
+  document.getElementById('captureImage').addEventListener('click', captureImage);
+  
+  // Image processing
+  document.getElementById('processImages').addEventListener('click', processImages);
+  document.getElementById('clearImages').addEventListener('click', clearImages);
+  
+  // Attendance submission
+  document.getElementById('submitAttendance').addEventListener('click', submitAttendance);
+  document.getElementById('editManually').addEventListener('click', editManually);
+  
+  // Threshold slider
+  const thresholdSlider = document.getElementById('thresholdSlider');
+  const thresholdValue = document.getElementById('thresholdValue');
+  thresholdSlider.addEventListener('input', function() {
+    thresholdValue.textContent = this.value;
+  });
+  
+  // Modal
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+}
+
+async function startCamera() {
+  try {
+    const constraints = {
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+      }
+    };
+    
+    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('cameraPreview');
+    video.srcObject = mediaStream;
+    
+    document.getElementById('cameraPlaceholder').style.display = 'none';
+    document.getElementById('startCamera').disabled = true;
+    document.getElementById('stopCamera').disabled = false;
+    document.getElementById('captureImage').disabled = false;
+    
+    showNotification('Camera started successfully', 'success');
+  } catch (error) {
+    console.error('Error starting camera:', error);
+    showNotification('Failed to start camera. Please check permissions.', 'error');
+  }
+}
+
+function stopCamera() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+  }
+  
+  const video = document.getElementById('cameraPreview');
+  video.srcObject = null;
+  
+  document.getElementById('cameraPlaceholder').style.display = 'flex';
+  document.getElementById('startCamera').disabled = false;
+  document.getElementById('stopCamera').disabled = true;
+  document.getElementById('captureImage').disabled = true;
+}
+
+function captureImage() {
+  const video = document.getElementById('cameraPreview');
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  context.drawImage(video, 0, 0);
+  
+  canvas.toBlob(function(blob) {
+    const imageData = {
+      blob: blob,
+      url: URL.createObjectURL(blob),
+      timestamp: new Date().toISOString()
+    };
+    
+    capturedImages.push(imageData);
+    displayCapturedImages();
+    
+    document.getElementById('processImages').disabled = false;
+    showNotification('Image captured successfully', 'success');
+  }, 'image/jpeg', 0.8);
+}
+
+function displayCapturedImages() {
+  const container = document.getElementById('capturedImages');
+  
+  if (capturedImages.length === 0) {
+    container.innerHTML = `
+      <div class="text-center text-[var(--text-secondary)] py-8">
+        <i class="iconoir-media-image text-3xl mb-2"></i>
+        <p>No images captured yet</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = capturedImages.map((image, index) => `
+    <div class="flex items-center space-x-3 p-3 bg-[var(--background-tertiary)] rounded-lg">
+      <img src="${image.url}" alt="Captured ${index + 1}" class="w-16 h-16 object-cover rounded cursor-pointer" 
+           onclick="showImageModal('${image.url}')">
+      <div class="flex-1">
+        <p class="text-sm font-medium text-[var(--text-primary)]">Image ${index + 1}</p>
+        <p class="text-xs text-[var(--text-secondary)]">${new Date(image.timestamp).toLocaleTimeString()}</p>
+      </div>
+      <button onclick="removeImage(${index})" class="text-[var(--error)] hover:text-[var(--error-hover)]">
+        <i class="iconoir-trash"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+function removeImage(index) {
+  URL.revokeObjectURL(capturedImages[index].url);
+  capturedImages.splice(index, 1);
+  displayCapturedImages();
+  
+  if (capturedImages.length === 0) {
+    document.getElementById('processImages').disabled = true;
+  }
+}
+
+function clearImages() {
+  capturedImages.forEach(image => URL.revokeObjectURL(image.url));
+  capturedImages = [];
+  displayCapturedImages();
+  document.getElementById('processImages').disabled = true;
+  
+  // Hide results sections
+  document.getElementById('detectedStudentsSection').classList.add('hidden');
+  document.getElementById('processedImages').classList.add('hidden');
+}
+
+async function processImages() {
+  if (capturedImages.length === 0) {
+    showNotification('Please capture some images first', 'warning');
+    return;
+  }
+  
+  const threshold = document.getElementById('thresholdSlider').value;
+  document.getElementById('processingStatus').classList.remove('hidden');
+  
+  try {
+    const formData = new FormData();
+    
+    // Add images
+    capturedImages.forEach((image, index) => {
+      formData.append('images', image.blob, `image_${index}.jpg`);
+    });
+    
+    // Add session data
+    formData.append('department', currentSessionData.department);
+    formData.append('batch_year', currentSessionData.batch_year);
+    formData.append('sections', currentSessionData.sections.join(','));
+    formData.append('subject', currentSessionData.subject);
+    formData.append('time_slot', currentSessionData.time_slot);
+    formData.append('threshold', threshold);
+    
+    const response = await fetch('/api/process-attendance-images/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      detectedStudentsData = result.students || [];
+      displayDetectedStudents(detectedStudentsData);
+      displayProcessedImages(result.processed_images || []);
+      showNotification(`Processed ${capturedImages.length} images. Detected ${detectedStudentsData.filter(s => s.detected).length} students.`, 'success');
+    } else {
+      throw new Error(result.message || 'Processing failed');
+    }
+    
+  } catch (error) {
+    console.error('Error processing images:', error);
+    showNotification('Failed to process images: ' + error.message, 'error');
+  } finally {
+    document.getElementById('processingStatus').classList.add('hidden');
+  }
+}
+
+function displayDetectedStudents(students) {
+  const container = document.getElementById('detectedStudents');
+  const section = document.getElementById('detectedStudentsSection');
+  
+  if (students.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full text-center text-[var(--text-secondary)] py-8">
+        <i class="iconoir-group text-3xl mb-2"></i>
+        <p>No students detected</p>
+      </div>
+    `;
+  } else {
+    container.innerHTML = students.map(student => `
+      <div class="student-card bg-[var(--background-tertiary)] p-4 rounded-lg ${student.detected ? 'border-l-4 border-[var(--success)]' : 'border-l-4 border-[var(--text-secondary)]'}" 
+           data-student-id="${student.student_regno}">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-medium text-[var(--text-primary)]">${student.name}</h3>
+            <p class="text-sm text-[var(--text-secondary)]">${student.student_regno}</p>
+          </div>
+          <div class="attendance-status">
+            ${student.detected ? 
+              '<i class="iconoir-check-circle text-[var(--success)] text-xl"></i>' : 
+              '<i class="iconoir-cancel text-[var(--text-secondary)] text-xl"></i>'
+            }
+          </div>
+        </div>
+        <div class="flex space-x-2">
+          <button type="button" class="attendance-btn present flex-1 px-3 py-2 text-sm rounded transition-colors ${student.detected ? 'bg-[var(--success)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--success)] hover:text-white'}" 
+                  data-student-id="${student.student_regno}" data-status="present">
+            <i class="iconoir-check mr-1"></i>Present
+          </button>
+          <button type="button" class="attendance-btn absent flex-1 px-3 py-2 text-sm rounded transition-colors ${!student.detected ? 'bg-[var(--error)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--error)] hover:text-white'}" 
+                  data-student-id="${student.student_regno}" data-status="absent">
+            <i class="iconoir-cancel mr-1"></i>Absent
+          </button>
+        </div>
+        ${student.confidence ? 
+          `<div class="mt-2 text-xs text-[var(--text-secondary)]">Confidence: ${(student.confidence * 100).toFixed(1)}%</div>` : 
+          ''
+        }
+      </div>
+    `).join('');
+    
+    // Setup attendance button handlers
+    setupAttendanceButtons();
+  }
+  
+  section.classList.remove('hidden');
+}
+
+function setupAttendanceButtons() {
+  document.querySelectorAll('.attendance-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const studentId = this.dataset.studentId;
+      const status = this.dataset.status;
+      const card = this.closest('.student-card');
+      
+      // Update student data
+      const studentIndex = detectedStudentsData.findIndex(s => s.student_regno === studentId);
+      if (studentIndex !== -1) {
+        detectedStudentsData[studentIndex].detected = status === 'present';
+        detectedStudentsData[studentIndex].manual_override = true;
+      }
+      
+      // Update UI
+      const presentBtn = card.querySelector('.attendance-btn.present');
+      const absentBtn = card.querySelector('.attendance-btn.absent');
+      const statusIcon = card.querySelector('.attendance-status i');
+      
+      if (status === 'present') {
+        presentBtn.classList.add('bg-[var(--success)]', 'text-white');
+        presentBtn.classList.remove('bg-[var(--background-secondary)]', 'text-[var(--text-primary)]');
+        absentBtn.classList.remove('bg-[var(--error)]', 'text-white');
+        absentBtn.classList.add('bg-[var(--background-secondary)]', 'text-[var(--text-primary)]');
+        statusIcon.className = 'iconoir-check-circle text-[var(--success)] text-xl';
+        card.classList.remove('border-[var(--text-secondary)]');
+        card.classList.add('border-[var(--success)]');
+      } else {
+        absentBtn.classList.add('bg-[var(--error)]', 'text-white');
+        absentBtn.classList.remove('bg-[var(--background-secondary)]', 'text-[var(--text-primary)]');
+        presentBtn.classList.remove('bg-[var(--success)]', 'text-white');
+        presentBtn.classList.add('bg-[var(--background-secondary)]', 'text-[var(--text-primary)]');
+        statusIcon.className = 'iconoir-cancel text-[var(--text-secondary)] text-xl';
+        card.classList.remove('border-[var(--success)]');
+        card.classList.add('border-[var(--text-secondary)]');
+      }
+    });
+  });
+}
+
+function displayProcessedImages(processedImages) {
+  const container = document.getElementById('processedImageContainer');
+  const section = document.getElementById('processedImages');
+  
+  if (processedImages.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+  
+  container.innerHTML = processedImages.map((imageData, index) => `
+    <div class="bg-[var(--background-tertiary)] p-4 rounded-lg">
+      <h4 class="text-sm font-medium text-[var(--text-primary)] mb-2">Processed Image ${index + 1}</h4>
+      <img src="data:image/jpeg;base64,${imageData}" alt="Processed ${index + 1}" 
+           class="w-full h-auto rounded cursor-pointer" 
+           onclick="showImageModal('data:image/jpeg;base64,${imageData}')">
+    </div>
+  `).join('');
+  
+  section.classList.remove('hidden');
+}
+
+async function submitAttendance() {
+  if (!detectedStudentsData.length) {
+    showNotification('No attendance data to submit', 'warning');
+    return;
+  }
+  
+  try {
+    const attendanceData = {
+      department: currentSessionData.department,
+      batch_year: currentSessionData.batch_year,
+      sections: currentSessionData.sections,
+      subject: currentSessionData.subject,
+      time_slot: currentSessionData.time_slot,
+      attendance: detectedStudentsData.map(student => ({
+        student_regno: student.student_regno,
+        student_name: student.name,
+        is_present: student.detected,
+        confidence: student.confidence || null,
+        manual_override: student.manual_override || false
+      }))
+    };
+    
+    const response = await fetch('/api/submit-attendance/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify(attendanceData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      showNotification('Attendance submitted successfully!', 'success');
+      // Redirect back to dashboard after a short delay
+      setTimeout(() => {
+        window.location.href = '/attendance-dashboard/';
+      }, 2000);
+    } else {
+      throw new Error(result.message || 'Submission failed');
+    }
+    
+  } catch (error) {
+    console.error('Error submitting attendance:', error);
+    showNotification('Failed to submit attendance: ' + error.message, 'error');
+  }
+}
+
+function editManually() {
+  // Redirect to the regular attendance form with pre-filled data
+  const params = new URLSearchParams({
+    department: currentSessionData.department,
+    batch_year: currentSessionData.batch_year,
+    sections: currentSessionData.sections.join(','),
+    subject: currentSessionData.subject,
+    time_slot: currentSessionData.time_slot,
+    prefill: 'true'
+  });
+  
+  window.location.href = `/attendance-dashboard/form/?${params.toString()}`;
+}
+
+function showImageModal(imageSrc) {
+  const modal = document.getElementById('imageModal');
+  document.getElementById('modalImage').src = imageSrc;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeModal() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+// Utility functions
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-transform transform translate-x-full`;
+  
+  // Set colors based on type
+  const colors = {
+    success: 'bg-[var(--success)] text-white',
+    error: 'bg-[var(--error)] text-white',
+    warning: 'bg-[var(--warning)] text-white',
+    info: 'bg-[var(--primary)] text-white'
+  };
+  
+  notification.className += ` ${colors[type] || colors.info}`;
+  notification.textContent = message;
+  
+  // Add to page
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.classList.remove('translate-x-full');
+  }, 100);
+  
+  // Remove after 5 seconds
+  setTimeout(() => {
+    notification.classList.add('translate-x-full');
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 5000);
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+  }
+  capturedImages.forEach(image => URL.revokeObjectURL(image.url));
+});
+</script>
+{% endblock %}
