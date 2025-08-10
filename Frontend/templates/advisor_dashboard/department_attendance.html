@@ -1,0 +1,235 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Department Attendance - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">
+        <i class="iconoir-stats-report mr-3"></i>Department Attendance
+      </h1>
+      <p class="text-[var(--text-secondary)] mt-2">View and monitor attendance across your assigned sections</p>
+    </div>
+    <a href="{% url 'advisor_dashboard:dashboard' %}" class="btn btn-secondary">
+      <i class="iconoir-arrow-left mr-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl p-6 shadow-md">
+    <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-4">
+      <i class="iconoir-filter mr-2"></i>Filters
+    </h3>
+    
+    <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <!-- Department Filter -->
+      <div>
+        <label for="department" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Department</label>
+        <select name="department" id="department" class="form-select w-full">
+          <option value="">All Departments</option>
+          {% for dept in assigned_departments %}
+          <option value="{{ dept.dept_id }}" {% if filters.department_id == dept.dept_id|stringformat:"s" %}selected{% endif %}>
+            {{ dept.dept_name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Batch Filter -->
+      <div>
+        <label for="batch" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Batch</label>
+        <select name="batch" id="batch" class="form-select w-full">
+          <option value="">All Batches</option>
+          {% for batch in assigned_batches %}
+          <option value="{{ batch.id }}" {% if filters.batch_id == batch.id|stringformat:"s" %}selected{% endif %}>
+            {{ batch.dept.dept_name }} - {{ batch.year }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Section Filter -->
+      <div>
+        <label for="section" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Section</label>
+        <select name="section" id="section" class="form-select w-full">
+          <option value="">All Sections</option>
+          {% for section in assigned_sections %}
+          <option value="{{ section.id }}" {% if filters.section_id == section.id|stringformat:"s" %}selected{% endif %}>
+            {{ section.section_name }} ({{ section.batch.dept.dept_name }} - {{ section.batch.year }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Date Range -->
+      <div>
+        <label for="date_from" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">From Date</label>
+        <input type="date" name="date_from" id="date_from" value="{{ filters.date_from }}" class="form-input w-full">
+      </div>
+
+      <div>
+        <label for="date_to" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">To Date</label>
+        <input type="date" name="date_to" id="date_to" value="{{ filters.date_to }}" class="form-input w-full">
+      </div>
+
+      <div class="md:col-span-5 flex justify-end space-x-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="iconoir-search mr-2"></i>Apply Filters
+        </button>
+        <a href="{% url 'advisor_dashboard:department_attendance' %}" class="btn btn-secondary">
+          <i class="iconoir-refresh mr-2"></i>Clear Filters
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section Statistics -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md">
+    <div class="p-6">
+      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-6">
+        <i class="iconoir-bar-chart mr-2"></i>Section-wise Attendance Statistics
+      </h3>
+
+      {% if section_stats %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-[var(--border)]">
+            <thead class="bg-[var(--bg-primary)]">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Section
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Department
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Batch Year
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Students
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Total Classes
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Present
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Absent
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Attendance %
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-[var(--bg-secondary)] divide-y divide-[var(--border)]">
+              {% for stat in section_stats %}
+              <tr class="hover:bg-[var(--bg-primary)] transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-[var(--text-primary)]">{{ stat.section.section_name }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-[var(--text-secondary)]">{{ stat.section.batch.dept.dept_name }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-[var(--text-secondary)]">{{ stat.section.batch.year }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-[var(--text-primary)]">{{ stat.student_count }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-[var(--text-primary)]">{{ stat.total_classes }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-green-600">{{ stat.present_count }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-red-600">{{ stat.absent_count }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                      <div class="bg-{% if stat.percentage >= 80 %}green{% elif stat.percentage >= 60 %}yellow{% else %}red{% endif %}-500 h-2 rounded-full" 
+                           style="width: {{ stat.percentage }}%"></div>
+                    </div>
+                    <span class="text-sm font-medium text-{% if stat.percentage >= 80 %}green{% elif stat.percentage >= 60 %}yellow{% else %}red{% endif %}-600">
+                      {{ stat.percentage }}%
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <a href="{% url 'advisor_dashboard:attendance' %}?section={{ stat.section.id }}" 
+                     class="text-[var(--primary)] hover:text-purple-900 mr-3">
+                    <i class="iconoir-camera mr-1"></i>Take Attendance
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-12">
+          <i class="iconoir-warning-triangle text-4xl text-[var(--text-secondary)] mb-4"></i>
+          <h3 class="text-lg font-medium text-[var(--text-primary)] mb-2">No Attendance Data</h3>
+          <p class="text-[var(--text-secondary)]">No attendance records found for the selected filters.</p>
+          <div class="mt-6">
+            <a href="{% url 'advisor_dashboard:attendance' %}" class="btn btn-primary">
+              <i class="iconoir-plus mr-2"></i>Start Taking Attendance
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-[var(--bg-secondary)] rounded-xl p-6 text-center">
+      <i class="iconoir-camera text-3xl text-[var(--primary)] mb-3"></i>
+      <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Take Attendance</h3>
+      <p class="text-sm text-[var(--text-secondary)] mb-4">Record attendance for any of your sections</p>
+      <a href="{% url 'advisor_dashboard:attendance' %}" class="btn btn-primary w-full">
+        Start Recording
+      </a>
+    </div>
+
+    <div class="bg-[var(--bg-secondary)] rounded-xl p-6 text-center">
+      <i class="iconoir-doc-chart text-3xl text-blue-500 mb-3"></i>
+      <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Generate Report</h3>
+      <p class="text-sm text-[var(--text-secondary)] mb-4">Create detailed attendance reports</p>
+      <a href="{% url 'advisor_dashboard:reports' %}" class="btn btn-info w-full">
+        View Reports
+      </a>
+    </div>
+
+    <div class="bg-[var(--bg-secondary)] rounded-xl p-6 text-center">
+      <i class="iconoir-history-backup text-3xl text-green-500 mb-3"></i>
+      <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Attendance History</h3>
+      <p class="text-sm text-[var(--text-secondary)] mb-4">View past attendance records</p>
+      <a href="{% url 'advisor_dashboard:attendance_history' %}" class="btn btn-success w-full">
+        View History
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Dynamic filtering for sections based on selected department/batch
+document.getElementById('department').addEventListener('change', function() {
+    const departmentId = this.value;
+    // You can add AJAX call here to filter batches and sections
+    console.log('Department changed:', departmentId);
+});
+
+document.getElementById('batch').addEventListener('change', function() {
+    const batchId = this.value;
+    // You can add AJAX call here to filter sections
+    console.log('Batch changed:', batchId);
+});
+</script>
+{% endblock %}
