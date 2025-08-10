@@ -9,6 +9,17 @@
   --text-secondary: #6E7081;
   --button-primary: #386641;
   --button-secondary: #6A994E;
+  --danger: #BC4749;
+  --warning: #F2CC8F;
+  
+  /* RGB values for opacity usage */
+  --accent-rgb: 167, 201, 87;
+  --primary-rgb: 56, 102, 65;
+  --secondary-rgb: 106, 153, 78;
+  --text-primary-rgb: 42, 45, 52;
+  --text-secondary-rgb: 110, 112, 129;
+  --danger-rgb: 188, 71, 73;
+  --warning-rgb: 242, 204, 143;
 }
 
 [data-theme="dark"] {
@@ -21,6 +32,17 @@
   --text-secondary: #B0C4DE;
   --button-primary: #BC4749;
   --button-secondary: #6A994E;
+  --danger: #BC4749;
+  --warning: #F2CC8F;
+  
+  /* RGB values for dark theme */
+  --accent-rgb: 167, 201, 87;
+  --primary-rgb: 56, 102, 65;
+  --secondary-rgb: 106, 153, 78;
+  --text-primary-rgb: 242, 232, 207;
+  --text-secondary-rgb: 176, 196, 222;
+  --danger-rgb: 188, 71, 73;
+  --warning-rgb: 242, 204, 143;
 }
 
 /* Base styling with client colors */

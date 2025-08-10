@@ -1,0 +1,125 @@
+{% extends 'attendance_dashboard/staff_base.html' %}
+
+{% block title %}Staff Dashboard - Student Attendance{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Welcome Section -->
+  <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold mb-2 text-white">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+        <p class="text-white opacity-90">Staff Attendance Management System</p>
+      </div>
+      <div class="hidden md:block">
+        <i class="iconoir-check-circle text-6xl text-white opacity-75"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Mark Attendance Card -->
+    <div class="card hover:scale-105 transition-transform duration-300">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-accent-custom rounded-lg flex items-center justify-center">
+            <i class="iconoir-check-circle text-2xl text-white"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-primary-custom">Mark Attendance</h3>
+          <p class="text-sm text-secondary-custom">Record student attendance for classes</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="{% url 'attendance_dashboard:attendance' %}" 
+           class="btn-primary inline-flex items-center">
+          Start Marking
+          <i class="iconoir-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- View Reports Card -->
+    <div class="card hover:scale-105 transition-transform duration-300">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-info-custom rounded-lg flex items-center justify-center">
+            <i class="iconoir-reports text-2xl text-white"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-primary-custom">Attendance Reports</h3>
+          <p class="text-sm text-secondary-custom">View and generate attendance reports</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="{% url 'attendance_dashboard:reports' %}" 
+           class="btn-secondary inline-flex items-center">
+          View Reports
+          <i class="iconoir-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Today's Summary Card -->
+    <div class="card hover:scale-105 transition-transform duration-300">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-warning-custom rounded-lg flex items-center justify-center">
+            <i class="iconoir-clock text-2xl text-white"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-primary-custom">Today's Summary</h3>
+          <p class="text-sm text-secondary-custom">View today's attendance summary</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <div class="text-sm text-secondary-custom">
+          <p>Classes: <span class="font-medium text-primary-custom">0</span></p>
+          <p>Students Marked: <span class="font-medium text-primary-custom">0</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="card">
+    <div class="px-6 py-4 border-b border-border">
+      <div class="flex items-center space-x-3">
+        <i class="iconoir-activity text-xl text-accent-custom"></i>
+        <h2 class="text-xl font-semibold text-primary-custom">Recent Activity</h2>
+      </div>
+    </div>
+    <div class="p-6">
+      <div class="text-center py-8">
+        <i class="iconoir-clipboard text-6xl text-secondary-custom mb-4"></i>
+        <h3 class="mt-2 text-sm font-medium text-primary-custom">No recent activity</h3>
+        <p class="mt-1 text-sm text-secondary-custom">Start marking attendance to see your recent activity here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <div class="card bg-info-light border border-info">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <i class="iconoir-info-circle text-xl text-info"></i>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-primary-custom">Getting Started</h3>
+        <div class="mt-2 text-sm text-secondary-custom">
+          <p>Welcome to the staff attendance dashboard! Here you can:</p>
+          <ul class="mt-2 list-disc list-inside space-y-1">
+            <li>Mark attendance for your classes</li>
+            <li>View attendance reports and analytics</li>
+            <li>Track student attendance patterns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Mark Attendance - Advisor Dashboard{% endblock %}
+
+{% block content %}
+{% include 'shared/attendance_form.html' with base_template='advisor_dashboard/advisor_base.html' user_role='advisor' %}
+{% endblock %}

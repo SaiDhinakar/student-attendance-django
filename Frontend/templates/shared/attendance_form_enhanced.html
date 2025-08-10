@@ -1,0 +1,901 @@
+<!-- {% extends 'shared/attendance_base.html' %} -->
+{% load static %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: var(--primary);
+    --primary-dark: var(--primary-dark);
+    --secondary: var(--secondary);
+    --success: var(--success);
+    --warning: var(--warning);
+    --danger: var(--danger);
+    --light: var(--surface);
+    --dark: var(--text-primary);
+  }
+  
+  .form-container {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .form-select, .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+  
+  .form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+  
+  .form-select:disabled, .form-input:disabled {
+    background-color: #f8fafc;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+  
+  .form-select[multiple] {
+    min-height: 120px;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+  }
+  
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .btn-success {
+    background: var(--success);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary {
+    background: #6b7280;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .student-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+  }
+  
+  .student-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .attendance-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .attendance-btn.present {
+    border-color: var(--success);
+    color: var(--success);
+  }
+  
+  .attendance-btn.present.active {
+    background: var(--success);
+    color: white;
+  }
+  
+  .attendance-btn.absent {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+  
+  .attendance-btn.absent.active {
+    background: var(--danger);
+    color: white;
+  }
+  
+  .time-display {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .status-indicator {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  .status-active {
+    background: #dcfce7;
+    color: #166534;
+  }
+  
+  .status-upcoming {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .status-inactive {
+    background: #f3f4f6;
+    color: #374151;
+  }
+  
+  .selection-badge {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin: 0.25rem 0.25rem 0.25rem 0;
+  }
+  
+  .error-message {
+    color: var(--danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .success-message {
+    color: var(--success);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 1rem;
+      margin: 1rem;
+      border-radius: 12px;
+    }
+    
+    .grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+    
+    .student-card {
+      padding: 0.75rem;
+    }
+    
+    .attendance-btn {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 1rem;
+    }
+    
+    .time-display {
+      padding: 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .form-container {
+      margin: 0.5rem;
+      padding: 0.75rem;
+    }
+    
+    .form-select[multiple] {
+      min-height: 100px;
+    }
+    
+    .student-card {
+      padding: 0.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+<!-- Attendance Form Content -->
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <!-- Page Header -->
+  <div class="text-center mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Mark Attendance</h1>
+    <p class="text-gray-600">Record student attendance for your classes</p>
+    {% if user_role == 'advisor' %}
+      <p class="text-sm text-blue-600 mt-1">Advisor Access - Department: {{ user_department|default:"All Departments" }}</p>
+    {% endif %}
+    <div class="time-display mt-4 inline-block">
+      <div class="text-sm opacity-90">{{ "now"|date:"F d, Y" }}</div>
+      <div class="text-lg font-bold" id="currentTime"></div>
+    </div>
+  </div>
+
+  <!-- Attendance Form -->
+  <div class="form-container">
+    <form id="attendanceForm">
+      {% csrf_token %}
+      
+      <!-- Form Row 1: Department and Batch -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <!-- Department Selection (Multiple) -->
+        <div class="form-group">
+          <label for="department" class="form-label">
+            <i class="iconoir-building mr-2"></i>Department(s) *
+          </label>
+          <select id="department" name="department" multiple
+                  class="form-select">
+            <!-- Options will be populated by JavaScript -->
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple departments</p>
+          <div id="selectedDepartments" class="mt-2"></div>
+        </div>
+
+        <!-- Batch Selection -->
+        <div class="form-group">
+          <label for="batch" class="form-label">
+            <i class="iconoir-group mr-2"></i>Batch *
+          </label>
+          <select id="batch" name="batch" disabled
+                  class="form-select">
+            <option value="">Select Batch</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Form Row 2: Subject and Sections -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <!-- Subject Selection -->
+        <div class="form-group">
+          <label for="subject" class="form-label">
+            <i class="iconoir-book mr-2"></i>Subject *
+          </label>
+          <select id="subject" name="subject" disabled
+                  class="form-select">
+            <option value="">Select Subject</option>
+          </select>
+        </div>
+
+        <!-- Section Selection (Multiple) -->
+        <div class="form-group">
+          <label for="section" class="form-label">
+            <i class="iconoir-list mr-2"></i>Section(s)
+          </label>
+          <select id="section" name="section" multiple disabled
+                  class="form-select">
+            <!-- Will be populated based on department and batch -->
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple sections</p>
+          <div id="selectedSections" class="mt-2"></div>
+        </div>
+      </div>
+
+      <!-- Form Row 3: Time Slot (Auto-selected) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <!-- Time Slot -->
+        <div class="form-group">
+          <label for="timeSlot" class="form-label">
+            <i class="iconoir-clock mr-2"></i>Time Slot *
+          </label>
+          <select id="timeSlot" name="timeSlot" readonly
+                  class="form-select">
+            <option value="">Auto-selecting time slot...</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Time slot is automatically selected based on current time</p>
+        </div>
+
+        <!-- Current Status -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="iconoir-info-circle mr-2"></i>Current Status
+          </label>
+          <div id="currentStatus" class="status-indicator status-inactive">
+            <p class="text-sm">Loading status...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="text-center mt-6">
+        <button type="submit" id="loadStudentsBtn" disabled
+                class="btn-primary">
+          <i class="iconoir-user-plus mr-2"></i>Load Students
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Students List (Hidden initially) -->
+  <div id="studentsSection" class="form-container hidden">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4 md:mb-0">Student Attendance</h2>
+      <div id="attendanceStats" class="text-sm text-gray-600 text-center md:text-right">
+        <!-- Stats will be updated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button type="button" id="markAllPresent" class="btn-success">
+        <i class="iconoir-check mr-1"></i>Mark All Present
+      </button>
+      <button type="button" id="markAllAbsent" class="btn-danger">
+        <i class="iconoir-xmark mr-1"></i>Mark All Absent
+      </button>
+      <button type="button" id="clearAll" class="btn-secondary">
+        <i class="iconoir-refresh mr-1"></i>Clear All
+      </button>
+    </div>
+
+    <!-- Students Grid -->
+    <div id="studentsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <!-- Students will be populated by JavaScript -->
+    </div>
+
+    <!-- Submit Attendance -->
+    <div class="text-center pt-6 border-t border-gray-200">
+      <button type="button" id="submitAttendance"
+              class="btn-primary">
+        <i class="iconoir-send mr-2"></i>Submit Attendance
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success/Error Messages -->
+<div id="messageContainer" class="fixed top-4 right-4 z-50 max-w-sm"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update current time every second
+    function updateCurrentTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('currentTime').textContent = timeString;
+    }
+    
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+
+    // Form elements
+    const departmentSelect = document.getElementById('department');
+    const batchSelect = document.getElementById('batch');
+    const subjectSelect = document.getElementById('subject');
+    const sectionSelect = document.getElementById('section');
+    const timeSlotSelect = document.getElementById('timeSlot');
+    const loadStudentsBtn = document.getElementById('loadStudentsBtn');
+    const studentsSection = document.getElementById('studentsSection');
+    const currentStatus = document.getElementById('currentStatus');
+
+    // Load departments on page load
+    loadDepartments();
+
+    // Event listeners for cascading dropdowns
+    departmentSelect.addEventListener('change', function() {
+        updateSelectedDepartments();
+        const selectedDepts = Array.from(this.selectedOptions).map(option => option.value).filter(v => v);
+        if (selectedDepts.length > 0) {
+            loadBatches(selectedDepts);
+            resetSubjects();
+            resetSections();
+            resetTimeSlot();
+            disableLoadButton();
+        } else {
+            resetBatches();
+            resetSubjects();
+            resetSections();
+            resetTimeSlot();
+            disableLoadButton();
+        }
+    });
+
+    batchSelect.addEventListener('change', function() {
+        const selectedBatch = this.value;
+        const selectedDepts = Array.from(departmentSelect.selectedOptions).map(option => option.value).filter(v => v);
+        if (selectedBatch && selectedDepts.length > 0) {
+            loadSubjects(selectedDepts, selectedBatch);
+            loadSections(selectedDepts, selectedBatch);
+            loadCurrentTimeSlot(selectedBatch);
+        } else {
+            resetSubjects();
+            resetSections();
+            resetTimeSlot();
+            disableLoadButton();
+        }
+    });
+
+    sectionSelect.addEventListener('change', function() {
+        updateSelectedSections();
+        checkFormCompletion();
+    });
+
+    subjectSelect.addEventListener('change', function() {
+        checkFormCompletion();
+    });
+
+    // Update selected departments display
+    function updateSelectedDepartments() {
+        const selectedContainer = document.getElementById('selectedDepartments');
+        const selectedOptions = Array.from(departmentSelect.selectedOptions).filter(option => option.value);
+        
+        selectedContainer.innerHTML = '';
+        selectedOptions.forEach(option => {
+            const badge = document.createElement('span');
+            badge.className = 'selection-badge';
+            badge.textContent = option.textContent;
+            selectedContainer.appendChild(badge);
+        });
+    }
+
+    // Update selected sections display
+    function updateSelectedSections() {
+        const selectedContainer = document.getElementById('selectedSections');
+        const selectedOptions = Array.from(sectionSelect.selectedOptions).filter(option => option.value);
+        
+        selectedContainer.innerHTML = '';
+        selectedOptions.forEach(option => {
+            const badge = document.createElement('span');
+            badge.className = 'selection-badge';
+            badge.textContent = option.textContent;
+            selectedContainer.appendChild(badge);
+        });
+    }
+
+    // Load departments from API
+    function loadDepartments() {
+        fetch('/api/attendance-form/?action=departments')
+            .then(response => response.json())
+            .then(data => {
+                if (data.departments) {
+                    departmentSelect.innerHTML = '';
+                    data.departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept;
+                        option.textContent = dept;
+                        departmentSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading departments:', error);
+                showMessage('Error loading departments', 'error');
+            });
+    }
+
+    // Load batches for selected departments
+    function loadBatches(deptNames) {
+        // For multiple departments, we'll load batches for the first selected department
+        // In a real implementation, you might want to load batches that are common across departments
+        const firstDept = deptNames[0];
+        fetch(`/api/attendance-form/?action=batches&dept_name=${encodeURIComponent(firstDept)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.batches) {
+                    batchSelect.innerHTML = '<option value="">Select Batch</option>';
+                    data.batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch.batch_year;
+                        option.textContent = batch.display_year;
+                        batchSelect.appendChild(option);
+                    });
+                    batchSelect.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading batches:', error);
+                showMessage('Error loading batches', 'error');
+            });
+    }
+
+    // Load subjects for selected departments and batch
+    function loadSubjects(deptNames, batchYear) {
+        // For multiple departments, we'll load subjects for the first selected department
+        const firstDept = deptNames[0];
+        fetch(`/api/attendance-form/?action=subjects&dept_name=${encodeURIComponent(firstDept)}&batch_year=${batchYear}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.subjects) {
+                    subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                    data.subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.subject_code;
+                        option.textContent = `${subject.subject_code} - ${subject.subject_name}`;
+                        subjectSelect.appendChild(option);
+                    });
+                    subjectSelect.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading subjects:', error);
+                showMessage('Error loading subjects', 'error');
+            });
+    }
+
+    // Load sections based on departments and batch
+    function loadSections(deptNames, batchYear) {
+        // Generate sections A, B, C, D for now
+        // In a real implementation, this would come from the API
+        sectionSelect.innerHTML = '';
+        const sections = ['A', 'B', 'C', 'D'];
+        sections.forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = `Section ${section}`;
+            sectionSelect.appendChild(option);
+        });
+        sectionSelect.disabled = false;
+    }
+
+    // Load current time slot for selected batch
+    function loadCurrentTimeSlot(batchYear) {
+        fetch(`/api/attendance-form/?action=current_time_slot&batch_year=${batchYear}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.current_time_slot) {
+                    const timeSlot = data.current_time_slot;
+                    timeSlotSelect.innerHTML = `<option value="${timeSlot.block_number}" selected>Block ${timeSlot.block_number} (${timeSlot.start_time} - ${timeSlot.end_time})</option>`;
+                    
+                    // Update status
+                    const statusText = timeSlot.status === 'active' ? 'Class is currently active' : 'Upcoming class';
+                    const statusClass = timeSlot.status === 'active' ? 'status-active' : 'status-upcoming';
+                    currentStatus.className = `status-indicator ${statusClass}`;
+                    currentStatus.innerHTML = `<p class="text-sm">${statusText}</p><p class="text-xs opacity-75">Current time: ${data.current_time}</p>`;
+                } else {
+                    timeSlotSelect.innerHTML = '<option value="">No active classes</option>';
+                    currentStatus.className = 'status-indicator status-inactive';
+                    currentStatus.innerHTML = `<p class="text-sm">${data.message || 'No classes scheduled'}</p><p class="text-xs opacity-75">Current time: ${data.current_time}</p>`;
+                }
+                checkFormCompletion();
+            })
+            .catch(error => {
+                console.error('Error loading time slot:', error);
+                showMessage('Error loading time slot', 'error');
+            });
+    }
+
+    // Reset functions
+    function resetBatches() {
+        batchSelect.innerHTML = '<option value="">Select Batch</option>';
+        batchSelect.disabled = true;
+    }
+
+    function resetSubjects() {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        subjectSelect.disabled = true;
+    }
+
+    function resetSections() {
+        sectionSelect.innerHTML = '';
+        sectionSelect.disabled = true;
+        document.getElementById('selectedSections').innerHTML = '';
+    }
+
+    function resetTimeSlot() {
+        timeSlotSelect.innerHTML = '<option value="">Auto-selecting time slot...</option>';
+        currentStatus.className = 'status-indicator status-inactive';
+        currentStatus.innerHTML = '<p class="text-sm">Loading status...</p>';
+    }
+
+    function disableLoadButton() {
+        loadStudentsBtn.disabled = true;
+    }
+
+    function checkFormCompletion() {
+        const selectedDepts = Array.from(departmentSelect.selectedOptions).map(option => option.value).filter(v => v);
+        const batch = batchSelect.value;
+        const subject = subjectSelect.value;
+        const timeSlot = timeSlotSelect.value;
+
+        if (selectedDepts.length > 0 && batch && subject && timeSlot) {
+            loadStudentsBtn.disabled = false;
+        } else {
+            loadStudentsBtn.disabled = true;
+        }
+    }
+
+    // Load students button click
+    loadStudentsBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        loadStudents();
+    });
+
+    // Load students for attendance
+    function loadStudents() {
+        const selectedDepts = Array.from(departmentSelect.selectedOptions).map(option => option.value).filter(v => v);
+        const selectedSections = Array.from(sectionSelect.selectedOptions).map(option => option.value).filter(v => v);
+        
+        const formData = {
+            departments: selectedDepts,
+            batch_year: batchSelect.value,
+            subject: subjectSelect.value,
+            sections: selectedSections.length > 0 ? selectedSections : ['A'], // Default to section A if none selected
+            time_slot: timeSlotSelect.value
+        };
+
+        // Show students section
+        studentsSection.classList.remove('hidden');
+        
+        // Generate sample students based on selected departments and sections
+        generateSampleStudents(formData);
+    }
+
+    // Generate sample students
+    function generateSampleStudents(formData) {
+        const studentsGrid = document.getElementById('studentsGrid');
+        studentsGrid.innerHTML = '';
+
+        // Generate students for each department and section
+        let studentId = 1;
+        const students = [];
+        
+        formData.departments.forEach(dept => {
+            formData.sections.forEach(section => {
+                // Generate 6 students per department-section combination
+                for (let i = 1; i <= 6; i++) {
+                    const deptCode = dept.substring(0, 2).toUpperCase();
+                    const rollNo = `21${deptCode}${section}${String(i).padStart(3, '0')}`;
+                    students.push({
+                        id: studentId++,
+                        name: `Student ${studentId}`,
+                        rollNo: rollNo,
+                        department: dept,
+                        section: section
+                    });
+                }
+            });
+        });
+
+        students.forEach(student => {
+            const studentCard = document.createElement('div');
+            studentCard.className = 'student-card';
+            studentCard.innerHTML = `
+                <div class="mb-3">
+                    <h3 class="font-medium text-gray-900">${student.name}</h3>
+                    <p class="text-sm text-gray-600">${student.rollNo}</p>
+                    <p class="text-xs text-gray-500">${student.department} - Section ${student.section}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" class="attendance-btn present" 
+                            data-student-id="${student.id}" data-status="present">
+                        <i class="iconoir-check mr-1"></i>Present
+                    </button>
+                    <button type="button" class="attendance-btn absent"
+                            data-student-id="${student.id}" data-status="absent">
+                        <i class="iconoir-xmark mr-1"></i>Absent
+                    </button>
+                </div>
+            `;
+            studentsGrid.appendChild(studentCard);
+        });
+
+        // Add event listeners to attendance buttons
+        addAttendanceEventListeners();
+        updateAttendanceStats();
+    }
+
+    // Add event listeners to attendance buttons
+    function addAttendanceEventListeners() {
+        document.querySelectorAll('.attendance-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const studentId = this.dataset.studentId;
+                const status = this.dataset.status;
+                const studentCard = this.closest('.student-card');
+                
+                // Remove active state from both buttons in this student card
+                studentCard.querySelectorAll('.attendance-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active state to clicked button
+                this.classList.add('active');
+                
+                // Store attendance data
+                studentCard.dataset.attendance = status;
+                updateAttendanceStats();
+            });
+        });
+
+        // Quick action buttons
+        document.getElementById('markAllPresent').addEventListener('click', function() {
+            document.querySelectorAll('.attendance-btn.present').forEach(btn => btn.click());
+        });
+
+        document.getElementById('markAllAbsent').addEventListener('click', function() {
+            document.querySelectorAll('.attendance-btn.absent').forEach(btn => btn.click());
+        });
+
+        document.getElementById('clearAll').addEventListener('click', function() {
+            document.querySelectorAll('.attendance-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.student-card[data-attendance]').forEach(card => {
+                delete card.dataset.attendance;
+            });
+            updateAttendanceStats();
+        });
+
+        // Submit attendance button
+        document.getElementById('submitAttendance').addEventListener('click', function() {
+            submitAttendance();
+        });
+    }
+
+    // Submit attendance
+    function submitAttendance() {
+        const selectedDepts = Array.from(departmentSelect.selectedOptions).map(option => option.value).filter(v => v);
+        const selectedSections = Array.from(sectionSelect.selectedOptions).map(option => option.value).filter(v => v);
+        
+        const attendanceData = {
+            departments: selectedDepts,
+            batch_year: batchSelect.value,
+            subject: subjectSelect.value,
+            sections: selectedSections.length > 0 ? selectedSections : ['A'],
+            time_slot: timeSlotSelect.value,
+            attendance: [],
+            submission_time: new Date().toISOString(),
+            submitted_by: '{{ user.get_full_name|default:user.username }}'
+        };
+
+        // Collect attendance data
+        document.querySelectorAll('.student-card[data-attendance]').forEach(card => {
+            const studentId = card.querySelector('.attendance-btn').dataset.studentId;
+            const status = card.dataset.attendance;
+            const studentName = card.querySelector('h3').textContent;
+            const rollNo = card.querySelector('p').textContent;
+            
+            attendanceData.attendance.push({
+                student_id: studentId,
+                student_name: studentName,
+                roll_no: rollNo,
+                status: status
+            });
+        });
+
+        // Show JSON data in alert
+        alert('Attendance Data (JSON):\n\n' + JSON.stringify(attendanceData, null, 2));
+
+        // Submit to API
+        fetch('/api/attendance-form/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(attendanceData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showMessage('✅ ' + data.message, 'success');
+                // Reset form after successful submission
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            } else {
+                showMessage('❌ ' + (data.error || 'Error submitting attendance'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting attendance:', error);
+            showMessage('❌ Error submitting attendance', 'error');
+        });
+    }
+
+    // Show message function
+    function showMessage(message, type) {
+        const messageContainer = document.getElementById('messageContainer');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `p-4 rounded-lg shadow-lg border-l-4 ${type === 'success' ? 'bg-green-50 border-green-400 text-green-800' : 'bg-red-50 border-red-400 text-red-800'} mb-2`;
+        messageDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-lg font-bold opacity-70 hover:opacity-100">×</button>
+            </div>
+        `;
+        
+        messageContainer.appendChild(messageDiv);
+        
+        // Remove message after 5 seconds
+        setTimeout(() => {
+            if (messageDiv.parentElement) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Update attendance statistics
+    function updateAttendanceStats() {
+        const totalStudents = document.querySelectorAll('.student-card').length;
+        const presentCount = document.querySelectorAll('.student-card[data-attendance="present"]').length;
+        const absentCount = document.querySelectorAll('.student-card[data-attendance="absent"]').length;
+        const unmarkedCount = totalStudents - presentCount - absentCount;
+        
+        const attendanceStats = document.getElementById('attendanceStats');
+        attendanceStats.innerHTML = `
+            <div class="flex flex-wrap gap-4 text-sm">
+                <span class="text-gray-600">Total: <strong>${totalStudents}</strong></span>
+                <span class="text-green-600">Present: <strong>${presentCount}</strong></span>
+                <span class="text-red-600">Absent: <strong>${absentCount}</strong></span>
+                <span class="text-yellow-600">Unmarked: <strong>${unmarkedCount}</strong></span>
+            </div>
+        `;
+    }
+});
+</script>

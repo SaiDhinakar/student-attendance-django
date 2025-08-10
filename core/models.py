@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 
 class TimestampedModel(models.Model):
@@ -41,7 +42,7 @@ class Department(TimestampedModel):
     """
     Model representing academic departments
     """
-    dept_id = models.AutoField(primary_key=True)
+    dept_id = models.IntegerField(primary_key=True, unique=True, help_text="Department ID (manually assigned)")
     dept_name = models.CharField(max_length=100, unique=True)
     
     class Meta:
@@ -63,19 +64,35 @@ class Batch(TimestampedModel):
         on_delete=models.CASCADE,
         db_column='dept_id'
     )
-    year = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(4)],
-        help_text="Academic year (1-4)"
+    batch_year = models.PositiveIntegerField(
+        help_text="Graduation year (e.g., 2027, 2028)"
     )
     
     class Meta:
         db_table = 'Batches'
         verbose_name = 'Batch'
         verbose_name_plural = 'Batches'
-        unique_together = ['dept', 'year']
+        unique_together = ['dept', 'batch_year']
     
     def __str__(self):
-        return f"{self.dept.dept_name} - Year {self.year}"
+        return f"{self.dept.dept_name} - {self.display_year}"
+    
+    @property
+    def display_year(self):
+        """Returns display format like 2023-2027"""
+        start_year = self.batch_year - 3  # 4 year course, so start year is graduation year - 3
+        return f"{start_year}-{self.batch_year}"
+    
+    @property
+    def current_year(self):
+        """Calculate current academic year (1-4) based on graduation year"""
+        current_date = timezone.now().date()
+        current_academic_year = current_date.year
+        if current_date.month >= 6:  # Academic year starts in June
+            current_academic_year += 1
+        
+        years_until_graduation = self.batch_year - current_academic_year
+        return max(1, min(4, 4 - years_until_graduation))
 
 
 class Section(TimestampedModel):
@@ -107,10 +124,10 @@ class Subject(TimestampedModel):
     subject_id = models.AutoField(primary_key=True)
     subject_code = models.CharField(max_length=20, unique=True)
     subject_name = models.CharField(max_length=200, unique=True)
-    dept = models.ForeignKey(
+    departments = models.ManyToManyField(
         Department,
-        on_delete=models.CASCADE,
-        db_column='dept_id'
+        related_name='subjects',
+        help_text="Departments that offer this subject"
     )
     year = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(4)],
@@ -124,6 +141,10 @@ class Subject(TimestampedModel):
     
     def __str__(self):
         return f"{self.subject_code} - {self.subject_name}"
+    
+    def get_departments_display(self):
+        """Return comma-separated list of department names"""
+        return ", ".join([dept.dept_name for dept in self.departments.all()])
 
 
 class Student(TimestampedModel):
