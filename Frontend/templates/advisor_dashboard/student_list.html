@@ -1,0 +1,163 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Student Management - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Student Management</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Manage students under your supervision</p>
+    </div>
+    <a href="{% url 'advisor_dashboard:student_create' %}" 
+       class="bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+      <i class="iconoir-plus mr-2"></i>Add New Student
+    </a>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <form method="GET" class="space-y-4">
+      <div class="grid grid-cols-1 gap-4">
+        <!-- Search -->
+        <div class="max-w-md">
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Search Students</label>
+          <input type="text" name="search" value="{{ search_query }}" 
+                 placeholder="Search by name or registration number..."
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+        </div>
+      </div>
+
+      <div class="flex space-x-4">
+        <button type="submit" class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          <i class="iconoir-search mr-2"></i>Search
+        </button>
+        <a href="{% url 'advisor_dashboard:student_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+          <i class="iconoir-refresh mr-2"></i>Clear Filters
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Students Table -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-[var(--text-primary)]">
+        Students ({{ students.paginator.count }} total)
+      </h3>
+    </div>
+
+    {% if students %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for student in students %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                    <span class="text-white font-medium">{{ student.name.0 }}</span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">{{ student.name }}</div>
+                  <div class="text-sm text-gray-500">{{ student.student_regno }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ student.section.section_name }}</div>
+              <div class="text-sm text-gray-500">{{ student.section.batch.dept.dept_name }} - {{ student.section.batch.year }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ student.department.dept_name }}</div>
+              <div class="text-sm text-gray-500">{{ student.batch.year }} Batch</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+              <a href="{% url 'advisor_dashboard:student_detail' student.student_regno %}" 
+                 class="text-[var(--primary)] hover:text-purple-700">View</a>
+              <a href="{% url 'advisor_dashboard:student_edit' student.student_regno %}" 
+                 class="text-blue-600 hover:text-blue-800">Edit</a>
+              <a href="{% url 'advisor_dashboard:student_delete' student.student_regno %}" 
+                 class="text-red-600 hover:text-red-800">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if students.has_other_pages %}
+    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 flex justify-between sm:hidden">
+          {% if students.has_previous %}
+          <a href="?page={{ students.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+          </a>
+          {% endif %}
+          {% if students.has_next %}
+          <a href="?page={{ students.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+          </a>
+          {% endif %}
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              Showing <span class="font-medium">{{ students.start_index }}</span> to <span class="font-medium">{{ students.end_index }}</span> of
+              <span class="font-medium">{{ students.paginator.count }}</span> results
+            </p>
+          </div>
+          <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              {% if students.has_previous %}
+              <a href="?page={{ students.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Previous
+              </a>
+              {% endif %}
+              {% if students.has_next %}
+              <a href="?page={{ students.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Next
+              </a>
+              {% endif %}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-12">
+      <i class="iconoir-user text-6xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+      <p class="text-gray-500 mb-4">
+        {% if search_query or filters.department_id or filters.batch_id or filters.section_id %}
+          Try adjusting your search criteria or filters.
+        {% else %}
+          You don't have any students assigned yet.
+        {% endif %}
+      </p>
+      {% if not search_query and not filters.department_id and not filters.batch_id and not filters.section_id %}
+      <a href="{% url 'advisor_dashboard:student_create' %}" 
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+        Add First Student
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

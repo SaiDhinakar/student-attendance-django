@@ -1,0 +1,92 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Edit Attendance - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Edit Attendance Record</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Update attendance status for {{ attendance.student.name }}</p>
+    </div>
+    <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+       class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+      <i class="iconoir-arrow-left mr-2"></i>Back to Records
+    </a>
+  </div>
+
+  <!-- Attendance Details -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-6">Attendance Information</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Student</label>
+        <p class="text-[var(--text-primary)] font-medium">{{ attendance.student.name }} ({{ attendance.student.student_regno }})</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Section</label>
+        <p class="text-[var(--text-primary)]">{{ attendance.timetable.section.section_name }}</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Subject</label>
+        <p class="text-[var(--text-primary)]">{{ attendance.timetable.subject.subject_name }} ({{ attendance.timetable.subject.subject_code }})</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Date & Time</label>
+        <p class="text-[var(--text-primary)]">
+          {{ attendance.timetable.date|date:"F j, Y" }}<br>
+          <span class="text-sm">{{ attendance.timetable.start_time|time:"g:i A" }} - {{ attendance.timetable.end_time|time:"g:i A" }}</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <form method="POST" class="border-t border-gray-200 pt-6">
+      {% csrf_token %}
+      
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">Attendance Status</label>
+        <div class="space-y-2">
+          <label class="flex items-center">
+            <input type="checkbox" name="is_present" {% if attendance.is_present %}checked{% endif %}
+                   class="h-4 w-4 text-[var(--primary)] focus:ring-[var(--primary)] border-gray-300 rounded">
+            <span class="ml-2 text-[var(--text-primary)]">Student was present</span>
+          </label>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">Check the box if the student was present for this class</p>
+      </div>
+
+      <!-- Current Status Display -->
+      <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Current Status</label>
+        {% if attendance.is_present %}
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+            <i class="iconoir-check-circle mr-2"></i>Present
+          </span>
+        {% else %}
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+            <i class="iconoir-xmark-circle mr-2"></i>Absent
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+        <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+           class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-colors">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="bg-[var(--primary)] text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          <i class="iconoir-check mr-2"></i>Update Attendance
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Bulk Edit Attendance - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Bulk Edit Attendance</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Edit attendance for multiple students at once</p>
+    </div>
+    <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+       class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+      <i class="iconoir-arrow-left mr-2"></i>Back to Records
+    </a>
+  </div>
+
+  {% if not timetable %}
+  <!-- Timetable Selection -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">Select Class to Edit</h3>
+    <p class="text-[var(--text-secondary)] mb-6">Choose a specific class/timetable to edit attendance for all students.</p>
+    
+    <form method="GET" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Select Timetable</label>
+          <select name="timetable" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+            <option value="">Choose a class...</option>
+            {% for timetable in available_timetables %}
+            <option value="{{ timetable.id }}">
+              {{ timetable.section.section_name }} - {{ timetable.subject.subject_name }} 
+              ({{ timetable.date|date:"M j, Y" }} {{ timetable.start_time|time:"g:i A" }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      <button type="submit" class="bg-[var(--primary)] text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors">
+        <i class="iconoir-edit-pencil mr-2"></i>Edit Attendance
+      </button>
+    </form>
+  </div>
+
+  {% else %}
+  <!-- Class Information -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">Class Information</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Section</label>
+        <p class="text-[var(--text-primary)] font-medium">{{ timetable.section.section_name }}</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Subject</label>
+        <p class="text-[var(--text-primary)] font-medium">{{ timetable.subject.subject_name }}</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Date</label>
+        <p class="text-[var(--text-primary)] font-medium">{{ timetable.date|date:"F j, Y" }}</p>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)]">Time</label>
+        <p class="text-[var(--text-primary)] font-medium">{{ timetable.start_time|time:"g:i A" }} - {{ timetable.end_time|time:"g:i A" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Edit Form -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-[var(--text-primary)]">Student Attendance</h3>
+      <div class="space-x-2">
+        <button type="button" onclick="selectAll()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm">
+          <i class="iconoir-check-circle mr-1"></i>Mark All Present
+        </button>
+        <button type="button" onclick="selectNone()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm">
+          <i class="iconoir-xmark-circle mr-1"></i>Mark All Absent
+        </button>
+      </div>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+      
+      {% if attendance_records %}
+      <div class="space-y-3">
+        {% for attendance in attendance_records %}
+        <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 h-10 w-10">
+              <div class="h-10 w-10 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                <span class="text-white font-medium">{{ attendance.student.name.0 }}</span>
+              </div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">{{ attendance.student.name }}</div>
+              <div class="text-sm text-gray-500">{{ attendance.student.student_regno }}</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center space-x-4">
+            <!-- Current Status -->
+            <div class="text-sm">
+              Current: 
+              {% if attendance.is_present %}
+                <span class="text-green-600 font-medium">Present</span>
+              {% else %}
+                <span class="text-red-600 font-medium">Absent</span>
+              {% endif %}
+            </div>
+            
+            <!-- Checkbox for new status -->
+            <label class="flex items-center">
+              <input type="checkbox" name="attendance_{{ attendance.attendance_id }}" 
+                     {% if attendance.is_present %}checked{% endif %}
+                     class="h-4 w-4 text-[var(--primary)] focus:ring-[var(--primary)] border-gray-300 rounded attendance-checkbox">
+              <span class="ml-2 text-sm text-gray-700">Present</span>
+            </label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 mt-6">
+        <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+           class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-colors">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="bg-[var(--primary)] text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          <i class="iconoir-check mr-2"></i>Update All Attendance
+        </button>
+      </div>
+
+      {% else %}
+      <div class="text-center py-8">
+        <i class="iconoir-calendar text-4xl text-gray-400 mb-4"></i>
+        <p class="text-gray-500">No attendance records found for this class.</p>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function selectAll() {
+    const checkboxes = document.querySelectorAll('.attendance-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+function selectNone() {
+    const checkboxes = document.querySelectorAll('.attendance-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+// Add visual feedback when checkboxes change
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.attendance-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const container = this.closest('.flex.items-center.justify-between');
+            if (this.checked) {
+                container.classList.add('bg-green-50', 'border-green-200');
+                container.classList.remove('bg-red-50', 'border-red-200');
+            } else {
+                container.classList.add('bg-red-50', 'border-red-200');
+                container.classList.remove('bg-green-50', 'border-green-200');
+            }
+        });
+        
+        // Initialize visual state
+        const container = checkbox.closest('.flex.items-center.justify-between');
+        if (checkbox.checked) {
+            container.classList.add('bg-green-50', 'border-green-200');
+        } else {
+            container.classList.add('bg-red-50', 'border-red-200');
+        }
+    });
+});
+</script>
+{% endblock %}

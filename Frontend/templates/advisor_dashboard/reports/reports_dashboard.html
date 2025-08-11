@@ -1,0 +1,229 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Reports Dashboard - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Attendance Reports</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Comprehensive attendance analysis and reporting</p>
+    </div>
+    <div class="flex space-x-3">
+      <a href="{% url 'advisor_dashboard:custom_report' %}" 
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+        <i class="iconoir-stats-report mr-2"></i>Custom Report
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-blue-100 text-sm">Total Students</p>
+          <p class="text-2xl font-bold">{{ stats.total_students }}</p>
+        </div>
+        <i class="iconoir-group text-3xl text-blue-200"></i>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-100 text-sm">Today's Attendance</p>
+          <p class="text-2xl font-bold">{{ stats.today_present }}/{{ stats.today_classes }}</p>
+          {% if stats.today_classes > 0 %}
+          <p class="text-green-100 text-xs">{{ stats.today_present|floatformat:0 }}% present</p>
+          {% endif %}
+        </div>
+        <i class="iconoir-calendar text-3xl text-green-200"></i>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-orange-100 text-sm">This Week</p>
+          <p class="text-2xl font-bold">{{ stats.week_present }}/{{ stats.week_classes }}</p>
+          {% if stats.week_classes > 0 %}
+          <p class="text-orange-100 text-xs">{{ stats.week_present|floatformat:0 }}% present</p>
+          {% endif %}
+        </div>
+        <i class="iconoir-calendar-minus text-3xl text-orange-200"></i>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-md p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-purple-100 text-sm">This Month</p>
+          <p class="text-2xl font-bold">{{ stats.month_present }}/{{ stats.month_classes }}</p>
+          {% if stats.month_classes > 0 %}
+          <p class="text-purple-100 text-xs">{{ stats.month_present|floatformat:0 }}% present</p>
+          {% endif %}
+        </div>
+        <i class="iconoir-calendar-plus text-3xl text-purple-200"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Options -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Daily Report -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-blue-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-calendar text-blue-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Daily Report</h3>
+          <p class="text-[var(--text-secondary)] text-sm">View attendance for specific days</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Detailed day-by-day attendance breakdown with subject-wise analysis.
+      </p>
+      <a href="{% url 'advisor_dashboard:daily_report' %}" 
+         class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+        View Daily Report <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <!-- Weekly Report -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-green-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-calendar-minus text-green-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Weekly Report</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Weekly attendance patterns</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Week-by-week attendance trends with student-wise breakdown.
+      </p>
+      <a href="{% url 'advisor_dashboard:weekly_report' %}" 
+         class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
+        View Weekly Report <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <!-- Monthly Report -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-orange-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-calendar-plus text-orange-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Monthly Report</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Monthly attendance summary</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Monthly overview with subject-wise performance analysis.
+      </p>
+      <a href="{% url 'advisor_dashboard:monthly_report' %}" 
+         class="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium">
+        View Monthly Report <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <!-- Subject Report -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-purple-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-book text-purple-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Subject Report</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Subject-wise attendance</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Analyze attendance patterns by individual subjects.
+      </p>
+      <a href="{% url 'advisor_dashboard:subject_report' %}" 
+         class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
+        View Subject Report <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <!-- Custom Report -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-red-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-stats-report text-red-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Custom Report</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Advanced filtering & export</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Create custom reports with flexible filters and export options.
+      </p>
+      <a href="{% url 'advisor_dashboard:custom_report' %}" 
+         class="inline-flex items-center text-red-600 hover:text-red-700 font-medium">
+        Create Custom Report <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+
+    <!-- Attendance History -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex items-center mb-4">
+        <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+          <i class="iconoir-clock-rotate-right text-indigo-600 text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Attendance History</h3>
+          <p class="text-[var(--text-secondary)] text-sm">Complete attendance records</p>
+        </div>
+      </div>
+      <p class="text-[var(--text-secondary)] text-sm mb-4">
+        Browse all historical attendance records with search and filters.
+      </p>
+      <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+         class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium">
+        View History <i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a href="{% url 'advisor_dashboard:daily_report' %}?date={{ 'now'|date:'Y-m-d' }}" 
+         class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+        <i class="iconoir-calendar text-blue-600 text-xl mr-3"></i>
+        <div>
+          <p class="font-medium text-blue-900">Today's Report</p>
+          <p class="text-blue-600 text-sm">View today's attendance</p>
+        </div>
+      </a>
+      
+      <a href="{% url 'advisor_dashboard:weekly_report' %}" 
+         class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+        <i class="iconoir-calendar-minus text-green-600 text-xl mr-3"></i>
+        <div>
+          <p class="font-medium text-green-900">This Week</p>
+          <p class="text-green-600 text-sm">Current week summary</p>
+        </div>
+      </a>
+      
+      <a href="{% url 'advisor_dashboard:custom_report' %}?date_from={{ 'now'|date:'Y-m-d' }}&date_to={{ 'now'|date:'Y-m-d' }}" 
+         class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+        <i class="iconoir-download text-purple-600 text-xl mr-3"></i>
+        <div>
+          <p class="font-medium text-purple-900">Export Data</p>
+          <p class="text-purple-600 text-sm">Download attendance data</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

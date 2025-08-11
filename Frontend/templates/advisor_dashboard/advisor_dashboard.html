@@ -84,6 +84,87 @@
     </div>
   </div>
 
+  <!-- Quick Actions -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-6">
+      <i class="iconoir-fast-arrow-right mr-2"></i>Quick Actions
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Student Management -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+        <div class="text-center">
+          <i class="iconoir-group text-3xl text-[var(--primary)] mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Student Management</h4>
+          <div class="space-y-2">
+            <a href="{% url 'advisor_dashboard:student_list' %}" 
+               class="block w-full bg-[var(--primary)] text-white py-2 px-3 rounded-md text-sm hover:bg-purple-700 transition-colors">
+              View All Students
+            </a>
+            <a href="{% url 'advisor_dashboard:student_create' %}" 
+               class="block w-full bg-green-600 text-white py-2 px-3 rounded-md text-sm hover:bg-green-700 transition-colors">
+              Add New Student
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Management -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+        <div class="text-center">
+          <i class="iconoir-check-circle text-3xl text-blue-600 mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Attendance</h4>
+          <div class="space-y-2">
+            <a href="{% url 'advisor_dashboard:attendance_list' %}" 
+               class="block w-full bg-blue-600 text-white py-2 px-3 rounded-md text-sm hover:bg-blue-700 transition-colors">
+              View Records
+            </a>
+            <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
+               class="block w-full bg-orange-600 text-white py-2 px-3 rounded-md text-sm hover:bg-orange-700 transition-colors">
+              Take Attendance
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reports & Analytics -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+        <div class="text-center">
+          <i class="iconoir-graph-up text-3xl text-green-600 mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Reports</h4>
+          <div class="space-y-2">
+            <a href="{% url 'advisor_dashboard:department_attendance' %}" 
+               class="block w-full bg-green-600 text-white py-2 px-3 rounded-md text-sm hover:bg-green-700 transition-colors">
+              Department Stats
+            </a>
+            <a href="{% url 'advisor_dashboard:attendance_history' %}" 
+               class="block w-full bg-indigo-600 text-white py-2 px-3 rounded-md text-sm hover:bg-indigo-700 transition-colors">
+              History & Analytics
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Operations -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+        <div class="text-center">
+          <i class="iconoir-edit-pencil text-3xl text-purple-600 mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Bulk Operations</h4>
+          <div class="space-y-2">
+            <a href="{% url 'advisor_dashboard:bulk_attendance_edit' %}" 
+               class="block w-full bg-purple-600 text-white py-2 px-3 rounded-md text-sm hover:bg-purple-700 transition-colors">
+              Bulk Edit Attendance
+            </a>
+            <a href="{% url 'advisor_dashboard:reports' %}" 
+               class="block w-full bg-teal-600 text-white py-2 px-3 rounded-md text-sm hover:bg-teal-700 transition-colors">
+              Generate Reports
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Assigned Departments/Batches -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Assigned Departments -->
@@ -123,6 +204,28 @@
         <p class="text-[var(--text-secondary)]">No specific batches assigned</p>
       {% endif %}
     </div>
+  </div>
+
+  <!-- Assigned Sections -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">
+      <i class="iconoir-group mr-2"></i>Assigned Sections
+    </h3>
+    {% if assigned_sections %}
+      <div class="space-y-2">
+        {% for section in assigned_sections %}
+        <div class="flex items-center justify-between bg-[var(--bg-primary)] rounded-lg p-3">
+          <div>
+            <span class="font-medium text-[var(--text-primary)]">Section {{ section.section_name }}</span>
+            <p class="text-sm text-[var(--text-secondary)]">{{ section.batch.dept.dept_name }} - {{ section.batch.display_year }}</p>
+          </div>
+          <span class="text-sm text-[var(--text-secondary)]">{{ section.students.count }} students</span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-[var(--text-secondary)]">No specific sections assigned</p>
+    {% endif %}
   </div>
 
   <!-- Quick Actions -->

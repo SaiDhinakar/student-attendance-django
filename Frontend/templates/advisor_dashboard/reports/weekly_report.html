@@ -1,0 +1,168 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Weekly Report - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Weekly Attendance Report</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Week of {{ week_start|date:"F d" }} - {{ week_end|date:"d, Y" }}</p>
+    </div>
+    <div class="flex space-x-3">
+      <a href="{% url 'advisor_dashboard:reports' %}" 
+         class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+        <i class="iconoir-arrow-left mr-2"></i>Back to Reports
+      </a>
+    </div>
+  </div>
+
+  <!-- Week Navigation -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <div class="flex items-center justify-between">
+      <a href="?week={{ prev_week|date:'Y-m-d' }}" 
+         class="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md transition-colors">
+        <i class="iconoir-arrow-left mr-2"></i>Previous Week
+      </a>
+      
+      <div class="text-center">
+        <h2 class="text-lg font-semibold text-[var(--text-primary)]">
+          {{ week_start|date:"F d" }} - {{ week_end|date:"d, Y" }}
+        </h2>
+        <p class="text-[var(--text-secondary)] text-sm">Week {{ week_start|date:"W" }} of {{ week_start|date:"Y" }}</p>
+      </div>
+      
+      <a href="?week={{ next_week|date:'Y-m-d' }}" 
+         class="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md transition-colors">
+        Next Week<i class="iconoir-arrow-right ml-2"></i>
+      </a>
+    </div>
+  </div>
+
+  {% if student_attendance %}
+    <!-- Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% with total_students=student_attendance|length total_classes=0 total_present=0 %}
+        {% for student_data in student_attendance.values %}
+          {% with total_classes=total_classes|add:student_data.total_classes %}
+            {% with total_present=total_present|add:student_data.total_present %}
+            {% endwith %}
+          {% endwith %}
+        {% endfor %}
+        
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm">Students</p>
+              <p class="text-2xl font-bold">{{ total_students }}</p>
+            </div>
+            <i class="iconoir-group text-3xl text-blue-200"></i>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md p-6 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-green-100 text-sm">Total Classes</p>
+              <p class="text-2xl font-bold">{{ total_classes }}</p>
+            </div>
+            <i class="iconoir-book text-3xl text-green-200"></i>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-md p-6 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-purple-100 text-sm">Average Attendance</p>
+              {% if total_classes > 0 %}
+                <p class="text-2xl font-bold">{{ total_present|floatformat:0 }}%</p>
+              {% else %}
+                <p class="text-2xl font-bold">N/A</p>
+              {% endif %}
+            </div>
+            <i class="iconoir-stats-up text-3xl text-purple-200"></i>
+          </div>
+        </div>
+      {% endwith %}
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-[var(--text-primary)]">Student Attendance</h3>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+              {% for day in weekdays %}
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{ day|slice:":3" }}</th>
+              {% endfor %}
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">%</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for student_data in student_attendance.values %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ student_data.student.name }}</div>
+                  <div class="text-sm text-gray-500">{{ student_data.student.student_regno }}</div>
+                </div>
+              </td>
+              {% for day in weekdays %}
+                <td class="px-4 py-4 whitespace-nowrap text-center">
+                  {% if day in student_data.days %}
+                    <div class="text-xs">
+                      <span class="text-green-600 font-bold">{{ student_data.days|get_item:day.present }}</span>
+                      <span class="text-gray-400">/</span>
+                      <span class="text-gray-600">{{ student_data.days|get_item:day.total }}</span>
+                    </div>
+                  {% else %}
+                    <span class="text-gray-300">-</span>
+                  {% endif %}
+                </td>
+              {% endfor %}
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="text-sm font-medium text-gray-900">
+                  {{ student_data.total_present }}/{{ student_data.total_classes }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  {% if student_data.percentage >= 80 %}bg-green-100 text-green-800{% elif student_data.percentage >= 60 %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                  {{ student_data.percentage }}%
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <!-- No Data -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-12 text-center">
+      <i class="iconoir-calendar-xmark text-6xl text-gray-400 mb-4"></i>
+      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-2">No Classes This Week</h3>
+      <p class="text-[var(--text-secondary)] mb-6">
+        There were no classes scheduled for the week of {{ week_start|date:"F d" }} - {{ week_end|date:"d, Y" }}.
+      </p>
+      <div class="flex justify-center space-x-4">
+        <a href="?week={{ prev_week|date:'Y-m-d' }}" 
+           class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          Previous Week
+        </a>
+        <a href="?week={{ next_week|date:'Y-m-d' }}" 
+           class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          Next Week
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

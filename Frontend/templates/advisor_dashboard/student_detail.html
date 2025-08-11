@@ -1,0 +1,102 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}{{ student.name }} - Student Details{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">{{ student.name }}</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Student ID: {{ student.student_regno }}</p>
+    </div>
+    <div class="flex space-x-3">
+      <a href="{% url 'advisor_dashboard:student_edit' student.student_regno %}" 
+         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        <i class="iconoir-edit-pencil mr-2"></i>Edit
+      </a>
+      <a href="{% url 'advisor_dashboard:student_list' %}" 
+         class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+        <i class="iconoir-arrow-left mr-2"></i>Back to List
+      </a>
+    </div>
+  </div>
+
+  <!-- Student Information Cards -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Basic Information -->
+    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">
+        <i class="iconoir-user mr-2"></i>Student Information
+      </h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Full Name</label>
+          <p class="text-[var(--text-primary)] font-medium text-lg">{{ student.name }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Registration Number</label>
+          <p class="text-[var(--text-primary)] font-medium">{{ student.student_regno }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Section</label>
+          <p class="text-[var(--text-primary)] font-medium">{{ student.section.section_name }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Department</label>
+          <p class="text-[var(--text-primary)]">{{ student.section.batch.dept.dept_name }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Batch Year</label>
+          <p class="text-[var(--text-primary)]">{{ student.section.batch.display_year }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Academic Year</label>
+          <p class="text-[var(--text-primary)]">Year {{ student.section.batch.current_year }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)]">Record Information</label>
+          <p class="text-[var(--text-primary)]">Added: {{ student.created_at|date:"M j, Y" }}</p>
+          <p class="text-[var(--text-primary)]">Last Updated: {{ student.updated_at|date:"M j, Y g:i A" }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">
+      <i class="iconoir-flash mr-2"></i>Quick Actions
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a href="{% url 'advisor_dashboard:attendance_list' %}?student={{ student.student_regno }}" 
+         class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+        <i class="iconoir-calendar text-2xl text-green-600 mr-3"></i>
+        <div>
+          <h4 class="font-medium text-green-900">View Attendance</h4>
+          <p class="text-sm text-green-600">Check attendance records</p>
+        </div>
+      </a>
+
+      <a href="{% url 'advisor_dashboard:custom_report' %}?student={{ student.student_regno }}" 
+         class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+        <i class="iconoir-graph-up text-2xl text-purple-600 mr-3"></i>
+        <div>
+          <h4 class="font-medium text-purple-900">Generate Report</h4>
+          <p class="text-sm text-purple-600">Create attendance report</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

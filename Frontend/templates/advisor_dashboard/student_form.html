@@ -1,0 +1,106 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}
+  {% if is_edit %}Edit Student{% else %}Add New Student{% endif %} - Advisor Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">
+        {% if is_edit %}Edit Student{% else %}Add New Student{% endif %}
+      </h1>
+      <p class="text-[var(--text-secondary)] mt-1">
+        {% if is_edit %}Update student information{% else %}Add a new student to your assigned sections{% endif %}
+      </p>
+    </div>
+    <a href="{% url 'advisor_dashboard:student_list' %}" 
+       class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+      <i class="iconoir-arrow-left mr-2"></i>Back to Students
+    </a>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <form method="POST" class="space-y-6">
+      {% csrf_token %}
+      
+      <!-- Basic Information -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-4">Basic Information</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Student Registration Number -->
+          <div>
+            <label for="student_regno" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+              Student Registration Number *
+            </label>
+            <input type="text" name="student_regno" id="student_regno" required
+                   value="{% if is_edit %}{{ student.student_regno }}{% endif %}"
+                   {% if is_edit %}readonly{% endif %}
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]
+                   {% if is_edit %}bg-gray-100{% endif %}"
+                   placeholder="e.g., 2024CSE001">
+            {% if is_edit %}
+            <p class="text-xs text-gray-500 mt-1">Registration number cannot be changed</p>
+            {% endif %}
+          </div>
+
+          <!-- Full Name -->
+          <div>
+            <label for="name" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+              Full Name *
+            </label>
+            <input type="text" name="name" id="name" required
+                   value="{% if is_edit %}{{ student.name }}{% endif %}"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                   placeholder="Enter student's full name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Information -->
+      <div class="border-b border-gray-200 pb-6">
+        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-4">Academic Information</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+          <!-- Section -->
+          <div>
+            <label for="section" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+              Section *
+            </label>
+            <select name="section" id="section" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+              <option value="">Select a section</option>
+              {% for section in assigned_sections %}
+              <option value="{{ section.section_id }}" 
+                      {% if is_edit and student.section.section_id == section.section_id %}selected{% endif %}>
+                {{ section.section_name }} - {{ section.batch.dept.dept_name }} ({{ section.batch.batch_year }})
+              </option>
+              {% endfor %}
+            </select>
+            <p class="text-xs text-gray-500 mt-1">You can only assign students to sections you manage</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+        <a href="{% url 'advisor_dashboard:student_list' %}" 
+           class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-colors">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="bg-[var(--primary)] text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          {% if is_edit %}
+            <i class="iconoir-check mr-2"></i>Update Student
+          {% else %}
+            <i class="iconoir-plus mr-2"></i>Create Student
+          {% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

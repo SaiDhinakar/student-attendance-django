@@ -41,47 +41,45 @@ class Advisor(models.Model):
     def get_assigned_students(self):
         """Get all students under this advisor's supervision"""
         from core.models import Student
+        from django.db.models import Q
         
-        students = Student.objects.none()
+        # Prioritize more specific assignments over general ones
+        filter_conditions = Q(student_regno__isnull=True)  # Start with empty condition
         
-        # Students from assigned sections
+        # 1. Direct section assignments (most specific)
         if self.sections.exists():
-            students = students.union(
-                Student.objects.filter(section__in=self.sections.all())
-            )
+            filter_conditions |= Q(section__in=self.sections.all())
         
-        # Students from assigned batches (if no specific sections)
-        if self.batches.exists():
-            students = students.union(
-                Student.objects.filter(section__batch__in=self.batches.all())
-            )
+        # 2. If no direct sections, check batch assignments
+        elif self.batches.exists():
+            filter_conditions |= Q(section__batch__in=self.batches.all())
             
-        # Students from assigned departments (if no specific batches/sections)
-        if self.departments.exists() and not self.batches.exists() and not self.sections.exists():
-            students = students.union(
-                Student.objects.filter(section__batch__dept__in=self.departments.all())
-            )
+        # 3. If no batches, check department assignments (least specific)
+        elif self.departments.exists():
+            filter_conditions |= Q(section__batch__dept__in=self.departments.all())
         
-        return students.distinct()
+        # Return distinct students matching the conditions
+        return Student.objects.filter(filter_conditions).distinct()
     
     def get_assigned_sections(self):
         """Get all sections under this advisor's supervision"""
-        sections = Section.objects.none()
+        from django.db.models import Q
+        from core.models import Section
         
-        # Direct section assignments
+        # Prioritize more specific assignments over general ones
+        filter_conditions = Q(section_id__isnull=True)  # Start with empty condition
+        
+        # 1. Direct section assignments (most specific)
         if self.sections.exists():
-            sections = sections.union(self.sections.all())
+            filter_conditions |= Q(section_id__in=self.sections.all().values_list('section_id', flat=True))
         
-        # Sections from assigned batches
-        if self.batches.exists():
-            sections = sections.union(
-                Section.objects.filter(batch__in=self.batches.all())
-            )
+        # 2. If no direct sections, check batch assignments
+        elif self.batches.exists():
+            filter_conditions |= Q(batch__in=self.batches.all())
             
-        # Sections from assigned departments
-        if self.departments.exists():
-            sections = sections.union(
-                Section.objects.filter(batch__dept__in=self.departments.all())
-            )
+        # 3. If no batches, check department assignments (least specific)
+        elif self.departments.exists():
+            filter_conditions |= Q(batch__dept__in=self.departments.all())
         
-        return sections.distinct()
+        # Return distinct sections matching the conditions
+        return Section.objects.filter(filter_conditions).distinct()

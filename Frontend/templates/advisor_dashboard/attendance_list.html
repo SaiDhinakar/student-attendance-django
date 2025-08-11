@@ -1,0 +1,226 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Attendance Records - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Attendance Records</h1>
+      <p class="text-[var(--text-secondary)] mt-1">View and manage attendance for your students</p>
+    </div>
+    <div class="flex space-x-3">
+      <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+        <i class="iconoir-plus mr-2"></i>Take Attendance
+      </a>
+      <a href="{% url 'advisor_dashboard:bulk_attendance_edit' %}" 
+         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        <i class="iconoir-edit-pencil mr-2"></i>Bulk Edit
+      </a>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <form method="GET" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Student Filter (only assigned students) -->
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Student</label>
+          <select name="student" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+            <option value="">All My Students</option>
+            {% for student in assigned_students %}
+            <option value="{{ student.student_regno }}" {% if filters.student_regno == student.student_regno %}selected{% endif %}>
+              {{ student.name }} ({{ student.student_regno }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Subject Filter -->
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Subject</label>
+          <select name="subject" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+            <option value="">All Subjects</option>
+            {% for subject in subjects %}
+            <option value="{{ subject.subject_id }}" {% if filters.subject_id == subject.subject_id|stringformat:"s" %}selected{% endif %}>
+              {{ subject.subject_name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Date From -->
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">From Date</label>
+          <input type="date" name="date_from" value="{{ filters.date_from }}"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+        </div>
+
+        <!-- Date To -->
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">To Date</label>
+          <input type="date" name="date_to" value="{{ filters.date_to }}"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+        </div>
+      </div>
+
+      <!-- Status Filter (separate row) -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Status</label>
+          <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+            <option value="">All</option>
+            <option value="present" {% if filters.status == 'present' %}selected{% endif %}>Present</option>
+            <option value="absent" {% if filters.status == 'absent' %}selected{% endif %}>Absent</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex space-x-4">
+        <button type="submit" class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          <i class="iconoir-search mr-2"></i>Filter
+        </button>
+        <a href="{% url 'advisor_dashboard:attendance_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+          <i class="iconoir-refresh mr-2"></i>Clear Filters
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Attendance Records Table -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-[var(--text-primary)]">
+        Attendance Records ({{ attendance_records.paginator.count }} total)
+      </h3>
+    </div>
+
+    {% if attendance_records %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for record in attendance_records %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ record.timetable.date|date:"M j, Y" }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-8 w-8">
+                  <div class="h-8 w-8 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                    <span class="text-white text-xs font-medium">{{ record.student.name.0 }}</span>
+                  </div>
+                </div>
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-gray-900">{{ record.student.name }}</div>
+                  <div class="text-sm text-gray-500">{{ record.student.student_regno }}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ record.timetable.subject.subject_name }}</div>
+              <div class="text-sm text-gray-500">{{ record.timetable.subject.subject_code }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ record.timetable.section.section_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ record.timetable.start_time|time:"g:i A" }} - {{ record.timetable.end_time|time:"g:i A" }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {% if record.is_present %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="iconoir-check-circle mr-1"></i>Present
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  <i class="iconoir-xmark-circle mr-1"></i>Absent
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <a href="{% url 'advisor_dashboard:attendance_edit' record.attendance_id %}" 
+                 class="text-blue-600 hover:text-blue-800">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if attendance_records.has_other_pages %}
+    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 flex justify-between sm:hidden">
+          {% if attendance_records.has_previous %}
+          <a href="?page={{ attendance_records.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+          </a>
+          {% endif %}
+          {% if attendance_records.has_next %}
+          <a href="?page={{ attendance_records.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+          </a>
+          {% endif %}
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              Showing <span class="font-medium">{{ attendance_records.start_index }}</span> to <span class="font-medium">{{ attendance_records.end_index }}</span> of
+              <span class="font-medium">{{ attendance_records.paginator.count }}</span> results
+            </p>
+          </div>
+          <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              {% if attendance_records.has_previous %}
+              <a href="?page={{ attendance_records.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Previous
+              </a>
+              {% endif %}
+              {% if attendance_records.has_next %}
+              <a href="?page={{ attendance_records.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Next
+              </a>
+              {% endif %}
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-12">
+      <i class="iconoir-calendar text-6xl text-gray-400 mb-4"></i>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No attendance records found</h3>
+      <p class="text-gray-500 mb-4">
+        {% if filters.student_regno or filters.section_id or filters.subject_id or filters.date_from or filters.date_to or filters.status %}
+          Try adjusting your search criteria or filters.
+        {% else %}
+          No attendance records have been created yet.
+        {% endif %}
+      </p>
+      <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+        Take Attendance
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
