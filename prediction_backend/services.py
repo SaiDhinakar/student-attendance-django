@@ -136,7 +136,11 @@ class PredictionService:
                             logger.info("✅ YOLO face detection model loaded successfully")
                     else:
                         logger.warning(f"⚠️  YOLO model not found at {yolo_path} (abs: {abs_yolo_path}), using mock face detection")
+<<<<<<< HEAD
                     
+=======
+                        
+>>>>>>> bbe8dcb (pt load fixed)
                     # Set up transforms
                     self.transform = transforms.Compose([
                         transforms.Resize((128, 128)),
@@ -180,7 +184,11 @@ class PredictionService:
             # Load gallery data
             with TimedLogger(logger, f"Gallery loading from {gallery_path}"):
                 logger.info(f"📄 Loading gallery data from {gallery_path} (abs: {abs_gallery_path})")
+<<<<<<< HEAD
                 # Try safe loading first: allowlist numpy reconstruct and ndarray
+=======
+                # Try safe loading first (weights_only=True by default in torch>=2.6) with allowlisted numpy reconstruct
+>>>>>>> bbe8dcb (pt load fixed)
                 try:
                     try:
                         from numpy._core import multiarray as _multiarray
@@ -188,17 +196,26 @@ class PredictionService:
                         logger.debug("Added numpy._core.multiarray._reconstruct and numpy.ndarray to torch safe globals")
                     except Exception as ge:
                         logger.debug(f"Could not add safe globals: {ge}")
+<<<<<<< HEAD
                     gallery_data = torch.load(abs_gallery_path, map_location='cpu')
+=======
+                    gallery_data = torch.load(gallery_path, map_location='cpu')
+>>>>>>> bbe8dcb (pt load fixed)
                 except Exception as e:
                     logger.warning(
                         "Safe torch.load failed, falling back to weights_only=False as the gallery file is trusted: %s",
                         e,
                     )
+<<<<<<< HEAD
                     try:
                         gallery_data = torch.load(abs_gallery_path, map_location='cpu', weights_only=False)
                     except TypeError:
                         gallery_data = torch.load(abs_gallery_path, map_location='cpu')
             
+=======
+                    gallery_data = torch.load(gallery_path, map_location='cpu', weights_only=False)
+                
+>>>>>>> bbe8dcb (pt load fixed)
                 # Handle np.ndarray or tensor values
                 gallery = {}
                 for k, v in gallery_data.items():
@@ -293,7 +310,11 @@ class PredictionService:
                 logger.info(f"📊 Processing section group {i+1}: {dept_name} {batch_year} - {section_names}")
                 
                 if dept_name and batch_year:
+<<<<<<< HEAD
                     # Load gallery for this department/batch/sections via sync_to_async
+=======
+                    # Load gallery for this department/batch/sections in a thread-safe way from async context
+>>>>>>> bbe8dcb (pt load fixed)
                     gallery = await sync_to_async(self.load_gallery)(dept_name, batch_year, section_names)
                     combined_gallery.update(gallery)
                     logger.info(f"📚 Added {len(gallery)} embeddings to combined gallery")
@@ -401,7 +422,7 @@ class PredictionService:
                                 matches.append((identity, similarity))
                                 logger.debug(f"✅ Face {valid_faces} matches {identity}: {similarity:.3f}")
                         
-                        logger.debug(f"🔍 Face {valid_faces}: checked {gallery_checked} gallery entries, found {len(matches)} matches")
+                        logger.debug(f"🔍 Face {validates_faces}: checked {gallery_checked} gallery entries, found {len(matches)} matches")
                                 
                         # Sort matches by similarity (highest first)
                         matches.sort(key=lambda x: x[1], reverse=True)
