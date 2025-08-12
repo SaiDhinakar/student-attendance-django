@@ -4,109 +4,7 @@
 {% block title %}Mark Attendance - Student Attendance System{% endblock %}
 
 {% block extra_css %}
-<style>
-  .form-container {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-card {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-label {
-    display: block;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .form-select, .form-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: var(--surface);
-    color: var(--text-primary);
-  }
-  
-  .form-select:focus, .form-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-  }
-  
-  .form-select:disabled, .form-input:disabled {
-    background-color: var(--muted);
-    color: var(--text-secondary);
-    cursor: not-allowed;
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: white;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
-  }
-  
-  .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-  
-  .loading {
-    opacity: 0.7;
-    pointer-events: none;
-  }
-  
-  .error-message {
-    color: var(--danger);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-  
-  .success-message {
-    color: var(--success);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-  
-  .time-display {
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-    text-align: center;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/attendance-form-backup.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -136,7 +34,7 @@
             <select id="department" name="department" class="form-select" required>
               <option value="">Select Department</option>
             </select>
-            <div id="departmentError" class="error-message" style="display: none;"></div>
+                        <div id="departmentError" class="error-message hidden"></div>
           </div>
 
           <!-- Batch Selection -->
@@ -147,7 +45,7 @@
             <select id="batch" name="batch" class="form-select" disabled required>
               <option value="">Select Batch</option>
             </select>
-            <div id="batchError" class="error-message" style="display: none;"></div>
+            <div id="batchError" class="error-message hidden"></div>
           </div>
 
           <!-- Subject Selection -->
@@ -158,7 +56,7 @@
             <select id="subject" name="subject" class="form-select" disabled required>
               <option value="">Select Subject</option>
             </select>
-            <div id="subjectError" class="error-message" style="display: none;"></div>
+            <div id="subjectError" class="error-message hidden"></div>
           </div>
 
           <!-- Section -->
@@ -194,9 +92,9 @@
         </div>
 
         <!-- Messages -->
-        <div id="formMessages" class="mt-6 text-center" style="display: none;">
-          <div id="successMessage" class="success-message" style="display: none;"></div>
-          <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="formMessages" class="mt-6 text-center hidden">
+          <div id="successMessage" class="success-message hidden"></div>
+          <div id="errorMessage" class="error-message hidden"></div>
         </div>
       </form>
     </div>

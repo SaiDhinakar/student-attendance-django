@@ -1,0 +1,515 @@
+/* Enhanced Attendance Form styles with Glassmorphic Design */
+.form-container {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-medium);
+  -webkit-backdrop-filter: var(--blur-medium);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  opacity: 0.8;
+}
+
+.form-group {
+  margin-bottom: 1.75rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  transition: color 0.2s ease;
+}
+
+.form-select {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--glass-bg-strong);
+  box-shadow: 0 0 0 3px rgba(167, 201, 87, 0.1), var(--glass-shadow);
+  transform: translateY(-1px);
+}
+
+.form-select:disabled {
+  background: rgba(var(--text-secondary-rgb), 0.1);
+  cursor: not-allowed;
+  opacity: 0.6;
+  backdrop-filter: none;
+}
+
+/* Enhanced Checkbox styles */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkbox-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(167, 201, 87, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.checkbox-item:hover::before {
+  left: 100%;
+}
+
+.checkbox-item:hover {
+  border-color: var(--accent);
+  background: var(--glass-bg-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--glass-shadow);
+}
+
+.checkbox-item.checked {
+  border-color: var(--accent);
+  background: rgba(167, 201, 87, 0.1);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin-right: 0.75rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkbox-item label {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* Enhanced Department container styles */
+.department-container {
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  margin-top: 0.75rem;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.department-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+/* Enhanced Scroll indicator */
+.department-container::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 24px;
+  background: var(--gradient-primary);
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.department-container:hover::after {
+  opacity: 0.7;
+}
+
+.department-checkboxes-scrollable {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Enhanced scrollbar */
+.department-checkboxes-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-track {
+  background: var(--glass-bg);
+  border-radius: 3px;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 3px;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Show scroll indicator when scrollable */
+.department-checkboxes-scrollable.is-scrollable::before {
+  content: "Scroll for more ↕";
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(var(--primary-rgb), 0.05);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0.25rem;
+  margin: -1rem -0.05rem 1.0rem -0.05rem;
+  border-radius: 15px 15px 15px 15px;
+  z-index: 1;
+}
+
+/* Custom scrollbar for department container */
+.department-checkboxes-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-track {
+  background: rgba(var(--primary-rgb), 0.1);
+  border-radius: 4px;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary-rgb), 0.3);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.department-checkboxes-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--primary-rgb), 0.5);
+}
+
+/* Firefox scrollbar */
+.department-checkboxes-scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--primary-rgb), 0.3) rgba(var(--primary-rgb), 0.1);
+}
+
+/* Scrollable container hover effects */
+.department-container:hover {
+  border-color: rgba(var(--primary-rgb), 0.4);
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Department container when items are selected */
+.department-container.has-selections {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.02);
+  box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.15);
+}
+
+.department-container.has-selections::after {
+  background: linear-gradient(to bottom, 
+    rgba(var(--accent-rgb), 0.4), 
+    rgba(var(--accent-rgb), 0.2)
+  );
+}
+
+/* Responsive adjustments for department container */
+@media (max-width: 640px) {
+  .department-checkboxes-scrollable {
+    grid-template-columns: 1fr;
+    max-height: 150px;
+    padding: 0.75rem;
+  }
+  
+  .department-container::after {
+    right: 4px;
+    width: 3px;
+    height: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .department-checkboxes-scrollable {
+    max-height: 120px;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .department-checkboxes-scrollable.is-scrollable::before {
+    font-size: 0.7rem;
+    padding: 0.2rem;
+  }
+}
+
+/* Tag styles */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tag.removable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag.removable:hover {
+  background: rgba(var(--accent-rgb), 0.2);
+}
+
+/* Button styles */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: rgba(var(--text-secondary-rgb), 0.3);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background: var(--text-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Status indicator styles */
+.status-indicator {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.status-active {
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.status-upcoming {
+  background: rgba(var(--primary-rgb), 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.status-inactive {
+  background: rgba(var(--text-secondary-rgb), 0.1);
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+/* Student card styles */
+.student-card {
+  padding: 1rem;
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 8px;
+  background: var(--background);
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.1);
+}
+
+.attendance-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 2px solid;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.attendance-btn.present {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.attendance-btn.present.active {
+  background: var(--accent);
+  color: white;
+}
+
+.attendance-btn.absent {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.attendance-btn.absent.active {
+  background: var(--danger);
+  color: white;
+}
+
+/* Time display styles */
+.time-display {
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Animation styles */
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-slide-out {
+  animation: slideOut 0.3s ease-in;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .form-container {
+    padding: 1rem;
+  }
+  
+  .checkbox-item {
+    padding: 0.5rem;
+  }
+  
+  .student-card {
+    padding: 0.75rem;
+  }
+}

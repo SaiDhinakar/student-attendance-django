@@ -12,16 +12,25 @@
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     
+    <!-- Glassmorphic Theme -->
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-theme.css' %}">
+    
+    <!-- Glassmorphic Components -->
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-components.css' %}">
+    
+    <!-- Advisor Unified UI -->
+    <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
+    
     <!-- Client's Custom Theme -->
     <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     {% block extra_css %}{% endblock %}
   </head>
-  <body class="min-h-screen text-primary-custom" style="background-color: var(--background);">
+  <body class="glassmorphic-body min-h-screen">
 
     <!-- HEADER -->
-    <header class="fixed top-0 z-50 w-full header-bg shadow-lg">
+    <header class="glassmorphic-header fixed top-0 z-50 w-full">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
           
@@ -30,179 +39,259 @@
             <!-- Mobile menu button -->
             <button
               id="sidebarToggle"
-              class="md:hidden inline-flex items-center justify-center p-2 rounded-md nav-link hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
+              class="md:hidden glassmorphic-btn-icon"
               aria-label="Open menu"
             >
               <i class="iconoir-menu text-xl"></i>
             </button>
 
             <!-- Logo -->
-            <a href="{% url 'advisor_dashboard:dashboard' %}" class="flex items-center">
-              <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
+            <a href="{% url 'advisor_dashboard:dashboard' %}" class="flex items-center hover:opacity-80 transition-opacity">
+              <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12 rounded-lg shadow-md" />
             </a>
           </div>
 
           <!-- Center: College Info -->
           <div class="flex-1 text-center px-4 md:px-8">
-            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-primary-custom leading-tight">
+            <h1 class="text-sm md:text-lg lg:text-xl font-bold glassmorphic-text-primary leading-tight">
               SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
             </h1>
-            <p class="text-xs md:text-sm text-secondary-custom font-medium mt-1">
+            <p class="text-xs md:text-sm glassmorphic-text-secondary font-medium mt-1">
               Advisor Dashboard
             </p>
           </div>
 
           <!-- Right: Desktop Navigation -->
-          <nav class="hidden md:flex items-center space-x-6">
+          <nav class="hidden lg:flex items-center space-x-2">
             {% if user.is_authenticated %}
+              <!-- Navigation Links -->
               <a href="{% url 'advisor_dashboard:dashboard' %}" 
-                 class="text-gray-700 hover:text-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Dashboard
+                 class="nav-btn {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="iconoir-dashboard-speed"></i>Dashboard
               </a>
               <a href="{% url 'advisor_dashboard:department_attendance' %}" 
-                 class="text-gray-700 hover:text-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Department Status
+                 class="nav-btn {% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="iconoir-stats-up"></i>Department Status
               </a>
               <a href="{% url 'advisor_dashboard:attendance' %}" 
-                 class="text-gray-700 hover:text-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Mark Attendance
+                 class="nav-btn {% if 'attendance' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="iconoir-check-circle"></i>Mark Attendance
               </a>
               <a href="{% url 'advisor_dashboard:reports' %}" 
-                 class="text-gray-700 hover:text-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Reports
+                 class="nav-btn {% if 'reports' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="iconoir-stats-report"></i>Reports
               </a>
               
-              <!-- User Info -->
-              <div class="flex items-center space-x-3 px-3 py-2 rounded-md bg-purple-50">
-                <div class="h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
-                </div>
-                <span class="text-sm text-gray-700">{{ user.get_full_name|default:user.username }}</span>
-              </div>
-              
-              <form method="post" action="{% url 'logout' %}" class="inline">
-                {% csrf_token %}
-                <button type="submit" 
-                        class="text-gray-700 hover:text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer">
-                  Logout
+              <!-- User Dropdown -->
+              <div class="relative ml-3">
+                <button id="userMenuButton" 
+                        class="user-menu-btn flex items-center space-x-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-200">
+                  <div class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
+                    <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                  </div>
+                  <div class="hidden md:block text-left">
+                    <p class="text-sm font-medium text-white">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="text-xs text-white/70">Advisor</p>
+                  </div>
+                  <i class="iconoir-nav-arrow-down text-white/70"></i>
                 </button>
-              </form>
+                
+                <!-- Dropdown Menu -->
+                <div id="userDropdown" 
+                     class="hidden absolute right-0 mt-2 w-64 bg-white/90 backdrop-blur-lg border border-white/30 rounded-xl shadow-xl z-50">
+                  <div class="p-4 border-b border-gray-200/50">
+                    <div class="flex items-center space-x-3">
+                      <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-gray-500">{{ user.email|default:"Advisor" }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-2">
+                    <a href="{% url 'advisor_dashboard:dashboard' %}" 
+                       class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
+                      <i class="iconoir-dashboard-speed mr-3"></i>Dashboard
+                    </a>
+                    <a href="#" 
+                       class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
+                      <i class="iconoir-user mr-3"></i>Profile Settings
+                    </a>
+                    <a href="#" 
+                       class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
+                      <i class="iconoir-settings mr-3"></i>Preferences
+                    </a>
+                    <hr class="my-2 border-gray-200/50">
+                    <form method="post" action="{% url 'logout' %}" class="w-full">
+                      {% csrf_token %}
+                      <button type="submit" 
+                              class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <i class="iconoir-log-out mr-3"></i>Sign Out
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             {% endif %}
           </nav>
+
+          <!-- Mobile User Button -->
+          <div class="lg:hidden">
+            {% if user.is_authenticated %}
+              <button id="mobileUserButton" 
+                      class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+                <div class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                  <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                </div>
+              </button>
+            {% endif %}
+          </div>
         </div>
       </div>
     </header>
 
     <!-- Mobile Sidebar -->
-    <div id="mobileSidebar" class="md:hidden">
+    <div id="mobileSidebar" class="lg:hidden">
       <!-- Overlay -->
       <div id="sidebarOverlay" 
-           class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300">
+           class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-all duration-300">
       </div>
 
       <!-- Sidebar Panel -->
-      <div class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="fixed top-0 left-0 h-full w-80 bg-white/95 backdrop-blur-xl shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-out">
         
         <!-- Sidebar Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-purple-50">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200/50 bg-gradient-to-r from-purple-50 to-pink-50">
           <div class="flex items-center space-x-3">
-            <div class="h-8 w-8 bg-purple-600 rounded flex items-center justify-center">
+            <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
               <span class="text-white font-bold text-sm">A</span>
             </div>
-            <span class="text-lg font-semibold text-purple-800">Advisor Menu</span>
+            <div>
+              <span class="text-lg font-bold text-gray-900">Advisor Menu</span>
+              <p class="text-xs text-gray-600">Student Attendance System</p>
+            </div>
           </div>
           <button id="sidebarClose" 
-                  class="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+                  class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 focus:outline-none transition-all">
+            <i class="iconoir-cancel text-xl"></i>
           </button>
         </div>
 
         <!-- User Info in Sidebar -->
-        <div class="p-4 border-b border-gray-200 bg-gray-50">
+        <div class="p-4 border-b border-gray-200/50 bg-gradient-to-r from-gray-50 to-gray-100">
           <div class="flex items-center space-x-3">
-            <div class="h-10 w-10 bg-purple-600 rounded-full flex items-center justify-center">
-              <span class="text-white font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
+            <div class="h-12 w-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
+              <span class="text-white font-bold text-lg">{{ user.first_name.0|default:user.username.0|upper }}</span>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
-              <p class="text-xs text-gray-500">Advisor</p>
+              <p class="text-sm font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+              <p class="text-xs text-gray-600">{{ user.email|default:"Advisor Account" }}</p>
+              <span class="inline-block mt-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">Advisor</span>
             </div>
           </div>
         </div>
 
         <!-- Sidebar Navigation -->
-        <nav class="p-4 space-y-2">
+        <nav class="p-4 space-y-2 overflow-y-auto h-full pb-20">
           <!-- Dashboard -->
           <a href="{% url 'advisor_dashboard:dashboard' %}" 
-             class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-            <i class="iconoir-dashboard-speed inline-block w-5 h-5 mr-3"></i>
-            Dashboard
+             class="nav-menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="iconoir-dashboard-speed"></i>
+            <span>Dashboard</span>
+            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
           </a>
           
           <!-- Student Management -->
           <div class="space-y-1">
-            <h3 class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Student Management</h3>
+            <h3 class="nav-menu-section">Student Management</h3>
             <a href="{% url 'advisor_dashboard:student_list' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-group inline-block w-5 h-5 mr-3"></i>
-              View Students
+               class="nav-menu-item">
+              <i class="iconoir-group"></i>
+              <span>View Students</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
             <a href="{% url 'advisor_dashboard:student_create' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-plus inline-block w-5 h-5 mr-3"></i>
-              Add Student
+               class="nav-menu-item">
+              <i class="iconoir-plus-circle"></i>
+              <span>Add Student</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
           </div>
 
           <!-- Attendance Management -->
           <div class="space-y-1 pt-2">
-            <h3 class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Attendance</h3>
+            <h3 class="nav-menu-section">Attendance Management</h3>
             <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-check-circle inline-block w-5 h-5 mr-3"></i>
-              Take Attendance
+               class="nav-menu-item">
+              <i class="iconoir-check-circle"></i>
+              <span>Take Attendance</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
             <a href="{% url 'advisor_dashboard:attendance_list' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-calendar inline-block w-5 h-5 mr-3"></i>
-              View Records
+               class="nav-menu-item">
+              <i class="iconoir-calendar"></i>
+              <span>Attendance Records</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
             <a href="{% url 'advisor_dashboard:bulk_attendance_edit' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-edit-pencil inline-block w-5 h-5 mr-3"></i>
-              Bulk Edit
+               class="nav-menu-item">
+              <i class="iconoir-edit-pencil"></i>
+              <span>Bulk Edit</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
           </div>
 
           <!-- Reports & Analytics -->
           <div class="space-y-1 pt-2">
-            <h3 class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reports & Analytics</h3>
+            <h3 class="nav-menu-section">Reports & Analytics</h3>
             <a href="{% url 'advisor_dashboard:department_attendance' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-graph-up inline-block w-5 h-5 mr-3"></i>
-              Department Stats
+               class="nav-menu-item">
+              <i class="iconoir-graph-up"></i>
+              <span>Department Statistics</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
             <a href="{% url 'advisor_dashboard:attendance_history' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-activity inline-block w-5 h-5 mr-3"></i>
-              History
+               class="nav-menu-item">
+              <i class="iconoir-activity"></i>
+              <span>Attendance History</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
             <a href="{% url 'advisor_dashboard:reports' %}" 
-               class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-700 font-medium transition-colors duration-200">
-              <i class="iconoir-stats-report inline-block w-5 h-5 mr-3"></i>
-              Reports
+               class="nav-menu-item">
+              <i class="iconoir-stats-report"></i>
+              <span>Detailed Reports</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
+            </a>
+          </div>
+
+          <!-- Settings -->
+          <div class="space-y-1 pt-2">
+            <h3 class="nav-menu-section">Account</h3>
+            <a href="#" 
+               class="nav-menu-item">
+              <i class="iconoir-user"></i>
+              <span>Profile Settings</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
+            </a>
+            <a href="#" 
+               class="nav-menu-item">
+              <i class="iconoir-settings"></i>
+              <span>Preferences</span>
+              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
           </div>
           
-          <div class="pt-4 border-t border-gray-200">
-            <form method="post" action="{% url 'logout' %}" class="block">
+          <!-- Logout -->
+          <div class="pt-4 border-t border-gray-200/50">
+            <form method="post" action="{% url 'logout' %}" class="w-full">
               {% csrf_token %}
               <button type="submit" 
-                      class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-red-600 font-medium transition-colors duration-200">
-                <i class="iconoir-log-out inline-block w-5 h-5 mr-3"></i>
-                Logout
+                      class="w-full nav-menu-item text-red-600 hover:bg-red-50 border-red-200">
+                <i class="iconoir-log-out"></i>
+                <span>Sign Out</span>
+                <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
               </button>
             </form>
           </div>
@@ -249,13 +338,18 @@
       </div>
     </footer>
 
-    <!-- JavaScript for Mobile Sidebar -->
+    <!-- JavaScript for Navigation -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
+        // Mobile sidebar functionality
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarPanel = document.querySelector('#mobileSidebar > div:last-child');
+
+        // User dropdown functionality
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userDropdown = document.getElementById('userDropdown');
 
         function openSidebar() {
           if (sidebarOverlay && sidebarPanel) {
@@ -273,7 +367,13 @@
           }
         }
 
-        // Event listeners
+        function toggleUserDropdown() {
+          if (userDropdown) {
+            userDropdown.classList.toggle('hidden');
+          }
+        }
+
+        // Sidebar event listeners
         if (sidebarToggle) {
           sidebarToggle.addEventListener('click', openSidebar);
         }
@@ -284,6 +384,21 @@
           sidebarOverlay.addEventListener('click', closeSidebar);
         }
 
+        // User dropdown event listeners
+        if (userMenuButton) {
+          userMenuButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleUserDropdown();
+          });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (userDropdown && !userDropdown.contains(e.target) && !userMenuButton.contains(e.target)) {
+            userDropdown.classList.add('hidden');
+          }
+        });
+
         // Close sidebar when clicking navigation links
         const sidebarLinks = document.querySelectorAll('#mobileSidebar a, #mobileSidebar button[type="submit"]');
         sidebarLinks.forEach(link => {
@@ -292,10 +407,21 @@
 
         // Handle escape key
         document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && sidebarOverlay && !sidebarOverlay.classList.contains('hidden')) {
-            closeSidebar();
+          if (e.key === 'Escape') {
+            if (sidebarOverlay && !sidebarOverlay.classList.contains('hidden')) {
+              closeSidebar();
+            }
+            if (userDropdown && !userDropdown.classList.contains('hidden')) {
+              userDropdown.classList.add('hidden');
+            }
           }
         });
+
+        // Mobile user button functionality
+        const mobileUserButton = document.getElementById('mobileUserButton');
+        if (mobileUserButton) {
+          mobileUserButton.addEventListener('click', openSidebar);
+        }
       });
     </script>
 

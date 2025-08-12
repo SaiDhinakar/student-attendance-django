@@ -1,0 +1,358 @@
+/* Design System Variables */
+:root {
+    --primary: #4A90E2;
+    --secondary: #2C3E50;
+    --accent: #E67E22;
+    --background: #F9FAFB;
+    --surface: #FFFFFF;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --border: #E5E7EB;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --transition: all 300ms ease-in-out;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 2.5rem;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+/* Welcome Section */
+.welcome-section {
+    background: linear-gradient(135deg, var(--primary) 0%, #3B7DD8 100%);
+    border-radius: var(--radius-xl);
+    color: white;
+    padding: var(--spacing-xl);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50px, -50px);
+}
+
+.welcome-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 var(--spacing-xs) 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.welcome-text p {
+    font-size: 1.125rem;
+    margin: 0;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.welcome-icon {
+    display: none;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0.3;
+    flex-shrink: 0;
+}
+
+/* Stats Cards Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.stat-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.stat-card.departments::before {
+    background: var(--secondary);
+}
+
+.stat-card.students::before {
+    background: var(--primary);
+}
+
+.stat-card.subjects::before {
+    background: var(--accent);
+}
+
+.stat-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-info h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.stat-info p {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.stat-icon {
+    width: 3rem;
+    height: 3rem;
+    opacity: 0.6;
+    flex-shrink: 0;
+}
+
+.stat-card.departments .stat-icon {
+    color: var(--secondary);
+}
+
+.stat-card.students .stat-icon {
+    color: var(--primary);
+}
+
+.stat-card.subjects .stat-icon {
+    color: var(--accent);
+}
+
+/* Management Grid */
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.management-card {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.management-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.management-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.management-header.student-management {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+}
+
+.management-header.academic-management {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+}
+
+.management-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.management-title svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: var(--spacing-sm);
+}
+
+.management-title.student svg {
+    color: var(--primary);
+}
+
+.management-title.academic svg {
+    color: var(--secondary);
+}
+
+.management-content {
+    padding: var(--spacing-md);
+}
+
+.management-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.management-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm);
+    background: #F8FAFC;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 0.9rem;
+}
+
+.management-link:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateX(4px);
+    border-color: var(--primary);
+}
+
+.management-link:active {
+    transform: translateX(2px);
+}
+
+.link-content {
+    display: flex;
+    align-items: center;
+}
+
+.link-arrow {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: var(--transition);
+    opacity: 0.6;
+}
+
+.management-link:hover .link-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .dashboard-container {
+        padding: var(--spacing-lg);
+    }
+
+    .welcome-text h1 {
+        font-size: 2.5rem;
+    }
+
+    .welcome-icon {
+        display: block;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .management-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-container {
+        padding: var(--spacing-sm);
+    }
+
+    .welcome-section {
+        padding: var(--spacing-md);
+    }
+
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-sm);
+    }
+
+    .welcome-text h1 {
+        font-size: 1.5rem;
+    }
+
+    .welcome-text p {
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .management-card {
+        min-width: unset;
+    }
+
+    .stat-card {
+        padding: var(--spacing-sm);
+    }
+
+    .stat-info p {
+        font-size: 1.5rem;
+    }
+
+    .stat-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}

@@ -1,0 +1,20 @@
+/* Admin Theme Styles */
+
+/* Branding styles */
+.admin-branding-title {
+  color: var(--primary);
+}
+
+.admin-branding-subtitle {
+  color: var(--text-secondary);
+}
+
+/* Hide elements */
+.hidden {
+  display: none;
+}
+
+/* Body background */
+.admin-body-bg {
+  background-color: var(--background);
+}

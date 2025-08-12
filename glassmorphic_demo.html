@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphic Theme Demo - Student Attendance</title>
+    
+    <!-- Icon Pack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="static/css/tailwind.css">
+    
+    <!-- Custom Glassmorphic Theme -->
+    <style>
+        /* Import all the glassmorphic styles directly for demo */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+        :root {
+          --accent: #A7C957;
+          --primary: #386641; 
+          --secondary: #6A994E;
+          --background: #f4f0e7;
+          --section-bg: #e4f2cf;
+          --text-primary: #2A2D34;
+          --text-secondary: #6E7081;
+          --button-primary: #386641;
+          --button-secondary: #6A994E;
+          --danger: #BC4749;
+          --warning: #F2CC8F;
+          
+          --glass-bg: rgba(228, 242, 207, 0.25);
+          --glass-bg-strong: rgba(228, 242, 207, 0.4);
+          --glass-border: rgba(56, 102, 65, 0.18);
+          --glass-shadow: 0 8px 32px 0 rgba(56, 102, 65, 0.15);
+          --glass-shadow-strong: 0 12px 40px 0 rgba(56, 102, 65, 0.25);
+          
+          --gradient-primary: linear-gradient(135deg, #A7C957 0%, #6A994E 50%, #386641 100%);
+          --gradient-secondary: linear-gradient(135deg, #e4f2cf 0%, #f4f0e7 100%);
+          --gradient-glass: linear-gradient(135deg, rgba(228, 242, 207, 0.3) 0%, rgba(167, 201, 87, 0.1) 100%);
+          
+          --blur-light: blur(8px);
+          --blur-medium: blur(12px);
+          --blur-strong: blur(16px);
+        }
+
+        [data-theme="dark"] {
+          --accent: #A7C957;
+          --primary: #386641;
+          --secondary: #6A994E;
+          --background: #18181e;
+          --section-bg: #232832;
+          --text-primary: #F2E8CF;
+          --text-secondary: #B0C4DE;
+          --button-primary: #BC4749;
+          --button-secondary: #6A994E;
+          --danger: #BC4749;
+          --warning: #F2CC8F;
+          
+          --glass-bg: rgba(35, 40, 50, 0.25);
+          --glass-bg-strong: rgba(35, 40, 50, 0.4);
+          --glass-border: rgba(167, 201, 87, 0.18);
+          --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+          --glass-shadow-strong: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+          
+          --gradient-primary: linear-gradient(135deg, #A7C957 0%, #6A994E 50%, #386641 100%);
+          --gradient-secondary: linear-gradient(135deg, #232832 0%, #18181e 100%);
+          --gradient-glass: linear-gradient(135deg, rgba(35, 40, 50, 0.3) 0%, rgba(167, 201, 87, 0.05) 100%);
+        }
+
+        * {
+          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+          background: var(--gradient-secondary);
+          color: var(--text-primary);
+          line-height: 1.6;
+          position: relative;
+          min-height: 100vh;
+        }
+
+        body::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+            radial-gradient(circle at 20% 80%, rgba(167, 201, 87, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(106, 153, 78, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(56, 102, 65, 0.05) 0%, transparent 50%);
+          animation: backgroundFloat 20s ease-in-out infinite;
+          z-index: -1;
+          pointer-events: none;
+        }
+
+        @keyframes backgroundFloat {
+          0%, 100% { 
+            background: 
+              radial-gradient(circle at 20% 80%, rgba(167, 201, 87, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(106, 153, 78, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 40% 40%, rgba(56, 102, 65, 0.05) 0%, transparent 50%);
+          }
+          50% { 
+            background: 
+              radial-gradient(circle at 80% 20%, rgba(167, 201, 87, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 20% 80%, rgba(106, 153, 78, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 60% 60%, rgba(56, 102, 65, 0.1) 0%, transparent 50%);
+          }
+        }
+
+        /* Glassmorphic Cards */
+        .card {
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur-light);
+          -webkit-backdrop-filter: var(--blur-light);
+          border: 1px solid var(--glass-border);
+          border-radius: 20px;
+          padding: 2rem;
+          box-shadow: var(--glass-shadow);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, var(--accent), transparent);
+          opacity: 0.6;
+        }
+
+        .card:hover {
+          transform: translateY(-8px);
+          box-shadow: var(--glass-shadow-strong);
+          background: var(--glass-bg-strong);
+          border-color: rgba(167, 201, 87, 0.3);
+        }
+
+        .btn-primary {
+          background: var(--gradient-primary);
+          color: white;
+          border: none;
+          padding: 0.875rem 2rem;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          letter-spacing: 0.025em;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 4px 15px 0 rgba(56, 102, 65, 0.3);
+          text-transform: capitalize;
+          cursor: pointer;
+        }
+
+        .btn-primary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+          left: 100%;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-3px) scale(1.02);
+          box-shadow: 0 8px 25px 0 rgba(56, 102, 65, 0.4);
+        }
+
+        .stats-card {
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur-light);
+          -webkit-backdrop-filter: var(--blur-light);
+          border: 1px solid var(--glass-border);
+          border-radius: 16px;
+          padding: 1.5rem;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .stats-card::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100px;
+          height: 100px;
+          background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+          opacity: 0.1;
+          border-radius: 50%;
+          transform: translate(30px, -30px);
+        }
+
+        .stats-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--glass-shadow-strong);
+          background: var(--glass-bg-strong);
+        }
+
+        .theme-toggle {
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur-light);
+          -webkit-backdrop-filter: var(--blur-light);
+          border: 1px solid var(--glass-border);
+          border-radius: 50px;
+          padding: 0.5rem;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .theme-toggle:hover {
+          background: var(--glass-bg-strong);
+          border-color: var(--accent);
+          transform: rotate(180deg);
+        }
+
+        .form-input {
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur-light);
+          -webkit-backdrop-filter: var(--blur-light);
+          border: 1px solid var(--glass-border);
+          border-radius: 12px;
+          padding: 1rem 1.25rem;
+          color: var(--text-primary);
+          font-size: 0.95rem;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          width: 100%;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px rgba(167, 201, 87, 0.1), var(--glass-shadow);
+          background: var(--glass-bg-strong);
+          transform: translateY(-1px);
+        }
+
+        .header-bg {
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur-medium);
+          -webkit-backdrop-filter: var(--blur-medium);
+          border-bottom: 1px solid var(--glass-border);
+          box-shadow: var(--glass-shadow);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="header-bg fixed top-0 z-50 w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="iconoir-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-primary">Sri Shakthi Institute</h1>
+                        <p class="text-xs text-secondary">Glassmorphic Theme Demo</p>
+                    </div>
+                </div>
+                
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="iconoir-sun-light" id="lightIcon"></i>
+                    <i class="iconoir-moon hidden" id="darkIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 md:pt-24 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Welcome Section -->
+            <div class="card mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">🎨 Glassmorphic Theme Demo</h1>
+                        <p style="color: var(--text-secondary);" class="mt-2">Modern, vibrant, and accessible design following your specifications.</p>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="h-16 w-16 bg-gradient-to-r from-accent to-secondary rounded-xl flex items-center justify-center">
+                            <i class="iconoir-dashboard text-2xl text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="stats-card">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="iconoir-user text-xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Total Students</p>
+                            <p class="text-2xl font-bold" style="color: var(--text-primary);">1,234</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 bg-gradient-to-r from-accent to-secondary rounded-lg flex items-center justify-center">
+                            <i class="iconoir-check-circle text-xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Present Today</p>
+                            <p class="text-2xl font-bold" style="color: var(--text-primary);">1,156</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                            <i class="iconoir-cancel text-xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Absent Today</p>
+                            <p class="text-2xl font-bold" style="color: var(--text-primary);">78</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 bg-gradient-to-r from-secondary to-primary rounded-lg flex items-center justify-center">
+                            <i class="iconoir-stats-up text-xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Attendance Rate</p>
+                            <p class="text-2xl font-bold" style="color: var(--text-primary);">93.7%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Demo -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4" style="color: var(--text-primary);">
+                        <i class="iconoir-edit-pencil mr-2" style="color: var(--accent);"></i>
+                        Form Elements Demo
+                    </h3>
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Student Name</label>
+                            <input type="text" class="form-input" placeholder="Enter student name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Department</label>
+                            <select class="form-input">
+                                <option>Computer Science</option>
+                                <option>Electronics</option>
+                                <option>Mechanical</option>
+                            </select>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="button" class="btn-primary flex items-center">
+                                <i class="iconoir-check mr-2"></i>
+                                Save Changes
+                            </button>
+                            <button type="button" class="btn-secondary flex items-center px-4 py-2 border border-glass-border rounded-full" style="background: var(--glass-bg); color: var(--text-primary);">
+                                <i class="iconoir-cancel mr-2"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4" style="color: var(--text-primary);">
+                        <i class="iconoir-activity mr-2" style="color: var(--accent);"></i>
+                        Recent Activity
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="h-8 w-8 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                                <i class="iconoir-check text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium" style="color: var(--text-primary);">Attendance marked for CS 3rd Year</p>
+                                <p class="text-xs" style="color: var(--text-secondary);">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="h-8 w-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                                <i class="iconoir-plus text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium" style="color: var(--text-primary);">New student registered</p>
+                                <p class="text-xs" style="color: var(--text-secondary);">4 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Scheme Demo -->
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-6" style="color: var(--text-primary);">
+                    <i class="iconoir-color-picker mr-2" style="color: var(--accent);"></i>
+                    Color Scheme & Theme Variables
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="h-16 w-16 mx-auto mb-2 rounded-full" style="background: var(--accent);"></div>
+                        <p class="text-sm font-medium" style="color: var(--text-primary);">Accent</p>
+                        <p class="text-xs" style="color: var(--text-secondary);">#A7C957</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="h-16 w-16 mx-auto mb-2 rounded-full" style="background: var(--primary);"></div>
+                        <p class="text-sm font-medium" style="color: var(--text-primary);">Primary</p>
+                        <p class="text-xs" style="color: var(--text-secondary);">#386641</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="h-16 w-16 mx-auto mb-2 rounded-full" style="background: var(--secondary);"></div>
+                        <p class="text-sm font-medium" style="color: var(--text-primary);">Secondary</p>
+                        <p class="text-xs" style="color: var(--text-secondary);">#6A994E</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="h-16 w-16 mx-auto mb-2 rounded-full" style="background: var(--danger);"></div>
+                        <p class="text-sm font-medium" style="color: var(--text-primary);">Danger</p>
+                        <p class="text-xs" style="color: var(--text-secondary);">#BC4749</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript for Theme Toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const lightIcon = document.getElementById('lightIcon');
+            const darkIcon = document.getElementById('darkIcon');
+            const html = document.documentElement;
+
+            // Check for saved theme preference or default to light mode
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'dark');
+                updateThemeIcons(true);
+            }
+
+            function updateThemeIcons(isDark) {
+                if (lightIcon && darkIcon) {
+                    if (isDark) {
+                        lightIcon.classList.add('hidden');
+                        darkIcon.classList.remove('hidden');
+                    } else {
+                        lightIcon.classList.remove('hidden');
+                        darkIcon.classList.add('hidden');
+                    }
+                }
+            }
+
+            function toggleTheme() {
+                const isDark = html.getAttribute('data-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    updateThemeIcons(false);
+                } else {
+                    html.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    updateThemeIcons(true);
+                }
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+
+            // Add smooth transition effects
+            html.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+        });
+    </script>
+</body>
+</html>

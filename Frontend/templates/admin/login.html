@@ -1,96 +1,239 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Student Attendance Admin</title>
+    <title>Admin Login - Student Attendance</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Client's Icon Pack -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
+    
+    <!-- Glassmorphic Theme CSS -->
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-    </style>
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'img/image.png' %}" type="image/png">
 </head>
-<body class="h-full bg-gray-50">
-    <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+<body class="glassmorphic-body min-h-screen">
+    <div class="login-container flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
-            <!-- Header -->
-            <div class="text-center">
-                <img src="{% static 'img/image.png' %}" alt="Logo" class="mx-auto h-16 w-16 rounded-xl shadow-lg" />
-                <h2 class="mt-6 text-3xl font-bold text-gray-900">
-                    Student Attendance
-                </h2>
-                <p class="mt-2 text-sm text-gray-600">
-                    Sign in to your admin account
-                </p>
-            </div>
+            <!-- Admin Login Card -->
+            <div class="glassmorphic-card">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="flex justify-center mb-4">
+                        <img src="{% static 'img/image.png' %}" alt="Logo" class="h-16 w-16 rounded-lg shadow-md" />
+                    </div>
+                    <div class="advisor-welcome-section p-4">
+                        <h1 class="text-2xl">Admin Login</h1>
+                        <p>Sign in to your admin account</p>
+                    </div>
+                </div>
 
-            <!-- Login Form -->
-            <div class="bg-white py-8 px-6 shadow-xl rounded-xl border border-gray-200">
+                <!-- Display messages -->
+                {% if messages %}
+                    <div class="mb-6 space-y-3">
+                        {% for message in messages %}
+                            <div class="glassmorphic-alert {% if message.tags == 'error' %}error{% else %}info{% endif %}">
+                                <div class="flex items-center">
+                                    <i class="iconoir-warning-triangle mr-2"></i>
+                                    <div class="text-sm">{{ message }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <form method="post" class="space-y-6">
                     {% csrf_token %}
                     
-                    <!-- Messages -->
-                    {% if messages %}
-                        <div class="space-y-3">
-                            {% for message in messages %}
-                                <div class="{% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %} px-4 py-3 rounded-lg">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Username Field -->
-                    <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                            Username
-                        </label>
-                        <input type="text" id="username" name="username" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                               placeholder="Enter your username">
-                    </div>
-                    
-                    <!-- Password Field -->
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                            Password
-                        </label>
-                        <input type="password" id="password" name="password" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                               placeholder="Enter your password">
-                    </div>
-                    
-                    <!-- Next URL -->
+                    <!-- Next field for redirects -->
                     {% if next %}
                         <input type="hidden" name="next" value="{{ next }}">
                     {% endif %}
-                    
+
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label for="username" class="glassmorphic-label">
+                            <i class="iconoir-user mr-1"></i>Username
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="iconoir-user glassmorphic-text-secondary"></i>
+                            </div>
+                            <input 
+                                id="username" 
+                                name="username" 
+                                type="text" 
+                                required 
+                                autocomplete="username"
+                                class="glassmorphic-input pl-10 pr-3 py-3 w-full"
+                                placeholder="Enter your admin username"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="glassmorphic-label">
+                            <i class="iconoir-lock mr-1"></i>Password
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="iconoir-lock glassmorphic-text-secondary"></i>
+                            </div>
+                            <input 
+                                id="password" 
+                                name="password" 
+                                type="password" 
+                                required 
+                                autocomplete="current-password"
+                                class="glassmorphic-input pl-10 pr-10 py-3 w-full"
+                                placeholder="Enter your admin password"
+                            />
+                            <button 
+                                type="button" 
+                                id="togglePassword"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center glassmorphic-text-secondary hover:text-primary focus:outline-none"
+                                aria-label="Toggle password visibility"
+                            >
+                                <i id="eyeOpen" class="iconoir-eye-empty"></i>
+                                <i id="eyeClosed" class="iconoir-eye-off hidden"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Submit Button -->
-                    <div>
-                        <button type="submit" 
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                            </svg>
-                            Sign In
+                    <div class="form-group">
+                        <button 
+                            type="submit" 
+                            id="loginButton"
+                            class="btn-advisor-primary w-full py-3 px-4 text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            <i class="iconoir-log-in mr-2"></i>
+                            <span id="buttonText">Sign in to Admin</span>
                         </button>
                     </div>
                 </form>
+
+                <!-- Additional Links -->
+                <div class="mt-6 text-center">
+                    <p class="text-sm glassmorphic-text-secondary">
+                        Need help? Contact your system administrator or 
+                        <a href="{% url 'dashboard' %}" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">
+                            return to main site
+                        </a>
+                    </p>
+                </div>
             </div>
 
-            <!-- Footer -->
-            <div class="text-center">
-                <p class="text-xs text-gray-500">
-                    © 2025 Student Attendance System. All rights reserved.
-                </p>
+            <!-- Additional Information -->
+            <div class="text-center text-xs glassmorphic-text-secondary">
+                <p>© 2025 Sri Shakthi Institute of Engineering and Technology</p>
+                <p class="mt-1">Student Attendance Management System - Admin Portal</p>
             </div>
         </div>
     </div>
+
+    <!-- JavaScript for enhanced functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const toggleButton = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeOpen = document.getElementById('eyeOpen');
+            const eyeClosed = document.getElementById('eyeClosed');
+
+            if (toggleButton && passwordInput && eyeOpen && eyeClosed) {
+                toggleButton.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    if (type === 'text') {
+                        eyeOpen.classList.add('hidden');
+                        eyeClosed.classList.remove('hidden');
+                    } else {
+                        eyeOpen.classList.remove('hidden');
+                        eyeClosed.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Form submission loading state
+            const form = document.querySelector('form');
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (form && loginButton && buttonText) {
+                form.addEventListener('submit', function() {
+                    // Disable the button to prevent double submission
+                    loginButton.disabled = true;
+                    loginButton.classList.add('opacity-75', 'cursor-not-allowed');
+                    
+                    // Change button text and add spinner
+                    buttonText.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Signing in...
+                    `;
+                });
+            }
+
+            // Auto-focus username field
+            const usernameInput = document.getElementById('username');
+            if (usernameInput && !usernameInput.value) {
+                usernameInput.focus();
+            }
+
+            // Form validation enhancement
+            const inputs = document.querySelectorAll('input[required]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '') {
+                        this.classList.add('border-red-500');
+                    } else {
+                        this.classList.remove('border-red-500');
+                    }
+                });
+
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.remove('border-red-500');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        /* Additional glassmorphic alert styles */
+        .glassmorphic-alert {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .glassmorphic-alert.error {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .glassmorphic-alert.info {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+    </style>
 </body>
 </html>

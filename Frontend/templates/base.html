@@ -10,18 +10,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
     
     <!-- Tailwind CSS -->
-    <!-- <link rel="stylesheet" href="{% static 'css/tailwind.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    
+    <!-- Glassmorphic Theme -->
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-theme.css' %}">
+    
+    <!-- Glassmorphic Components -->
+    <link rel="stylesheet" href="{% static 'css/glassmorphic-components.css' %}">
+    
+    <!-- Advisor Unified UI -->
+    <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
     
     <!-- Client's Custom Theme -->
-    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">>
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     {% block extra_css %}{% endblock %}
   </head>
-  <body class="min-h-screen text-primary-custom" style="background-color: var(--background);"">
+  <body class="glassmorphic-body min-h-screen">
 
     <!-- HEADER -->
-    <header class="fixed top-0 z-50 w-full header-bg shadow-lg">
+    <header class="glassmorphic-header fixed top-0 z-50 w-full">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
           
@@ -30,7 +39,7 @@
             <!-- Mobile menu button -->
             <button
               id="sidebarToggle"
-              class="md:hidden inline-flex items-center justify-center p-2 rounded-md nav-link hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
+              class="md:hidden glassmorphic-btn-icon"
               aria-label="Open menu"
             >
               <i class="iconoir-menu text-xl"></i>
@@ -44,10 +53,10 @@
 
           <!-- Center: College Info -->
           <div class="flex-1 text-center px-4 md:px-8">
-            <h1 class="text-sm md:text-lg lg:text-xl font-bold text-primary-custom leading-tight">
+            <h1 class="text-sm md:text-lg lg:text-xl font-bold glassmorphic-text-primary leading-tight">
               SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
             </h1>
-            <p class="text-xs md:text-sm text-secondary-custom font-medium mt-1">
+            <p class="text-xs md:text-sm glassmorphic-text-secondary font-medium mt-1">
               Student Attendance System
             </p>
           </div>
@@ -57,7 +66,7 @@
             <!-- Theme Toggle Button -->
             <button
               id="themeToggle"
-              class="theme-toggle hidden md:inline-flex items-center justify-center p-2 text-sm font-medium"
+              class="glassmorphic-btn-icon hidden md:inline-flex"
               aria-label="Toggle theme"
             >
               <i class="iconoir-sun-light text-lg" id="lightIcon"></i>
@@ -124,18 +133,20 @@
       </div>
 
       <!-- Sidebar Panel -->
-      <div class="fixed top-0 left-0 h-full w-64 section-bg shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="fixed top-0 left-0 h-full w-64 bg-glass-bg-strong backdrop-filter backdrop-blur-strong border-r border-glass-border shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out"
+           style="background: var(--glass-bg-strong); backdrop-filter: var(--blur-strong); -webkit-backdrop-filter: var(--blur-strong); border-right: 1px solid var(--glass-border);">
         
         <!-- Sidebar Header -->
-        <div class="flex items-center justify-between p-4 border-b border-primary bg-primary-custom">
+        <div class="flex items-center justify-between p-4 border-b border-glass-border bg-gradient-primary"
+             style="background: var(--gradient-primary); border-bottom: 1px solid var(--glass-border);">
           <div class="flex items-center space-x-3">
-            <div class="h-8 w-8 bg-accent rounded flex items-center justify-center">
+            <div class="h-8 w-8 bg-white bg-opacity-20 rounded flex items-center justify-center">
               <i class="iconoir-apps text-white"></i>
             </div>
             <span class="text-lg font-semibold text-white">Menu</span>
           </div>
           <button id="sidebarClose" 
-                  class="p-2 rounded-md text-white hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-accent">
+                  class="p-2 rounded-md text-white hover:bg-white hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30">
             <i class="iconoir-cancel text-lg"></i>
           </button>
         </div>
@@ -238,7 +249,7 @@
     <footer class="section-bg border-t border-primary mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="text-center text-sm text-secondary-custom">
-          <p class="mt-1">Design and developed by <b style="font-weight: bold; color: var(--primary);">AIML students</b></p>
+          <p class="mt-1">Design and developed by <b class="branding-text">AIML students</b></p>
         </div>
       </div>
     </footer>

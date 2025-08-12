@@ -4,93 +4,76 @@
 
 {% block content %}
 <div class="space-y-6">
-  <!-- Welcome Section -->
-  <div class="bg-gradient-to-r from-[var(--primary)] to-purple-700 rounded-xl shadow-lg p-6 text-white">
+  <!-- Advisor-Style Welcome Section -->
+  <div class="advisor-welcome-section">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold mb-2">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+        <h1>Welcome, {{ user.get_full_name|default:user.username }}!</h1>
         {% if advisor %}
-          <p class="text-purple-100">Advisor Dashboard - {{ advisor.employee_id }}</p>
+          <p>Advisor Dashboard - {{ advisor.employee_id }}</p>
           {% if advisor.office_location %}
-          <p class="text-purple-200 text-sm mt-1">
+          <p class="text-sm mt-2 opacity-90">
             <i class="iconoir-position mr-1"></i>{{ advisor.office_location }}
           </p>
           {% endif %}
         {% else %}
-          <p class="text-purple-100">Advisor Dashboard - No Profile</p>
-          <p class="text-yellow-200 text-sm mt-1">
+          <p>Advisor Dashboard - No Profile</p>
+          <p class="text-sm mt-2 opacity-90">
             <i class="iconoir-warning-triangle mr-1"></i>Contact admin to create your advisor profile
           </p>
         {% endif %}
       </div>
       <div class="hidden md:block">
-        <i class="iconoir-graduation-cap text-6xl text-purple-200"></i>
+        <i class="iconoir-graduation-cap advisor-welcome-icon"></i>
       </div>
     </div>
   </div>
 
-  <!-- Statistics Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <!-- Advisor-Style Statistics Cards -->
+  <div class="advisor-stats-grid">
     <!-- Total Students -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 border-l-4 border-[var(--primary)]">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="iconoir-group text-3xl text-[var(--primary)]"></i>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Total Students</h3>
-          <p class="text-2xl font-bold text-[var(--primary)]">{{ stats.total_students }}</p>
-        </div>
+    <div class="advisor-stat-card">
+      <div class="stat-icon" style="background: var(--gradient-primary);">
+        <i class="iconoir-group"></i>
       </div>
+      <div class="stat-title">Total Students</div>
+      <div class="stat-value">{{ stats.total_students }}</div>
     </div>
 
     <!-- Total Sections -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="iconoir-book text-3xl text-blue-500"></i>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Sections</h3>
-          <p class="text-2xl font-bold text-blue-500">{{ stats.total_sections }}</p>
-        </div>
+    <div class="advisor-stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+        <i class="iconoir-book"></i>
       </div>
+      <div class="stat-title">Sections</div>
+      <div class="stat-value">{{ stats.total_sections }}</div>
     </div>
 
     <!-- Attendance Rate -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 border-l-4 border-green-500">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="iconoir-percentage text-3xl text-green-500"></i>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Attendance Rate</h3>
-          <p class="text-2xl font-bold text-green-500">{{ stats.attendance_percentage }}%</p>
-        </div>
+    <div class="advisor-stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%);">
+        <i class="iconoir-percentage"></i>
       </div>
+      <div class="stat-title">Attendance Rate</div>
+      <div class="stat-value">{{ stats.attendance_percentage }}%</div>
     </div>
 
     <!-- Today's Classes -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <i class="iconoir-calendar text-3xl text-orange-500"></i>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-[var(--text-primary)]">Today's Classes</h3>
-          <p class="text-2xl font-bold text-orange-500">{{ stats.today_classes }}</p>
-        </div>
+    <div class="advisor-stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="iconoir-calendar"></i>
       </div>
+      <div class="stat-title">Today's Classes</div>
+      <div class="stat-value">{{ stats.today_classes }}</div>
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
-    <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-6">
-      <i class="iconoir-fast-arrow-right mr-2"></i>Quick Actions
+  <!-- Advisor-Style Quick Actions -->
+  <div class="advisor-actions-section">
+    <h3>
+      <i class="iconoir-fast-arrow-right"></i>Quick Actions
     </h3>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="advisor-actions-grid">
       <!-- Student Management -->
       <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
         <div class="text-center">

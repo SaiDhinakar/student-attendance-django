@@ -1,0 +1,524 @@
+/* 🎨 Unified Advisor-Style UI Components for All Dashboards */
+
+/* Advisor-Style Welcome Sections */
+.advisor-welcome-section {
+  background: var(--gradient-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  color: white;
+  box-shadow: var(--glass-shadow-strong);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.advisor-welcome-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(50px, -50px);
+}
+
+.advisor-welcome-section h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.advisor-welcome-section p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.advisor-welcome-icon {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 4rem;
+  opacity: 0.8;
+}
+
+/* Advisor-Style Statistics Cards */
+.advisor-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.advisor-stat-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.advisor-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 0 2px 2px 0;
+}
+
+.advisor-stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--glass-shadow-strong);
+  background: var(--glass-bg-strong);
+}
+
+.advisor-stat-card .stat-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.advisor-stat-card .stat-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.advisor-stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+/* Advisor-Style Quick Actions Grid */
+.advisor-actions-section {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 2rem;
+}
+
+.advisor-actions-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.advisor-actions-section h3 i {
+  color: var(--accent);
+}
+
+.advisor-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.advisor-action-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.advisor-action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(167, 201, 87, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.advisor-action-card:hover::before {
+  left: 100%;
+}
+
+.advisor-action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow);
+  background: var(--glass-bg-strong);
+  border-color: rgba(167, 201, 87, 0.3);
+}
+
+.advisor-action-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: all 0.3s ease;
+}
+
+.advisor-action-card:hover .advisor-action-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.advisor-action-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.advisor-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.advisor-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+}
+
+.advisor-action-btn.primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.advisor-action-btn.secondary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+}
+
+.advisor-action-btn.success {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+}
+
+.advisor-action-btn.warning {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+}
+
+.advisor-action-btn.info {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+}
+
+.advisor-action-btn.purple {
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+  color: white;
+}
+
+.advisor-action-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Advisor-Style Information Panels */
+.advisor-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.advisor-info-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advisor-info-panel:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-strong);
+}
+
+.advisor-info-panel h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.advisor-info-panel h3 i {
+  color: var(--accent);
+}
+
+.advisor-info-item {
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  transition: all 0.2s ease;
+}
+
+.advisor-info-item:hover {
+  background: var(--glass-bg-strong);
+  transform: translateX(4px);
+}
+
+.advisor-info-item:last-child {
+  margin-bottom: 0;
+}
+
+.advisor-info-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex-grow: 1;
+}
+
+.advisor-info-value {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Advisor-Style Overview Cards */
+.advisor-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.advisor-overview-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-light);
+  -webkit-backdrop-filter: var(--blur-light);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advisor-overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-strong);
+  background: var(--glass-bg-strong);
+}
+
+.advisor-overview-card h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.advisor-overview-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.advisor-overview-card .highlight {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.advisor-overview-card .success {
+  color: #10b981;
+}
+
+.advisor-overview-card .warning {
+  color: #f59e0b;
+}
+
+.advisor-overview-card .info {
+  color: #0891b2;
+}
+
+/* Enhanced Button Styles to Match Advisor UI */
+.btn-advisor-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-advisor-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(56, 102, 65, 0.3);
+}
+
+.btn-advisor-secondary {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-advisor-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-advisor-success {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-advisor-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* Responsive Design for Advisor-Style Components */
+@media (max-width: 768px) {
+  .advisor-stats-grid,
+  .advisor-actions-grid,
+  .advisor-info-grid,
+  .advisor-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .advisor-welcome-section {
+    padding: 1.5rem;
+  }
+  
+  .advisor-welcome-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .advisor-stat-card,
+  .advisor-action-card,
+  .advisor-info-panel {
+    padding: 1.25rem;
+  }
+  
+  .advisor-action-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Dark Theme Enhancements for Advisor Style */
+[data-theme="dark"] .advisor-welcome-section {
+  background: linear-gradient(135deg, #BC4749 0%, #6A994E 50%, #386641 100%);
+}
+
+[data-theme="dark"] .advisor-stat-card .stat-value {
+  color: var(--accent);
+}
+
+[data-theme="dark"] .advisor-info-label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .advisor-overview-card .highlight {
+  color: var(--accent);
+}
+
+/* Animation Enhancements */
+@keyframes advisorCardFloat {
+  0%, 100% { 
+    transform: translateY(0px);
+  }
+  50% { 
+    transform: translateY(-4px);
+  }
+}
+
+.advisor-stat-card:nth-child(even) {
+  animation: advisorCardFloat 6s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.advisor-stat-card:nth-child(odd) {
+  animation: advisorCardFloat 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advisor-stat-card:nth-child(even),
+  .advisor-stat-card:nth-child(odd) {
+    animation: none;
+  }
+}

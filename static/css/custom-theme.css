@@ -51,6 +51,22 @@ body {
   color: var(--text-primary);
 }
 
+/* Body background */
+.main-body-bg {
+  background-color: var(--background);
+}
+
+/* Branding text */
+.branding-text {
+  font-weight: bold; 
+  color: var(--primary);
+}
+
+/* Main background */
+.main-section-bg {
+  background-color: var(--background);
+}
+
 /* Custom component styles using client colors */
 .btn-primary {
   background-color: var(--button-primary);
