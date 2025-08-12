@@ -151,6 +151,7 @@
     const passwordInput = document.getElementById('id_password');
     const eyeOpen = document.getElementById('eyeOpen');
     const eyeClosed = document.getElementById('eyeClosed');
+    const toggleTheme = document.getElementById('themeToggle');
 
     if (toggleButton && passwordInput && eyeOpen && eyeClosed) {
       toggleButton.addEventListener('click', function() {
@@ -213,5 +214,8 @@
       });
     });
   });
+
+      toggleTheme.style.display = 'none'; 
+
 </script>
 {% endblock %}
