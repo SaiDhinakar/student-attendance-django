@@ -24,7 +24,7 @@ def staff_dashboard(request):
             return redirect("advisor_dashboard:dashboard")
         else:
             messages.error(request, "Access denied. You don't have staff permissions.")
-            return redirect("login")
+            return redirect("auth:login")
     
     # If user is in Staffs group, redirect to attendance marking
     if request.user.groups.filter(name='Staffs').exists():
@@ -48,7 +48,7 @@ def attendance_view(request):
             return redirect("advisor_dashboard:dashboard")
         else:
             messages.error(request, "Access denied. You don't have staff permissions.")
-            return redirect("login")
+            return redirect("auth:login")
     
     context = {
         'user': request.user,
@@ -71,7 +71,7 @@ def reports_view(request):
             return redirect("advisor_dashboard:dashboard")
         else:
             messages.error(request, "Access denied. You don't have staff permissions.")
-            return redirect("login")
+            return redirect("auth:login")
     
     # Only general staff can access reports, not Staffs group
     if request.user.groups.filter(name='Staffs').exists():
@@ -95,7 +95,7 @@ def camera_attendance_view(request):
             return redirect("advisor_dashboard:dashboard")
         else:
             messages.error(request, "Access denied. You don't have staff permissions.")
-            return redirect("login")
+            return redirect("auth:login")
     
     context = {
         'user': request.user,

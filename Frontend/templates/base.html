@@ -40,7 +40,7 @@
             </button>
 
             <!-- Logo -->
-            <a href="{% url 'dashboard' %}" class="flex items-center">
+            <a href="{% url 'auth:dashboard' %}" class="flex items-center">
               <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
             </a>
           </div>
@@ -69,7 +69,7 @@
             <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center space-x-6">
               {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" 
+                <a href="{% url 'auth:dashboard' %}" 
                    class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
                   <i class="iconoir-dashboard mr-2"></i>
                   Dashboard
@@ -99,7 +99,7 @@
                   <i class="iconoir-settings mr-2"></i>
                   Admin
                 </a>
-                <form method="post" action="{% url 'logout' %}" class="inline">
+                <form method="post" action="{% url 'auth:logout' %}" class="inline">
                   {% csrf_token %}
                   <button type="submit" 
                           class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
@@ -108,7 +108,7 @@
                   </button>
                 </form>
               {% else %}
-                <a href="{% url 'login' %}" 
+                <a href="{% url 'auth:login' %}" 
                    class="btn-primary flex items-center">
                   <i class="iconoir-log-in mr-2"></i>
                   Login
@@ -148,7 +148,7 @@
         <!-- Sidebar Navigation -->
         <nav class="p-4 space-y-2">
           {% if user.is_authenticated %}
-            <a href="{% url 'dashboard' %}" 
+            <a href="{% url 'auth:dashboard' %}" 
                class="flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200">
               <i class="iconoir-dashboard mr-3"></i>
               Dashboard
@@ -190,7 +190,7 @@
               <span id="themeText">Light Mode</span>
             </button>
             
-            <form method="post" action="{% url 'logout' %}" class="block">
+            <form method="post" action="{% url 'auth:logout' %}" class="block">
               {% csrf_token %}
               <button type="submit" 
                       class="w-full text-left px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
@@ -199,7 +199,7 @@
               </button>
             </form>
           {% else %}
-            <a href="{% url 'login' %}" 
+            <a href="{% url 'auth:login' %}" 
                class="flex items-center justify-center px-4 py-3 rounded-lg btn-primary text-center">
               <i class="iconoir-log-in mr-3"></i>
               Login

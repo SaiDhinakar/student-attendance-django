@@ -41,7 +41,7 @@ def advisor_dashboard(request):
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
         print(f"DEBUG: User {request.user.username} denied access to advisor dashboard")
-        return redirect("/auth/login/")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     
@@ -117,7 +117,7 @@ def department_attendance(request):
     """View department attendance for advisors"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     
@@ -198,7 +198,7 @@ def advisor_attendance_marking(request):
     """Attendance marking for advisors - redirects to shared attendance form"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     
@@ -255,7 +255,7 @@ def advisor_attendance_history(request):
     """View attendance history with detailed analytics"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     
@@ -287,7 +287,7 @@ def advisor_reports(request):
     """Reports view for advisors"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     
@@ -308,7 +308,7 @@ def student_list(request):
     """List all students under advisor's supervision with search and filter"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -347,7 +347,7 @@ def student_detail(request, student_regno):
     """View detailed information about a student"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -372,7 +372,7 @@ def student_create(request):
     """Create a new student (only for assigned sections)"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -407,7 +407,7 @@ def student_edit(request, student_regno):
     """Edit student information"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -456,7 +456,7 @@ def student_delete(request, student_regno):
     """Delete a student (with confirmation)"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -491,7 +491,7 @@ def attendance_list(request):
     """List attendance records with advanced filtering"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -559,7 +559,7 @@ def attendance_edit(request, attendance_id):
     """Edit individual attendance record"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -594,7 +594,7 @@ def bulk_attendance_edit(request):
     """Bulk edit attendance for a specific class/timetable"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -660,7 +660,7 @@ def staff_attendance_access(request):
     """Allow advisor to access staff attendance taking functionality"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -686,7 +686,7 @@ def attendance_reports(request):
     """Main reports dashboard for advisors"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -743,7 +743,7 @@ def daily_report(request):
     """Daily attendance report"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -804,7 +804,7 @@ def weekly_report(request):
     """Weekly attendance report"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -880,7 +880,7 @@ def monthly_report(request):
     """Monthly attendance report"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -980,7 +980,7 @@ def subject_report(request):
     """Subject-wise attendance report"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:
@@ -1075,7 +1075,7 @@ def custom_report(request):
     """Custom attendance report with flexible filters"""
     if not check_advisor_permission(request.user):
         messages.error(request, "Access denied. You don't have advisor permissions.")
-        return redirect("login")
+        return redirect("auth:login")
     
     advisor = get_advisor_profile(request.user)
     if not advisor:

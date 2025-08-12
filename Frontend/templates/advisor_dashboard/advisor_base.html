@@ -124,7 +124,7 @@
                       <i class="iconoir-settings mr-3"></i>Preferences
                     </a>
                     <hr class="my-2 border-gray-200/50">
-                    <form method="post" action="{% url 'logout' %}" class="w-full">
+                    <form method="post" action="{% url 'auth:logout' %}" class="w-full">
                       {% csrf_token %}
                       <button type="submit" 
                               class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
@@ -285,7 +285,7 @@
           
           <!-- Logout -->
           <div class="pt-4 border-t border-gray-200/50">
-            <form method="post" action="{% url 'logout' %}" class="w-full">
+            <form method="post" action="{% url 'auth:logout' %}" class="w-full">
               {% csrf_token %}
               <button type="submit" 
                       class="w-full nav-menu-item text-red-600 hover:bg-red-50 border-red-200">

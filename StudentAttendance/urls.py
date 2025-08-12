@@ -19,9 +19,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+def home_redirect(request):
+    """Redirect to auth dashboard which handles role-based redirects"""
+    if request.user.is_authenticated:
+        return redirect('auth:dashboard')
+    else:
+        return redirect('auth:login')
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", lambda request: redirect('admin:index'), name="home"),  # Redirect to admin
+    path("", home_redirect, name="home"),  # Role-based redirect
     path("auth/", include("Authentication.urls")),  # Keep auth URLs for login
     path("staff/", include("attendance_dashboard.urls")),  # Staff attendance dashboard
     path("advisor/", include("advisor_dashboard.urls")),  # Advisor dashboard

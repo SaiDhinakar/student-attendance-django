@@ -123,9 +123,9 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"  # This will redirect to the dashboard view which handles role-based redirection
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_URL = "auth:login"
+LOGIN_REDIRECT_URL = "auth:dashboard"  # This will redirect to the dashboard view which handles role-based redirection
+LOGOUT_REDIRECT_URL = "auth:login"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

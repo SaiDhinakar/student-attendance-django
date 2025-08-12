@@ -49,7 +49,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out")
-    return redirect("/auth/login/")
+    return redirect("auth:login")
 
 
 @login_required
