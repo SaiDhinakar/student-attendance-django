@@ -17,34 +17,29 @@
     
     <!-- Advisor Unified UI -->
     <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
-    
+       <!-- Client's Custom Theme -->
+    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     {% block extra_css %}{% endblock %}
   </head>
   <body class="glassmorphic-body min-h-screen">
 
     <!-- HEADER -->
-    <header class="glassmorphic-header fixed top-0 z-50 w-full">
+    <header class="fixed top-0 z-50 w-full header-bg shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
           
           <!-- Left: Mobile Menu Button + Logo -->
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-4">
             <!-- Mobile menu button -->
-            <button
-              id="sidebarToggle"
-              class="md:hidden glassmorphic-btn-icon"
-              aria-label="Open menu"
-            >
-              <i class="iconoir-menu text-xl"></i>
-            </button>
-
+            
             <!-- Logo -->
             <a href="{% url 'auth:dashboard' %}" class="flex items-center">
               <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
             </a>
           </div>
-
+          
           <!-- Center: College Info -->
           <div class="flex-1 text-center px-4 md:px-8">
             <h1 class="text-sm md:text-lg lg:text-xl font-bold glassmorphic-text-primary leading-tight">
@@ -54,20 +49,27 @@
               Student Attendance System
             </p>
           </div>
-
+          
+          <button
+            id="sidebarToggle"
+            class="md:hidden glassmorphic-btn-icon"
+            aria-label="Open menu"
+          >
+            <i class="iconoir-menu text-xl"></i>
+          </button>
           <!-- Right: Theme Toggle + Desktop Navigation -->
           <div class="flex items-center space-x-4">
             <!-- Theme Toggle Button -->
             <button
-              id="themeToggle"
-              class="glassmorphic-btn-icon hidden md:inline-flex"
-              aria-label="Toggle theme"
+            id="themeToggle"
+            class="glassmorphic-btn-icon hidden md:inline-flex"
+            aria-label="Toggle theme"
             >
-              <i class="iconoir-sun-light text-lg" id="lightIcon"></i>
-              <i class="iconoir-moon text-lg hidden" id="darkIcon"></i>
-            </button>
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex items-center space-x-6">
+            <i class="iconoir-sun-light text-lg" id="lightIcon"></i>
+            <i class="iconoir-moon text-lg hidden" id="darkIcon"></i>
+          </button>
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-6">
               {% if user.is_authenticated %}
                 <a href="{% url 'auth:dashboard' %}" 
                    class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
