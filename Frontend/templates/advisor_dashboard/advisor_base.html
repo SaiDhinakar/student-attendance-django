@@ -81,9 +81,14 @@
                  class="nav-btn {% if 'reports' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="iconoir-stats-report"></i>Reports
               </a>
-              
-              <!-- User Dropdown -->
-              <div class="relative ml-3">
+            {% endif %}
+          </nav>
+
+          <!-- User Profile - Always Visible -->
+          <div class="flex items-center space-x-2">
+            {% if user.is_authenticated %}
+              <!-- User Dropdown - Desktop -->
+              <div class="hidden lg:block relative ml-3">
                 <button id="userMenuButton" 
                         class="user-menu-btn flex items-center space-x-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-200">
                   <div class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
@@ -134,18 +139,16 @@
                   </div>
                 </div>
               </div>
-            {% endif %}
-          </nav>
 
-          <!-- Mobile User Button -->
-          <div class="lg:hidden">
-            {% if user.is_authenticated %}
-              <button id="mobileUserButton" 
-                      class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-                <div class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                  <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
-                </div>
-              </button>
+              <!-- Mobile User Button -->
+              <div class="lg:hidden">
+                <button id="mobileUserButton" 
+                        class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+                  <div class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
+                  </div>
+                </button>
+              </div>
             {% endif %}
           </div>
         </div>

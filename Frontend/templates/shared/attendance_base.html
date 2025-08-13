@@ -26,18 +26,18 @@
         <div class="flex items-center justify-between h-16 md:h-20">
           
           <!-- Left: Mobile Menu Button + Logo -->
-          <div class="flex items-center space-x-3">
+          <div class="flex items-left space-x-3">
             <!-- Mobile menu button -->
-            <button
+            <!-- <button
               id="sidebarToggle"
               class="md:hidden inline-flex items-center justify-center p-2 rounded-md nav-link hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
               aria-label="Open menu"
             >
               <i class="iconoir-menu text-xl"></i>
-            </button>
+            </button> -->
 
             <!-- Logo -->
-            <a href="{% if user.groups.all.0.name == 'Advisors' %}{% url 'advisor_dashboard:dashboard' %}{% else %}{% url 'attendance_dashboard:dashboard' %}{% endif %}" class="flex items-center space-x-3">
+            <a href="{% if user.groups.all.0.name == 'Advisors' %}{% url 'advisor_dashboard:dashboard' %}{% else %}{% url 'attendance_dashboard:dashboard' %}{% endif %}" class="flex items-left space-x-3">
               <img src="{% static 'img/image.png' %}" alt="Logo" class="h-10 w-10 md:h-12 md:w-12" />
               <div class="hidden sm:block">
                 <h1 class="text-lg font-bold text-primary-custom">SSIET</h1>
@@ -47,7 +47,7 @@
           </div>
 
         <!-- Center: College Info -->
-        <div class="flex flex-1 items-center justify-center text-center px-4 md:px-8">
+        <div class="flex flex-1 items-center justify-left text-center px-4 md:px-8">
           <div>
             <h1 class="text-sm md:text-lg lg:text-xl font-bold text-primary-custom leading-tight">
               SRI SHAKTHI INSTITUTE OF ENGINEERING AND TECHNOLOGY
@@ -57,6 +57,7 @@
               Attendance Management System
             </p>
           </div>
+          
         </div>
 
           <!-- Right: User Profile -->

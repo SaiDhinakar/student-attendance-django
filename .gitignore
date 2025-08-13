@@ -5,9 +5,13 @@ build/
 dist/
 wheels/
 *.egg-info
-
+test/
+readmeai.md
+prompt.md
+gallery
 # Virtual environments
 .venv
-
+db.sqlite3
+check_gallery.py
 # Backend ignores
 backend/

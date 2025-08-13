@@ -29,24 +29,54 @@
 
  <style>
     :root {
-        --accent: #A7C957;
-        --primary: #386641; 
-        --secondary: #6A994E;
-        --background: #f4f0e7;
-        --section-bg: #e4f2cf;
-        --text-primary: #2A2D34;
-        --text-secondary: #6E7081;
-        --button-primary: #386641;
-        --button-secondary: #6A994E;
-        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-        --transition-duration: 200ms;
-        --transition-ease: ease-in-out;
-        --border-radius-sm: 4px;
-        --border-radius-md: 6px;
-        --border-radius-lg: 8px;
-        --gradient-primary: linear-gradient(to right, var(--primary), var(--secondary));
+        /* Light Green Staff Colors */
+        --accent: #2C55E;
+        --primary: #16A34A; 
+        --secondary: #4ADE80;
+        --background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+        --section-bg: rgba(220, 252, 231, 0.3);
+        --text-primary: #1F2937;
+        --text-secondary: #6B7280;
+        --button-primary: #16A34A;
+        --button-secondary: #22C55E;
+        --danger: #EF4444;
+        
+        /* Glassmorphic Extensions with Light Green */
+        --glass-bg: rgba(220, 252, 231, 0.3);
+        --glass-bg-strong: rgba(220, 252, 231, 0.5);
+        --glass-border: rgba(22, 163, 74, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(22, 163, 74, 0.1);
+        --glass-shadow-strong: 0 12px 40px 0 rgba(22, 163, 74, 0.2);
+        --blur-light: blur(8px);
+        --blur-medium: blur(12px);
+        --gradient-primary: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #15803D 100%);
+    }
+
+    [data-theme="dark"] {
+        /* Dark Light Green Colors */
+        --accent: #22C55E;
+        --primary: #16A34A;
+        --secondary: #4ADE80;
+        --background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        --section-bg: rgba(15, 23, 42, 0.3);
+        --text-primary: #F8FAFC;
+        --text-secondary: #CBD5E1;
+        --button-primary: #22C55E;
+        --button-secondary: #4ADE80;
+        --danger: #EF4444;
+        
+        /* Dark Light Green Glassmorphic Extensions */
+        --glass-bg: rgba(15, 23, 42, 0.3);
+        --glass-bg-strong: rgba(15, 23, 42, 0.5);
+        --glass-border: rgba(34, 197, 94, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        --glass-shadow-strong: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+        --gradient-primary: linear-gradient(135deg, #22C55E 0%, #16A34A 50%, #EF4444 100%);
+    }
+    
+    /* Global styling with glassmorphic background */
+    * {
+        box-sizing: border-box;
     }
 
     body {
