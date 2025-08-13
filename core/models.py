@@ -170,7 +170,6 @@ class Student(TimestampedModel):
         on_delete=models.CASCADE,
         db_column='section_id'
     )
-    embedding = models.BinaryField(null=True, blank=True, help_text="Face recognition embedding data")
     
     class Meta:
         db_table = 'Students'

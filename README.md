@@ -22,9 +22,53 @@ python manage.py runserver
 # Login: staff_user/staff123, advisor_user/advisor123, admin/admin123
 ```
 
+## DB Setup
+
+Install SQL server and SQL Workbench
+
+```bash
+# For Arch linux users
+sudo pacman -S mysql mysql-clients mysql-workbench
+
+# Initilize database
+sudo mysqld --initialize --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+
+# start service
+sudo systemctl enable --now mysqld
+
+sudo mysql_secure_installation # press y for initial setup
+
+```
+
+Then open your workbench create a new database connection with your preferred database name, user name, passowrd
+
+
+## Env Configurations
+
+```bash
+# Save it as .env with your actual data
+# Environment Configuration
+
+# MySQL Database Configurations
+
+DATABASE_NAME=<your_database_name>
+DATABASE_USER=<your_username> # default root
+DATABASE_PASSWORD=<your_database_password>
+DATABASE_HOST="localhost" # default
+DATABASE_PORT=3306 # default
+
+
+# Django Settings
+
+SECRET_KEY="<your django secret key>"
+ALLOWED_HOSTS="*,localhost" # change allowed host if you want
+
+```
+
 ## 📚 Complete Documentation
 
 For comprehensive documentation including:
+
 - Detailed installation instructions
 - API documentation
 - System architecture
