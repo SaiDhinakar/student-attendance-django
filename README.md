@@ -75,7 +75,6 @@ For comprehensive documentation including:
 - Recent updates and project status
 - Testing procedures
 
-**See: [`readmeai.md`](./readmeai.md)** - Our AI-maintained documentation that stays current with all project changes.
 
 ## 🎯 Key Features
 
@@ -89,7 +88,7 @@ For comprehensive documentation including:
 - **Backend**: Django 5.2.5, Python 3.12+
 - **ML**: YOLO 11, LightCNN, PyTorch
 - **Frontend**: HTML5/CSS3/JS, TailwindCSS
-- **Database**: SQLite (dev), PostgreSQL (prod)
+- **Database**: SQLite (dev), MySQL (prod)
 
 ## 📊 Current Status
 
@@ -101,4 +100,3 @@ For comprehensive documentation including:
 
 ---
 
-**For detailed documentation and latest updates**: [`readmeai.md`](./readmeai.md)
