@@ -22,6 +22,7 @@ urlpatterns = [
     # Student CRUD operations
     path('students/', views.student_list, name='student_list'),
     path('students/create/', views.student_create, name='student_create'),
+    path('students/bulk-upload/', views.bulk_student_upload, name='bulk_student_upload'),
     path('students/<str:student_regno>/', views.student_detail, name='student_detail'),
     path('students/<str:student_regno>/edit/', views.student_edit, name='student_edit'),
     path('students/<str:student_regno>/delete/', views.student_delete, name='student_delete'),

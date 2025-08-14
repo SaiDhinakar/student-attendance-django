@@ -10,10 +10,16 @@
       <h1 class="text-3xl font-bold text-[var(--text-primary)]">Student Management</h1>
       <p class="text-[var(--text-secondary)] mt-1">Manage students under your supervision</p>
     </div>
-    <a href="{% url 'advisor_dashboard:student_create' %}" 
-       class="bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
-      <i class="iconoir-plus mr-2"></i>Add New Student
-    </a>
+    <div class="flex space-x-3">
+      <a href="{% url 'advisor_dashboard:bulk_student_upload' %}" 
+         class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+        <i class="iconoir-upload mr-2"></i>Bulk Upload
+      </a>
+      <a href="{% url 'advisor_dashboard:student_create' %}" 
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+        <i class="iconoir-plus mr-2"></i>Add Student
+      </a>
+    </div>
   </div>
 
   <!-- Search and Filters -->

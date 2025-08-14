@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse, HttpResponse
 from django.contrib import messages
 from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
 import json
+import csv
+import io
 from django.core.paginator import Paginator
 from django.db import transaction
 
@@ -382,10 +384,21 @@ def student_create(request):
     if request.method == 'POST':
         try:
             with transaction.atomic():
+                # Get the selected section
+                section = get_object_or_404(Section, section_id=request.POST['section'])
+                
+                # Ensure advisor has permission for this section
+                if section not in advisor.get_assigned_sections():
+                    messages.error(request, "You don't have permission to add students to this section.")
+                    return redirect("advisor_dashboard:student_create")
+                
+                # Create student with department and batch from section
                 student = Student.objects.create(
                     student_regno=request.POST['student_regno'],
                     name=request.POST['name'],
-                    section_id=request.POST['section'],
+                    section=section,
+                    department=section.batch.dept,  # Auto-assign from section's batch
+                    batch=section.batch,           # Auto-assign from section
                 )
                 messages.success(request, f"Student {student.name} created successfully!")
                 return redirect("advisor_dashboard:student_detail", student_regno=student.student_regno)
@@ -401,6 +414,114 @@ def student_create(request):
         'assigned_sections': assigned_sections,
     }
     return render(request, 'advisor_dashboard/student_form.html', context)
+
+
+@login_required
+def bulk_student_upload(request):
+    """Bulk upload students from CSV file"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect("auth:login")
+    
+    advisor = get_advisor_profile(request.user)
+    if not advisor:
+        messages.error(request, "No advisor profile found.")
+        return redirect("advisor_dashboard:dashboard")
+    
+    if request.method == 'POST':
+        if 'csv_file' not in request.FILES:
+            messages.error(request, "Please select a CSV file to upload.")
+            return redirect("advisor_dashboard:bulk_student_upload")
+        
+        csv_file = request.FILES['csv_file']
+        section_id = request.POST.get('section')
+        
+        if not section_id:
+            messages.error(request, "Please select a section for the students.")
+            return redirect("advisor_dashboard:bulk_student_upload")
+        
+        try:
+            # Get the selected section and validate advisor access
+            section = get_object_or_404(Section, section_id=section_id)
+            if section not in advisor.get_assigned_sections():
+                messages.error(request, "You don't have permission to add students to this section.")
+                return redirect("advisor_dashboard:bulk_student_upload")
+            
+            # Read and validate CSV file
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "Please upload a valid CSV file.")
+                return redirect("advisor_dashboard:bulk_student_upload")
+            
+            # Parse CSV content
+            decoded_file = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+            reader = csv.DictReader(io_string)
+            
+            # Validate required columns
+            required_columns = ['student_regno', 'name']
+            if not all(col in reader.fieldnames for col in required_columns):
+                messages.error(request, f"CSV file must contain columns: {', '.join(required_columns)}")
+                return redirect("advisor_dashboard:bulk_student_upload")
+            
+            created_students = []
+            errors = []
+            
+            with transaction.atomic():
+                for row_num, row in enumerate(reader, start=2):  # Start from 2 because row 1 is header
+                    student_regno = row.get('student_regno', '').strip()
+                    name = row.get('name', '').strip()
+                    
+                    if not student_regno or not name:
+                        errors.append(f"Row {row_num}: Missing student_regno or name")
+                        continue
+                    
+                    # Check if student already exists
+                    if Student.objects.filter(student_regno=student_regno).exists():
+                        errors.append(f"Row {row_num}: Student {student_regno} already exists")
+                        continue
+                    
+                    try:
+                        # Create student with department and batch from section
+                        student = Student.objects.create(
+                            student_regno=student_regno,
+                            name=name,
+                            section=section,
+                            department=section.batch.dept,  # Auto-assign from section's batch
+                            batch=section.batch,           # Auto-assign from section
+                        )
+                        created_students.append(student)
+                    except Exception as e:
+                        errors.append(f"Row {row_num}: Error creating student {student_regno}: {str(e)}")
+            
+            # Provide feedback
+            if created_students:
+                messages.success(request, f"Successfully created {len(created_students)} students.")
+            
+            if errors:
+                # Show first few errors to avoid overwhelming the user
+                error_messages = errors[:5]
+                if len(errors) > 5:
+                    error_messages.append(f"... and {len(errors) - 5} more errors")
+                messages.warning(request, "Some students could not be created: " + "; ".join(error_messages))
+            
+            if not created_students and not errors:
+                messages.info(request, "No valid student data found in the CSV file.")
+            
+            return redirect("advisor_dashboard:student_list")
+            
+        except Exception as e:
+            messages.error(request, f"Error processing CSV file: {str(e)}")
+            return redirect("advisor_dashboard:bulk_student_upload")
+    
+    # GET request - show upload form
+    assigned_sections = advisor.get_assigned_sections()
+    
+    context = {
+        'user': request.user,
+        'advisor': advisor,
+        'assigned_sections': assigned_sections,
+    }
+    return render(request, 'advisor_dashboard/bulk_student_upload.html', context)
 
 @login_required
 def student_edit(request, student_regno):
@@ -430,6 +551,9 @@ def student_edit(request, student_regno):
                     new_section = get_object_or_404(Section, section_id=new_section_id)
                     if new_section in advisor.get_assigned_sections():
                         student.section = new_section
+                        # Automatically update department and batch based on new section
+                        student.department = new_section.batch.dept
+                        student.batch = new_section.batch
                     else:
                         messages.error(request, "You don't have permission to move student to that section.")
                         return redirect("advisor_dashboard:student_edit", student_regno=student_regno)
