@@ -59,7 +59,7 @@ table,
 .table thead th,
 .table th,
 th {
-  background: var(--gradient-primary) !important;
+  background: #817267 !important;
   color: white !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
@@ -136,9 +136,9 @@ th {
 }
 
 .pagination .page-item.active .page-link {
-  background: var(--gradient-primary) !important;
+  background: #817267 !important;
   color: white !important;
-  box-shadow: 0 4px 15px rgba(56, 102, 65, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(129, 114, 103, 0.3) !important;
 }
 
 /* ===== Enhanced Modals ===== */
@@ -153,7 +153,7 @@ th {
 }
 
 .modal-header {
-  background: var(--gradient-primary) !important;
+  background: #817267 !important;
   color: white !important;
   border-bottom: none !important;
   border-radius: 20px 20px 0 0 !important;
@@ -328,7 +328,7 @@ th {
 .addlink,
 .changelink,
 .deletelink {
-  background: var(--gradient-primary) !important;
+  background: #817267 !important;
   color: white !important;
   border: none !important;
   padding: 0.5rem 1rem !important;

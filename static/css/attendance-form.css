@@ -2,7 +2,17 @@
 .form-container {
   background: var(--glass-bg);
   backdrop-filter: var(--blur-medium);
-  -webkit-backdrop-filter: var(--blur-medium);
+  -w  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 24px;
+  background: #817267;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;rop-filter: var(--blur-medium);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   padding: 2rem;
@@ -18,7 +28,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--gradient-primary);
+  background: #817267;
   opacity: 0.8;
 }
 
@@ -159,7 +169,7 @@
   transform: translateY(-50%);
   width: 6px;
   height: 24px;
-  background: var(--gradient-primary);
+  background: #817267;
   border-radius: 3px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -192,7 +202,7 @@
 }
 
 .department-checkboxes-scrollable::-webkit-scrollbar-thumb {
-  background: var(--gradient-primary);
+  background: #817267;
   border-radius: 3px;
 }
 

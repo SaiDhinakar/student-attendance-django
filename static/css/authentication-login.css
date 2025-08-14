@@ -43,7 +43,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--gradient-primary);
+  background: #817267;
 }
 
 /* Enhanced form inputs for login */
@@ -66,7 +66,7 @@
 
 /* Enhanced login button */
 .login-container .btn-primary {
-  background: var(--gradient-primary);
+  background: #817267;
   border: none;
   padding: 1rem 2rem;
   font-size: 1rem;

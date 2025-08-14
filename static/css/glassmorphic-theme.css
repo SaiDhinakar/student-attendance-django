@@ -157,7 +157,7 @@ body::before {
 
 /* Enhanced Buttons with Glassmorphic Design */
 .btn-primary {
-  background: var(--gradient-primary);
+  background: #817267;
   color: white;
   border: none;
   padding: 0.875rem 2rem;
@@ -322,7 +322,7 @@ body::before {
 }
 
 .table-header {
-  background: var(--gradient-primary);
+  background: #817267;
   color: white;
   font-weight: 600;
   text-transform: uppercase;

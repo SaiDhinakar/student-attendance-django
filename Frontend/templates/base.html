@@ -50,13 +50,14 @@
             </p>
           </div>
           
-          <button
-            id="sidebarToggle"
-            class="md:hidden glassmorphic-btn-icon"
-            aria-label="Open menu"
-          >
-            <i class="iconoir-menu text-xl"></i>
-          </button>
+                <form method="post" action="{% url 'auth:logout' %}" class="inline">
+                  {% csrf_token %}
+                  <button type="submit" 
+                          class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
+                    <i class="iconoir-log-out mr-2"></i>
+                    
+                  </button>
+                </form>
           <!-- Right: Theme Toggle + Desktop Navigation -->
           <div class="flex items-center space-x-4">
             <!-- Theme Toggle Button -->

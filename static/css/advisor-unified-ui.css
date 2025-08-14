@@ -1,8 +1,50 @@
 /* 🎨 Unified Advisor-Style UI Components for All Dashboards */
+/* Solid Advisor-Style Welcome Sections */
+.solid-advisor-welcome-section {
+  background: #817267; /* Solid background */
+  border-radius: 16px;
+  padding: 2rem;
+  color: white;
+  box-shadow: var(--glass-shadow-strong);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.solid-advisor-welcome-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(50px, -50px);
+}
+
+.solid-advisor-welcome-section h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.solid-advisor-welcome-section p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.solid-advisor-welcome-icon {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 4rem;
+  opacity: 0.8;
+}
 
 /* Advisor-Style Welcome Sections */
 .advisor-welcome-section {
-  background: var(--gradient-primary);
+  background: #817267;
   border-radius: 16px;
   padding: 2rem;
   color: white;
@@ -71,7 +113,7 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: var(--gradient-primary);
+  background: #817267;
   border-radius: 0 2px 2px 0;
 }
 
@@ -222,32 +264,32 @@
 }
 
 .advisor-action-btn.primary {
-  background: var(--gradient-primary);
+  background: #817267;
   color: white;
 }
 
 .advisor-action-btn.secondary {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: #817267;
   color: white;
 }
 
 .advisor-action-btn.success {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  background: #817267;
   color: white;
 }
 
 .advisor-action-btn.warning {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: #817267;
   color: white;
 }
 
 .advisor-action-btn.info {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  background: #817267;
   color: white;
 }
 
 .advisor-action-btn.purple {
-  background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+  background: #817267;
   color: white;
 }
 
@@ -386,7 +428,7 @@
 
 /* Enhanced Button Styles to Match Advisor UI */
 .btn-advisor-primary {
-  background: var(--gradient-primary);
+  background: #817267;
   color: white;
   border: none;
   padding: 0.875rem 2rem;
@@ -403,11 +445,11 @@
 
 .btn-advisor-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(56, 102, 65, 0.3);
+  box-shadow: 0 8px 25px rgba(129, 114, 103, 0.3);
 }
 
 .btn-advisor-secondary {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: #817267;
   color: white;
   border: none;
   padding: 0.875rem 2rem;
@@ -424,11 +466,11 @@
 
 .btn-advisor-secondary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 25px rgba(129, 114, 103, 0.3);
 }
 
 .btn-advisor-success {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  background: #817267;
   color: white;
   border: none;
   padding: 0.875rem 2rem;
@@ -445,7 +487,28 @@
 
 .btn-advisor-success:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 8px 25px rgba(129, 114, 103, 0.3);
+}
+
+.btn-advisor-warning {
+  background: #817267;
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-advisor-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(129, 114, 103, 0.3);
 }
 
 /* Responsive Design for Advisor-Style Components */
@@ -481,7 +544,7 @@
 
 /* Dark Theme Enhancements for Advisor Style */
 [data-theme="dark"] .advisor-welcome-section {
-  background: linear-gradient(135deg, #BC4749 0%, #6A994E 50%, #386641 100%);
+  background: #817267;
 }
 
 [data-theme="dark"] .advisor-stat-card .stat-value {

@@ -71,10 +71,10 @@
                 <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
               </div>
               <div class="hidden md:block text-left">
-                <p class="text-sm font-medium text-white">{{ user.get_full_name|default:user.username }}</p>
-                <p class="text-xs text-white/70">Advisor</p>
+                <p class="text-sm font-semibold text-black">{{ user.get_full_name|default:user.username }}</p>
+                <p class="text-xs text-black/70">Advisor</p>
               </div>
-              <i class="iconoir-nav-arrow-down text-white/70"></i>
+              <i class="iconoir-nav-arrow-down text-black/70"></i>
             </button>
 
             <!-- Dropdown Menu -->
@@ -83,7 +83,7 @@
               <div class="p-4 border-b border-gray-200/50">
                 <div class="flex items-center space-x-3">
                   <div
-                    class="h-10 w-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    class="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center">
                     <span class="text-white font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
                   </div>
                   <div>
@@ -110,7 +110,7 @@
                   {% csrf_token %}
                   <button type="submit"
                     class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <i class="iconoir-log-out mr-3"></i>Sign Out
+                    <i class="iconoir-log-out mr-3"></i>Log out
                   </button>
                 </form>
               </div>
@@ -122,7 +122,7 @@
             <button id="mobileUserButton"
               class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
               <div
-                class="h-8 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
               </div>
             </button>
@@ -157,15 +157,15 @@
         </div> -->
 
       <!-- User Info in Sidebar -->
-      <div class="p-4 border-b border-gray-200/50 bg-gradient-to-r from-gray-50 to-gray-100">
+      <div class="p-4 pt-20 border-b border-gray-200/50 bg-gradient-to-r from-gray-50 to-gray-100">
         <div class="flex items-center space-x-3">
           <button id="sidebarClose"
             class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 focus:outline-none transition-all">
             <i class="iconoir-cancel text-xl"></i>
           </button>
           <div
-            class="h-12 w-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
-            <span class="text-white font-bold text-lg">{{ user.first_name.0|default:user.username.0|upper }}</span>
+            class="h-12 w-12 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+            <span class="text-black font-bold text-lg">{{ user.first_name.0|default:user.username.0|upper }}</span>
           </div>
           <div>
             <p class="text-sm font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</p>
@@ -180,16 +180,16 @@
       <nav class="p-4 space-y-4 overflow-y-auto h-full pb-20">
 
         <!-- Dashboard -->
-        <a href="{% url 'advisor_dashboard:dashboard' %}"
+        <!-- <a href="{% url 'advisor_dashboard:dashboard' %}"
           class="block w-full nav-menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-          <i class="iconoir-dashboard-speed"></i>
-          <span>Dashboard</span>
+          <i class="iconoir-dashboard-speed" ></i>
+          <span >Dashboard</span>
           <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-        </a>
+        </a> -->
 
         <!-- Student Management -->
         <div class="space-y-2">
-          <h3 class="nav-menu-section">Student Management</h3>
+          <h3 class="nav-menu-section font-bold">Student Management</h3>
           <a href="{% url 'advisor_dashboard:student_list' %}" class="block w-full nav-menu-item">
             <i class="iconoir-group"></i>
             <span>View Students</span>
@@ -227,7 +227,7 @@
 
         <!-- Attendance Management -->
         <div class="space-y-2">
-          <h3 class="nav-menu-section">Attendance Management</h3>
+          <h3 class="nav-menu-section font-bold">Attendance Management</h3>
           <a href="{% url 'advisor_dashboard:staff_attendance' %}" class="block w-full nav-menu-item">
             <i class="iconoir-check-circle"></i>
             <span>Take Attendance</span>
@@ -242,7 +242,7 @@
 
         <!-- Reports & Analytics -->
         <div class="space-y-2">
-          <h3 class="nav-menu-section">Reports & Analytics</h3>
+          <h3 class="nav-menu-section font-bold">Reports & Analytics</h3>
           <a href="{% url 'advisor_dashboard:department_attendance' %}" class="block w-full nav-menu-item">
             <i class="iconoir-graph-up"></i>
             <span>Department Statistics</span>
@@ -262,7 +262,7 @@
 
         <!-- Account -->
         <div class="space-y-2">
-          <h3 class="nav-menu-section">Account</h3>
+          <h3 class="nav-menu-section font-bold">Account</h3>
           <a href="#" class="block w-full nav-menu-item">
             <i class="iconoir-user"></i>
             <span>Profile Settings</span>
@@ -281,7 +281,7 @@
             {% csrf_token %}
             <button type="submit" class="block w-full nav-menu-item text-red-600 hover:bg-red-50 border-red-200">
               <i class="iconoir-log-out"></i>
-              <span>Sign Out</span>
+              <span>Log out</span>
               <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </button>
           </form>
