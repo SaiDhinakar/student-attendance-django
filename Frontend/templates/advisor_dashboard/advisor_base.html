@@ -19,8 +19,8 @@
   <!-- Advisor Unified UI -->
   <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
 
-   <!-- Client's Custom Theme -->
-    <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
+  <!-- Client's Custom Theme -->
+  <link rel="stylesheet" href="{% static 'css/custom-theme.css' %}">
 
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   {% block extra_css %}{% endblock %}
@@ -66,8 +66,7 @@
           <div class="hidden lg:block relative ml-2">
             <button id="userMenuButton"
               class="user-menu-btn flex items-center space-x-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-200">
-              <div
-                class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center shadow-md">
+              <div class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center shadow-md">
                 <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
               </div>
               <div class="hidden md:block text-left">
@@ -82,8 +81,7 @@
               class="hidden absolute right-0 mt-2 w-64 bg-white/90 backdrop-blur-lg border border-white/30 rounded-xl shadow-xl z-50">
               <div class="p-4 border-b border-gray-200/50">
                 <div class="flex items-center space-x-3">
-                  <div
-                    class="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center">
+                  <div class="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center">
                     <span class="text-white font-bold">{{ user.first_name.0|default:user.username.0|upper }}</span>
                   </div>
                   <div>
@@ -97,13 +95,13 @@
                   class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
                   <i class="iconoir-dashboard-speed mr-3"></i>Dashboard
                 </a>
-                <a href="#"
+                <a href="{% url 'advisor_dashboard:student_list' %}"
                   class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
-                  <i class="iconoir-user mr-3"></i>Profile Settings
+                  <i class="iconoir-group mr-3"></i>View Students
                 </a>
-                <a href="#"
+                <a href="{% url 'advisor_dashboard:staff_attendance' %}"
                   class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-lg transition-colors">
-                  <i class="iconoir-settings mr-3"></i>Preferences
+                  <i class="iconoir-check-circle mr-3"></i>Take Attendance
                 </a>
                 <hr class="my-2 border-gray-200/50">
                 <form method="post" action="{% url 'auth:logout' %}" class="w-full">
@@ -121,8 +119,7 @@
           <div class="lg:hidden">
             <button id="mobileUserButton"
               class="flex items-center space-x-2 px-2 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-              <div
-                class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <div class="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <span class="text-white font-bold text-sm">{{ user.first_name.0|default:user.username.0|upper }}</span>
               </div>
             </button>
@@ -163,8 +160,7 @@
             class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 focus:outline-none transition-all">
             <i class="iconoir-cancel text-xl"></i>
           </button>
-          <div
-            class="h-12 w-12 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+          <div class="h-12 w-12 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
             <span class="text-black font-bold text-lg">{{ user.first_name.0|default:user.username.0|upper }}</span>
           </div>
           <div>
@@ -195,24 +191,16 @@
             <span>View Students</span>
             <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
           </a>
-          
+
           <!-- Student Management -->
           <div class="space-y-1">
-            <h3 class="nav-menu-section">Student Management</h3>
-            <a href="{% url 'advisor_dashboard:student_list' %}" 
-               class="nav-menu-item">
-              <i class="iconoir-group"></i>
-              <span>View Students</span>
-              <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-            </a>
-            <a href="{% url 'advisor_dashboard:student_create' %}" 
-               class="nav-menu-item">
+        
+            <a href="{% url 'advisor_dashboard:student_create' %}" class="block w-full nav-menu-item">
               <i class="iconoir-plus-circle"></i>
               <span>Add Student</span>
               <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
             </a>
-            <a href="{% url 'advisor_dashboard:bulk_student_upload' %}" 
-               class="nav-menu-item">
+            <a href="{% url 'advisor_dashboard:bulk_student_upload' %}" class="block w-full nav-menu-item">
               <i class="iconoir-upload"></i>
               <span>Bulk Upload</span>
               <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
