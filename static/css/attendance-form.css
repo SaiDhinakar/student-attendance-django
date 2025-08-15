@@ -1,24 +1,18 @@
 /* Enhanced Attendance Form styles with Glassmorphic Design */
 .form-container {
-  background: var(--glass-bg);
-  backdrop-filter: var(--blur-medium);
-  -w  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 24px;
-  background: #817267;
-  border-radius: 3px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;rop-filter: var(--blur-medium);
-  border: 1px solid var(--glass-border);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.3)); /* Fallback background */
+  backdrop-filter: var(--blur-medium, blur(12px));
+  -webkit-backdrop-filter: var(--blur-medium, blur(12px));
+  border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--glass-shadow, 0 8px 32px 0 rgba(0, 0, 0, 0.15));
   position: relative;
   overflow: hidden;
+  min-height: 200px; /* Ensure minimum height */
+  margin-bottom: 2rem; /* Ensure proper spacing */
+  display: block; /* Force display */
+  visibility: visible; /* Force visibility */
 }
 
 .form-container::before {
@@ -34,21 +28,24 @@
 
 .form-group {
   margin-bottom: 1.75rem;
+  display: block; /* Ensure form groups are visible */
+  visibility: visible;
 }
 
 .form-label {
   display: block;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-primary, #2A2D34); /* Fallback color */
   margin-bottom: 0.75rem;
   transition: color 0.2s ease;
+  visibility: visible;
 }
 
 .form-select {
   width: 100%;
   padding: 1rem 1.25rem;
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.2)); /* Fallback border */
   border-radius: 12px;
   background: var(--glass-bg);
   backdrop-filter: var(--blur-light);
