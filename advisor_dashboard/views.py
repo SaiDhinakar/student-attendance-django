@@ -429,21 +429,34 @@ def bulk_student_upload(request):
         return redirect("advisor_dashboard:dashboard")
     
     if request.method == 'POST':
+        print(f"DEBUG: POST request received")
+        print(f"DEBUG: FILES in request: {request.FILES}")
+        print(f"DEBUG: POST data: {request.POST}")
+        
         if 'csv_file' not in request.FILES:
+            print("DEBUG: No csv_file in request.FILES")
             messages.error(request, "Please select a CSV file to upload.")
             return redirect("advisor_dashboard:bulk_student_upload")
         
         csv_file = request.FILES['csv_file']
+        print(f"DEBUG: CSV file name: {csv_file.name}")
+        print(f"DEBUG: CSV file size: {csv_file.size}")
+        
         section_id = request.POST.get('section')
+        print(f"DEBUG: Selected section_id: {section_id}")
         
         if not section_id:
+            print("DEBUG: No section_id provided")
             messages.error(request, "Please select a section for the students.")
             return redirect("advisor_dashboard:bulk_student_upload")
         
         try:
+            print(f"DEBUG: Starting CSV processing...")
             # Get the selected section and validate advisor access
             section = get_object_or_404(Section, section_id=section_id)
+            print(f"DEBUG: Found section: {section}")
             if section not in advisor.get_assigned_sections():
+                print("DEBUG: Section not in advisor's assigned sections")
                 messages.error(request, "You don't have permission to add students to this section.")
                 return redirect("advisor_dashboard:bulk_student_upload")
             
@@ -453,34 +466,56 @@ def bulk_student_upload(request):
                 return redirect("advisor_dashboard:bulk_student_upload")
             
             # Parse CSV content
-            decoded_file = csv_file.read().decode('utf-8')
+            decoded_file = csv_file.read().decode('utf-8-sig')  # utf-8-sig automatically removes BOM
+            print(f"DEBUG: Decoded file content preview: {decoded_file[:200]}")
             io_string = io.StringIO(decoded_file)
             reader = csv.DictReader(io_string)
+            
+            print(f"DEBUG: CSV fieldnames: {reader.fieldnames}")
+            
+            # Clean fieldnames of any BOM characters (fallback)
+            if reader.fieldnames:
+                cleaned_fieldnames = [field.lstrip('\ufeff') for field in reader.fieldnames]
+                if cleaned_fieldnames != reader.fieldnames:
+                    print(f"DEBUG: Cleaned BOM from fieldnames: {cleaned_fieldnames}")
+                    reader.fieldnames = cleaned_fieldnames
             
             # Validate required columns
             required_columns = ['student_regno', 'name']
             if not all(col in reader.fieldnames for col in required_columns):
+                print(f"DEBUG: Missing columns. Found: {reader.fieldnames}, Required: {required_columns}")
                 messages.error(request, f"CSV file must contain columns: {', '.join(required_columns)}")
                 return redirect("advisor_dashboard:bulk_student_upload")
             
             created_students = []
             errors = []
             
+            print(f"DEBUG: Starting transaction...")
             with transaction.atomic():
+                print(f"DEBUG: Entering CSV processing loop...")
                 for row_num, row in enumerate(reader, start=2):  # Start from 2 because row 1 is header
+                    print(f"DEBUG: Processing row {row_num}: {dict(row)}")
                     student_regno = row.get('student_regno', '').strip()
                     name = row.get('name', '').strip()
                     
+                    print(f"DEBUG: Extracted - student_regno: '{student_regno}', name: '{name}'")
+                    
                     if not student_regno or not name:
-                        errors.append(f"Row {row_num}: Missing student_regno or name")
+                        error_msg = f"Row {row_num}: Missing student_regno or name"
+                        print(f"DEBUG: {error_msg}")
+                        errors.append(error_msg)
                         continue
                     
                     # Check if student already exists
-                    if Student.objects.filter(student_regno=student_regno).exists():
-                        errors.append(f"Row {row_num}: Student {student_regno} already exists")
+                    existing_student = Student.objects.filter(student_regno=student_regno).first()
+                    if existing_student:
+                        error_msg = f"Row {row_num}: Student {student_regno} already exists"
+                        print(f"DEBUG: {error_msg}")
+                        errors.append(error_msg)
                         continue
                     
                     try:
+                        print(f"DEBUG: Creating student with regno={student_regno}, name={name}, section={section}")
                         # Create student with department and batch from section
                         student = Student.objects.create(
                             student_regno=student_regno,
@@ -489,27 +524,44 @@ def bulk_student_upload(request):
                             department=section.batch.dept,  # Auto-assign from section's batch
                             batch=section.batch,           # Auto-assign from section
                         )
+                        print(f"DEBUG: Successfully created student: {student}")
                         created_students.append(student)
                     except Exception as e:
-                        errors.append(f"Row {row_num}: Error creating student {student_regno}: {str(e)}")
+                        error_msg = f"Row {row_num}: Error creating student {student_regno}: {str(e)}"
+                        print(f"DEBUG: {error_msg}")
+                        errors.append(error_msg)
+            
+            print(f"DEBUG: Processing complete. Created: {len(created_students)}, Errors: {len(errors)}")
+            print(f"DEBUG: Created students: {[str(s) for s in created_students]}")
+            print(f"DEBUG: Errors: {errors}")
             
             # Provide feedback
             if created_students:
-                messages.success(request, f"Successfully created {len(created_students)} students.")
+                success_msg = f"Successfully created {len(created_students)} students."
+                print(f"DEBUG: Success message: {success_msg}")
+                messages.success(request, success_msg)
             
             if errors:
                 # Show first few errors to avoid overwhelming the user
                 error_messages = errors[:5]
                 if len(errors) > 5:
                     error_messages.append(f"... and {len(errors) - 5} more errors")
-                messages.warning(request, "Some students could not be created: " + "; ".join(error_messages))
+                warning_msg = "Some students could not be created: " + "; ".join(error_messages)
+                print(f"DEBUG: Warning message: {warning_msg}")
+                messages.warning(request, warning_msg)
             
             if not created_students and not errors:
-                messages.info(request, "No valid student data found in the CSV file.")
+                info_msg = "No valid student data found in the CSV file."
+                print(f"DEBUG: Info message: {info_msg}")
+                messages.info(request, info_msg)
             
+            print(f"DEBUG: Redirecting to student_list...")
             return redirect("advisor_dashboard:student_list")
             
         except Exception as e:
+            print(f"DEBUG: Exception in bulk upload: {e}")
+            import traceback
+            traceback.print_exc()
             messages.error(request, f"Error processing CSV file: {str(e)}")
             return redirect("advisor_dashboard:bulk_student_upload")
     

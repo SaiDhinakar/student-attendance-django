@@ -310,7 +310,7 @@ def process_images(request):
                 {
                     "register_number": student.student_regno,
                     "name": student.name,
-                    "confidence": confidence,
+                    "confidence": float(confidence),  # Convert numpy.float32 to Python float
                     "is_present": is_present,
                     "prediction_id": prediction.id,
                     "section": student.section.section_name,
@@ -507,7 +507,7 @@ def get_session_data(request, session_id):
                     "register_number": p.student.student_regno,
                     "name": p.student.name,
                     "predicted_present": p.predicted_present,
-                    "confidence_score": p.confidence_score,
+                    "confidence_score": float(p.confidence_score),  # Convert to Python float
                     "predicted_at": p.predicted_at.isoformat(),
                 }
                 for p in predictions
@@ -683,7 +683,7 @@ def debug_session_info(request, session_id):
             "student_regno": p.student.student_regno,
             "student_name": p.student.name,
             "predicted_present": p.predicted_present,
-            "confidence_score": p.confidence_score,
+            "confidence_score": float(p.confidence_score),  # Convert to Python float
         } for p in predictions]
         
         # Get submissions

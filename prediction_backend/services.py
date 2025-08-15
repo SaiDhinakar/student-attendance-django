@@ -401,7 +401,7 @@ class PredictionService:
                                 matches.append((identity, similarity))
                                 logger.debug(f"✅ Face {valid_faces} matches {identity}: {similarity:.3f}")
                         
-                        logger.debug(f"🔍 Face {validates_faces}: checked {gallery_checked} gallery entries, found {len(matches)} matches")
+                        logger.debug(f"🔍 Face {valid_faces}: checked {gallery_checked} gallery entries, found {len(matches)} matches")
                                 
                         # Sort matches by similarity (highest first)
                         matches.sort(key=lambda x: x[1], reverse=True)
