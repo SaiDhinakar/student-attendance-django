@@ -206,7 +206,7 @@ class AdvisorSectionAdmin(AdvisorFilteredAdminMixin, admin.ModelAdmin):
     get_department.short_description = 'Department'
     
     def student_count(self, obj):
-        return obj.students.count()
+        return obj.student_set.count()
     student_count.short_description = 'Students'
     
     def get_queryset(self, request):
