@@ -120,10 +120,10 @@
                class="block w-full bg-green-600 text-white py-2 px-3 rounded-md text-sm hover:bg-green-700 transition-colors">
               Department Stats
             </a>
-            <!-- <a href="{% url 'advisor_dashboard:attendance_history' %}" 
+            <a href="{% url 'advisor_dashboard:reports' %}" 
                class="block w-full bg-indigo-600 text-white py-2 px-3 rounded-md text-sm hover:bg-indigo-700 transition-colors">
-              History & Analytics
-            </a> -->
+              Generate Reports
+            </a>
           </div>
         </div>
       </div>
@@ -149,45 +149,7 @@
   </div>
 
   <!-- Assigned Departments/Batches -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Assigned Departments -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
-      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">
-        <i class="iconoir-building mr-2"></i>Assigned Departments
-      </h3>
-      {% if assigned_departments %}
-        <div class="space-y-2">
-          {% for department in assigned_departments %}
-          <div class="flex items-center justify-between bg-[var(--bg-primary)] rounded-lg p-3">
-            <span class="font-medium text-[var(--text-primary)]">{{ department.dept_name }}</span>
-            <span class="text-sm text-[var(--text-secondary)]">ID: {{ department.dept_id }}</span>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="text-[var(--text-secondary)]">No departments assigned</p>
-      {% endif %}
-    </div>
 
-    <!-- Assigned Batches -->
-    <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
-      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-4">
-        <i class="iconoir-user-graduation mr-2"></i>Assigned Batches
-      </h3>
-      {% if assigned_batches %}
-        <div class="space-y-2">
-          {% for batch in assigned_batches %}
-          <div class="flex items-center justify-between bg-[var(--bg-primary)] rounded-lg p-3">
-            <span class="font-medium text-[var(--text-primary)]">{{ batch.dept.dept_name }} - {{ batch.year }}</span>
-            <span class="text-sm text-[var(--text-secondary)]">{{ batch.students.count }} students</span>
-          </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="text-[var(--text-secondary)]">No specific batches assigned</p>
-      {% endif %}
-    </div>
-  </div>
 
   <!-- Assigned Sections -->
   <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
@@ -211,96 +173,6 @@
     {% endif %}
   </div>
 
-  <!-- Quick Actions -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-  <!-- View Attendance -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-    <div class="p-6">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-[var(--primary)] bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="iconoir-stats-report text-2xl text-[var(--primary)]"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">View Attendance</h3>
-        <p class="text-sm text-[var(--text-secondary)] mb-4">Check department attendance statistics</p>
-        <a href="{% url 'advisor_dashboard:department_attendance' %}" 
-           class="inline-flex items-center justify-center gap-2 w-full px-4 py-2 
-                  text-sm font-medium rounded-lg 
-                  bg-[var(--primary)] text-white 
-                  hover:bg-[green] 
-                  transition-colors duration-200">
-          <i class="iconoir-eye text-lg"></i>
-          <span>View Status</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Take Attendance -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-    <div class="p-6">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-green-500 bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="iconoir-camera text-2xl text-green-500"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Take Attendance</h3>
-        <p class="text-sm text-[var(--text-secondary)] mb-4">Record student attendance for classes</p>
-        <a href="{% url 'advisor_dashboard:attendance' %}" 
-           class="inline-flex items-center justify-center gap-2 w-full px-4 py-2 
-                  text-sm font-medium rounded-lg 
-                  bg-green-500 text-white 
-                  hover:bg-green-600 
-                  transition-colors duration-200">
-          <i class="iconoir-check-circle text-lg"></i>
-          <span>Start Marking</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Attendance History -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-    <div class="p-6">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-blue-500 bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="iconoir-clock text-2xl text-blue-500"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Attendance History</h3>
-        <p class="text-sm text-[var(--text-secondary)] mb-4">View recent attendance submissions</p>
-        <a href="{% url 'advisor_dashboard:attendance_history' %}" 
-           class="inline-flex items-center justify-center gap-2 w-full px-4 py-2 
-                  text-sm font-medium rounded-lg 
-                  bg-blue-500 text-white 
-                  hover:bg-blue-600 
-                  transition-colors duration-200">
-          <i class="iconoir-history-backup text-lg"></i>
-          <span>View History</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Generate Reports -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-    <div class="p-6">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-orange-500 bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="iconoir-doc-chart text-2xl text-orange-500"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">Generate Reports</h3>
-        <p class="text-sm text-[var(--text-secondary)] mb-4">Create detailed attendance reports</p>
-        <a href="{% url 'advisor_dashboard:reports' %}" 
-           class="inline-flex items-center justify-center gap-2 w-full px-4 py-2 
-                  text-sm font-medium rounded-lg 
-                  bg-orange-500 text-white 
-                  hover:bg-orange-600 
-                  transition-colors duration-200">
-          <i class="iconoir-print text-lg"></i>
-          <span>View Reports</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
 
   <!-- Recent Activity -->
   {% if advisor and advisor.can_view_all_attendance %}

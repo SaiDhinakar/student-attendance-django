@@ -53,22 +53,22 @@
                 <form method="post" action="{% url 'auth:logout' %}" class="inline">
                   {% csrf_token %}
                   <button type="submit" 
-                          class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
-                    <i class="iconoir-log-out mr-2"></i>
-                    
+                      class="nav-link hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-transparent border-none cursor-pointer flex items-center">
+                  <i class="iconoir-log-in mr-2 text-xl"></i>
+                  
                   </button>
                 </form>
           <!-- Right: Theme Toggle + Desktop Navigation -->
           <div class="flex items-center space-x-4">
             <!-- Theme Toggle Button -->
-            <button
+            <!-- <button
             id="themeToggle"
             class="glassmorphic-btn-icon hidden md:inline-flex"
             aria-label="Toggle theme"
             >
             <i class="iconoir-sun-light text-lg" id="lightIcon"></i>
             <i class="iconoir-moon text-lg hidden" id="darkIcon"></i>
-          </button>
+          </button> -->
           <!-- Desktop Navigation -->
           <nav class="hidden md:flex items-center space-x-6">
               {% if user.is_authenticated %}
@@ -111,11 +111,11 @@
                   </button>
                 </form>
               {% else %}
-                <a href="{% url 'auth:login' %}" 
+                <!-- <a href="{% url 'auth:login' %}" 
                    class="btn-primary flex items-center">
                   <i class="iconoir-log-in mr-2"></i>
                   Login
-                </a>
+                </a> -->
               {% endif %}
             </nav>
           </div>
@@ -183,7 +183,7 @@
             </a>
             
             <!-- Mobile Theme Toggle -->
-            <button
+            <!-- <button
               id="mobileThemeToggle"
               class="w-full flex items-center px-4 py-3 rounded-lg nav-link hover:bg-primary hover:text-white font-medium transition-colors duration-200"
               aria-label="Toggle theme"
@@ -191,7 +191,7 @@
               <i class="iconoir-sun-light mr-3" id="mobileLightIcon"></i>
               <i class="iconoir-moon mr-3 hidden" id="mobileDarkIcon"></i>
               <span id="themeText">Light Mode</span>
-            </button>
+            </button> -->
             
             <form method="post" action="{% url 'auth:logout' %}" class="block">
               {% csrf_token %}
