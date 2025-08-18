@@ -832,6 +832,7 @@ def bulk_attendance_edit(request):
 # STAFF ATTENDANCE TAKING ACCESS
 
 @login_required
+@login_required
 def staff_attendance_access(request):
     """Allow advisor to access staff attendance taking functionality"""
     if not check_advisor_permission(request.user):
@@ -843,18 +844,19 @@ def staff_attendance_access(request):
         messages.error(request, "No advisor profile found.")
         return redirect("advisor_dashboard:dashboard")
     
-    # Redirect to the shared attendance taking template
-    # but with advisor context
+    # Render the same attendance form that staff users see
     context = {
         'user': request.user,
         'advisor': advisor,
+        'user_role': 'advisor',
+        'base_template': 'advisor_dashboard/advisor_base.html',
         'is_advisor_mode': True,
         'assigned_sections': advisor.get_assigned_sections(),
         'assigned_departments': advisor.departments.all(),
         'assigned_batches': advisor.batches.all(),
     }
     
-    return render(request, 'shared/attendance_taking.html', context)
+    return render(request, 'shared/attendance_form.html', context)
 
 # Report views
 @login_required

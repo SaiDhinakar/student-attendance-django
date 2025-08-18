@@ -171,7 +171,7 @@
             <p class="text-sm font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</p>
             <p class="text-xs text-gray-600">{{ user.email|default:"Advisor Account" }}</p>
             <span
-              class="inline-block mt-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">Advisor</span>
+              class="inline-block mt-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">Staff</span>
           </div>
         </div>
       </div>
@@ -187,55 +187,6 @@
           <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
         </a> -->
 
-        <!-- Student Management -->
-        <div class="space-y-2">
-          <h3 class="nav-menu-section font-bold">Student Management</h3>
-          <a href="{% url 'advisor_dashboard:student_list' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-group"></i>
-            <span>View Students</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-          <a href="{% url 'advisor_dashboard:student_create' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-plus-circle"></i>
-            <span>Add Student</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-        </div>
-
-        <!-- Attendance Management -->
-        <div class="space-y-2">
-          <h3 class="nav-menu-section font-bold">Attendance Management</h3>
-          <a href="{% url 'advisor_dashboard:staff_attendance' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-check-circle"></i>
-            <span>Take Attendance</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-          <a href="{% url 'advisor_dashboard:attendance_list' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-calendar"></i>
-            <span>Attendance Records</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-        </div>
-
-        <!-- Reports & Analytics -->
-        <div class="space-y-2">
-          <h3 class="nav-menu-section font-bold">Reports & Analytics</h3>
-          <a href="{% url 'advisor_dashboard:department_attendance' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-graph-up"></i>
-            <span>Department Statistics</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-          <a href="{% url 'advisor_dashboard:attendance_history' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-activity"></i>
-            <span>Attendance History</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-          <a href="{% url 'advisor_dashboard:reports' %}" class="block w-full nav-menu-item">
-            <i class="iconoir-stats-report"></i>
-            <span>Detailed Reports</span>
-            <i class="iconoir-nav-arrow-right ml-auto opacity-50"></i>
-          </a>
-        </div>
 
         <!-- Account -->
         <div class="space-y-2">
