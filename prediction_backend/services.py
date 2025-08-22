@@ -27,18 +27,19 @@ from asgiref.sync import sync_to_async
 
 # Import the LightCNN model
 try:
-    from backend.LightCNN.light_cnn import LightCNN_29Layers_v2
+    from prediction_backend.LightCNN.light_cnn import LightCNN_29Layers_v2
 except ImportError:
     print("Warning: LightCNN model not found. Prediction service will not work.")
     LightCNN_29Layers_v2 = None
 
+os.makedirs('logs', exist_ok=True)
 # Enhanced logging configuration
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('/tmp/prediction_service.log')
+        logging.FileHandler(os.path.join('logs','prediction_service.log'))
     ]
 )
 logger = logging.getLogger(__name__)
@@ -103,7 +104,7 @@ class PredictionService:
                     logger.info("🧵 Thread pool executor initialized with 8 workers")
                     
                     # Load face recognition model
-                    model_path = "backend/checkpoints/LightCNN_29Layers_V2_checkpoint.pth.tar"
+                    model_path = "prediction_backend/checkpoints/LightCNN_29Layers_V2_checkpoint.pth.tar"
                     abs_model_path = os.path.abspath(model_path)
                     logger.info(f"🔍 Attempting to load face model from: {model_path} (abs: {abs_model_path})")
                     
@@ -125,7 +126,7 @@ class PredictionService:
                         logger.warning(f"⚠️  Face recognition model not found at {model_path} (abs: {abs_model_path}) or LightCNN not available, using mock predictions")
                         
                     # Load YOLO model
-                    yolo_path = "backend/yolo/weights/yolo11n-face.pt"
+                    yolo_path = "prediction_backend/yolo/weights/yolo11n-face.pt"
                     abs_yolo_path = os.path.abspath(yolo_path)
                     logger.info(f"🔍 Attempting to load YOLO model from: {yolo_path} (abs: {abs_yolo_path})")
                     
