@@ -4,6 +4,9 @@
 		<img src="https://img.shields.io/badge/Python-3.12-blue?logo=python" alt="Python 3.12">
 		<img src="https://img.shields.io/badge/Django-5.x-green?logo=django" alt="Django 5.x">
 		<img src="https://img.shields.io/badge/MySQL-8.x-blue?logo=mysql" alt="MySQL 8.x">
+		<img src="https://img.shields.io/badge/YOLO-11-ffbb00?logo=yolo" alt="YOLO">
+		<img src="https://img.shields.io/badge/PyTorch-2.x-ee4c2c?logo=pytorch" alt="PyTorch">
+		<img src="https://img.shields.io/badge/OpenCV-4.x-5C3EE8?logo=opencv" alt="OpenCV">
 	</p>
 	<p><b>An AI-powered facial recognition attendance management system built with Django.</b></p>
 </div>
