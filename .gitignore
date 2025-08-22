@@ -17,3 +17,5 @@ check_gallery.py
 backend/
 
 .env
+logs/
+checkpoints/
