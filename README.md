@@ -4,7 +4,6 @@
 		<img src="https://img.shields.io/badge/Python-3.12-blue?logo=python" alt="Python 3.12">
 		<img src="https://img.shields.io/badge/Django-5.x-green?logo=django" alt="Django 5.x">
 		<img src="https://img.shields.io/badge/MySQL-8.x-blue?logo=mysql" alt="MySQL 8.x">
-		<img src="https://img.shields.io/github/license/SaiDhinakar/student-attendance-django" alt="License">
 	</p>
 	<p><b>An AI-powered facial recognition attendance management system built with Django.</b></p>
 </div>
@@ -121,7 +120,7 @@ student-attendance-django/
 ## 📚 Documentation
 
 - 📐 [Architecture](docs/ARCHITECTURE.md)
-- 📖 [References](docs/REFERENCES.md)q
+- 📖 [References](docs/REFERENCES.md)
 
 <div align="center">
 	<br><br>
