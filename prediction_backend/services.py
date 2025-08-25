@@ -25,15 +25,8 @@ from django.core.cache import cache
 from core.models import Student, Department, Batch, Section
 from asgiref.sync import sync_to_async
 
-# Import the LightCNN model
-try:
-    from prediction_backend.LightCNN.light_cnn import LightCNN_29Layers_v2
-except ImportError:
-    print("Warning: LightCNN model not found. Prediction service will not work.")
-    LightCNN_29Layers_v2 = None
-
+# Set up logging first before any logger usage
 os.makedirs('logs', exist_ok=True)
-# Enhanced logging configuration
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -43,6 +36,22 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Import the LightCNN model
+import sys
+# Add the backend directory to Python path to import LightCNN
+backend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backend')
+if backend_path not in sys.path:
+    sys.path.insert(0, backend_path)
+
+try:
+    logger.info("🔍 Attempting to import LightCNN_29Layers_v2 from LightCNN.light_cnn")
+    from LightCNN.light_cnn import LightCNN_29Layers_v2
+    logger.info("✅ LightCNN_29Layers_v2 imported successfully")
+except ImportError as e:
+    logger.error(f"❌ Failed to import LightCNN_29Layers_v2: {e}")
+    print(f"Warning: LightCNN model not found. Error: {e}. Prediction service will not work.")
+    LightCNN_29Layers_v2 = None
 
 class TimedLogger:
     """Helper class for timing operations"""
@@ -103,48 +112,83 @@ class PredictionService:
                     self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=8)
                     logger.info("🧵 Thread pool executor initialized with 8 workers")
                     
-                    # Load face recognition model
-                    model_path = "prediction_backend/checkpoints/LightCNN_29Layers_V2_checkpoint.pth.tar"
+                                        # Load face recognition model
+                    model_path = "backend/checkpoints/LightCNN_29Layers_V2_checkpoint.pth.tar"
                     abs_model_path = os.path.abspath(model_path)
                     logger.info(f"🔍 Attempting to load face model from: {model_path} (abs: {abs_model_path})")
+                    logger.info(f"🔍 Model file exists: {os.path.exists(model_path)}")
+                    logger.info(f"🔍 LightCNN_29Layers_v2 is available: {LightCNN_29Layers_v2 is not None}")
                     
                     if os.path.exists(model_path) and LightCNN_29Layers_v2:
                         with TimedLogger(logger, "Face model loading"):
                             logger.info("📄 Face model file found, loading...")
-                            self.face_model = LightCNN_29Layers_v2(num_classes=100)
-                            checkpoint = torch.load(model_path, map_location=self.device)
-                            new_state_dict = {
-                                k.replace("module.", ""): v 
-                                for k, v in checkpoint.get("state_dict", checkpoint).items() 
-                                if 'fc2' not in k
-                            }
-                            self.face_model.load_state_dict(new_state_dict, strict=False)
-                            self.face_model = self.face_model.to(self.device)
-                            self.face_model.eval()
-                            logger.info("✅ Face recognition model loaded successfully")
+                            try:
+                                self.face_model = LightCNN_29Layers_v2(num_classes=100)
+                                logger.info("✅ LightCNN_29Layers_v2 model instance created")
+                                
+                                checkpoint = torch.load(model_path, map_location=self.device)
+                                logger.info(f"✅ Checkpoint loaded, keys: {list(checkpoint.keys())}")
+                                
+                                new_state_dict = {
+                                    k.replace("module.", ""): v 
+                                    for k, v in checkpoint.get("state_dict", checkpoint).items() 
+                                    if 'fc2' not in k
+                                }
+                                logger.info(f"✅ State dict prepared with {len(new_state_dict)} keys")
+                                
+                                self.face_model.load_state_dict(new_state_dict, strict=False)
+                                logger.info("✅ State dict loaded into model")
+                                
+                                self.face_model = self.face_model.to(self.device)
+                                logger.info(f"✅ Model moved to device: {self.device}")
+                                
+                                self.face_model.eval()
+                                logger.info("✅ Face recognition model loaded successfully and set to eval mode")
+                            except Exception as model_e:
+                                logger.error(f"❌ Error loading face model: {model_e}")
+                                logger.exception("Face model loading exception details:")
+                                self.face_model = None
                     else:
-                        logger.warning(f"⚠️  Face recognition model not found at {model_path} (abs: {abs_model_path}) or LightCNN not available, using mock predictions")
+                        if not os.path.exists(model_path):
+                            logger.error(f"❌ Face recognition model file not found at {model_path} (abs: {abs_model_path})")
+                        if not LightCNN_29Layers_v2:
+                            logger.error("❌ LightCNN_29Layers_v2 class not available")
+                        logger.warning("⚠️  Using mock predictions for face recognition")
+                        self.face_model = None
                         
                     # Load YOLO model
                     yolo_path = "prediction_backend/yolo/weights/yolo11n-face.pt"
                     abs_yolo_path = os.path.abspath(yolo_path)
                     logger.info(f"🔍 Attempting to load YOLO model from: {yolo_path} (abs: {abs_yolo_path})")
+                    logger.info(f"🔍 YOLO model file exists: {os.path.exists(yolo_path)}")
                     
                     if os.path.exists(yolo_path):
                         with TimedLogger(logger, "YOLO model loading"):
                             logger.info("📄 YOLO model file found, loading...")
-                            self.yolo_model = YOLO(yolo_path)
-                            logger.info("✅ YOLO face detection model loaded successfully")
+                            try:
+                                self.yolo_model = YOLO(yolo_path)
+                                logger.info("✅ YOLO face detection model loaded successfully")
+                            except Exception as yolo_e:
+                                logger.error(f"❌ Error loading YOLO model: {yolo_e}")
+                                logger.exception("YOLO model loading exception details:")
+                                self.yolo_model = None
                     else:
-                        logger.warning(f"⚠️  YOLO model not found at {yolo_path} (abs: {abs_yolo_path}), using mock face detection")
+                        logger.error(f"❌ YOLO model file not found at {yolo_path} (abs: {abs_yolo_path})")
+                        logger.warning("⚠️  Using mock face detection")
+                        self.yolo_model = None
                         
                     # Set up transforms
-                    self.transform = transforms.Compose([
-                        transforms.Resize((128, 128)),
-                        transforms.ToTensor(),
-                        transforms.Normalize(mean=[0.5], std=[0.5])
-                    ])
-                    logger.info("🔄 Image transforms initialized")
+                    try:
+                        self.transform = transforms.Compose([
+                            transforms.Resize((128, 128)),
+                            transforms.ToTensor(),
+                            transforms.Normalize(mean=[0.5], std=[0.5])
+                        ])
+                        logger.info("✅ Image transforms initialized successfully")
+                    except Exception as transform_e:
+                        logger.error(f"❌ Error setting up transforms: {transform_e}")
+                        logger.exception("Transform setup exception details:")
+                        raise
                     
                     self.initialized = True
                     logger.info("🎉 PredictionService initialized successfully")
@@ -173,42 +217,58 @@ class PredictionService:
             gallery_path = f"gallery/gallery_{department_name}_{batch_year}.pth"
             abs_gallery_path = os.path.abspath(gallery_path)
             logger.info(f"🔍 Attempting to load gallery from: {gallery_path} (abs: {abs_gallery_path})")
+            logger.info(f"🔍 Gallery file exists: {os.path.exists(gallery_path)}")
+            logger.info(f"🔍 Gallery file size: {os.path.getsize(abs_gallery_path) if os.path.exists(abs_gallery_path) else 'N/A'} bytes")
             
             if not Path(abs_gallery_path).exists():
-                logger.warning(f"⚠️  Gallery file {gallery_path} not found (abs: {abs_gallery_path})")
+                logger.error(f"❌ Gallery file {gallery_path} not found (abs: {abs_gallery_path})")
                 return {}
             
             # Load gallery data
             with TimedLogger(logger, f"Gallery loading from {gallery_path}"):
                 logger.info(f"📄 Loading gallery data from {gallery_path} (abs: {abs_gallery_path})")
-                # Try safe loading first: allowlist numpy reconstruct and ndarray
                 try:
+                    # Try safe loading first: allowlist numpy reconstruct and ndarray
                     try:
                         from numpy._core import multiarray as _multiarray
                         torch.serialization.add_safe_globals([_multiarray._reconstruct, np.ndarray])
-                        logger.debug("Added numpy._core.multiarray._reconstruct and numpy.ndarray to torch safe globals")
+                        logger.debug("✅ Added numpy._core.multiarray._reconstruct and numpy.ndarray to torch safe globals")
                     except Exception as ge:
-                        logger.debug(f"Could not add safe globals: {ge}")
+                        logger.debug(f"⚠️  Could not add safe globals: {ge}")
+                    
                     gallery_data = torch.load(gallery_path, map_location='cpu')
+                    logger.info(f"✅ Gallery loaded with torch.load (safe mode)")
+                    
                 except Exception as e:
-                    logger.warning(
-                        "Safe torch.load failed, falling back to weights_only=False as the gallery file is trusted: %s",
-                        e,
-                    )
+                    logger.warning(f"⚠️  Safe torch.load failed: {e}, falling back to weights_only=False")
                     try:
                         gallery_data = torch.load(abs_gallery_path, map_location='cpu', weights_only=False)
-                    except TypeError:
+                        logger.info(f"✅ Gallery loaded with torch.load (weights_only=False)")
+                    except TypeError as te:
+                        logger.warning(f"⚠️  weights_only parameter not supported: {te}, using basic torch.load")
                         gallery_data = torch.load(abs_gallery_path, map_location='cpu')
+                        logger.info(f"✅ Gallery loaded with basic torch.load")
+                    except Exception as e2:
+                        logger.error(f"❌ Failed to load gallery with all methods: {e2}")
+                        logger.exception("Gallery loading exception details:")
+                        return {}
+                
+                logger.info(f"📊 Raw gallery data type: {type(gallery_data)}, keys: {list(gallery_data.keys()) if isinstance(gallery_data, dict) else 'Not a dict'}")
             
                 # Handle np.ndarray or tensor values
                 gallery = {}
+                logger.info("🔄 Processing gallery data entries...")
                 for k, v in gallery_data.items():
                     if isinstance(v, np.ndarray):
                         gallery[k] = v
+                        logger.debug(f"✅ Added numpy array for {k}: shape {v.shape}")
                     elif isinstance(v, torch.Tensor):
                         gallery[k] = v.cpu().numpy()
+                        logger.debug(f"✅ Added tensor (converted to numpy) for {k}: shape {v.shape}")
                     else:
                         logger.warning(f"⚠️  Skipping invalid embedding for {k}: {type(v)}")
+                
+                logger.info(f"📊 Processed {len(gallery)} valid embeddings from {len(gallery_data)} entries")
             
             # Cache the gallery (thread-safe)
             with self._gallery_lock:
@@ -270,13 +330,23 @@ class PredictionService:
                                  sections_data: List[Dict] = None) -> Tuple[str, List[Dict]]:
         """Async wrapper for image processing with support for multiple sections"""
         logger.info(f"🖼️  Starting async image processing (threshold: {threshold})")
+        logger.info(f"📊 Input: image_bytes size: {len(image_bytes)} bytes, sections_data: {len(sections_data) if sections_data else 0} sections")
         
         if not self.initialized:
-            logger.info("🔧 Service not initialized, initializing now...")
-            self.initialize()
+            logger.warning("⚠️  Service not initialized, initializing now...")
+            try:
+                self.initialize()
+                logger.info("✅ Service initialized successfully")
+            except Exception as init_e:
+                logger.error(f"❌ Failed to initialize service: {init_e}")
+                logger.exception("Service initialization exception details:")
+                return None, []
             
         if not self.face_model or not self.yolo_model:
-            logger.warning("⚠️  Models not available, returning mock data")
+            logger.warning("⚠️  Models not available (face_model: {}, yolo_model: {}), returning mock data".format(
+                "available" if self.face_model else "missing",
+                "available" if self.yolo_model else "missing"
+            ))
             return await self._mock_process_image(image_bytes)
             
         # Process sections data to get combined gallery and student lists
@@ -294,10 +364,15 @@ class PredictionService:
                 logger.info(f"📊 Processing section group {i+1}: {dept_name} {batch_year} - {section_names}")
                 
                 if dept_name and batch_year:
-                    # Load gallery for this department/batch/sections via sync_to_async
-                    gallery = await sync_to_async(self.load_gallery)(dept_name, batch_year, section_names)
-                    combined_gallery.update(gallery)
-                    logger.info(f"📚 Added {len(gallery)} embeddings to combined gallery")
+                    try:
+                        # Load gallery for this department/batch/sections via sync_to_async
+                        gallery = await sync_to_async(self.load_gallery)(dept_name, batch_year, section_names)
+                        combined_gallery.update(gallery)
+                        logger.info(f"📚 Added {len(gallery)} embeddings to combined gallery (total: {len(combined_gallery)})")
+                    except Exception as gallery_e:
+                        logger.error(f"❌ Error loading gallery for {dept_name}_{batch_year}: {gallery_e}")
+                        logger.exception("Gallery loading exception details:")
+                        continue
                     
                     # Get students for these sections using sync_to_async
                     for section_name in section_names:
@@ -310,17 +385,33 @@ class PredictionService:
                                 ).values_list('student_regno', flat=True)
                             )
                             all_section_students.update(student_list)
-                            logger.info(f"👥 Added {len(student_list)} students from section {section_name}")
-                        except Exception as e:
-                            logger.error(f"❌ Error fetching students for section {section_name}: {e}")
+                            logger.info(f"👥 Added {len(student_list)} students from section {section_name} (total: {len(all_section_students)})")
+                        except Exception as student_e:
+                            logger.error(f"❌ Error fetching students for section {section_name}: {student_e}")
+                            logger.exception("Student fetching exception details:")
+                else:
+                    logger.warning(f"⚠️  Incomplete section info for group {i+1}: dept_name={dept_name}, batch_year={batch_year}")
+        else:
+            logger.warning("⚠️  No sections_data provided")
+        
+        logger.info(f"📊 Final combined gallery size: {len(combined_gallery)} students")
+        logger.info(f"👥 Final section students size: {len(all_section_students)} students")
         
         # Run processing in thread pool
+        logger.info("🧵 Submitting image processing to thread pool executor...")
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            self.executor,
-            self._process_image_sync,
-            image_bytes, threshold, combined_gallery, all_section_students
-        )
+        try:
+            result = await loop.run_in_executor(
+                self.executor,
+                self._process_image_sync,
+                image_bytes, threshold, combined_gallery, all_section_students
+            )
+            logger.info(f"✅ Thread pool execution completed successfully")
+            return result
+        except Exception as executor_e:
+            logger.error(f"❌ Error in thread pool execution: {executor_e}")
+            logger.exception("Thread pool execution exception details:")
+            return None, []
         
     def _process_image_sync(self, image_bytes: bytes, threshold: float, 
                            gallery: Dict[str, np.ndarray], section_students: Set[str]) -> Tuple[str, List[Dict]]:
@@ -330,14 +421,23 @@ class PredictionService:
                 logger.info(f"🔍 Starting image processing with threshold {threshold}")
                 logger.info(f"📚 Gallery size: {len(gallery)} students")
                 logger.info(f"👥 Section students: {len(section_students)} students")
+                logger.info(f"📸 Image bytes size: {len(image_bytes)} bytes")
                 
                 # Decode image
-                nparr = np.frombuffer(image_bytes, np.uint8)
-                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                if img is None:
-                    raise ValueError("Could not decode image")
-                
-                logger.info(f"📸 Image decoded: {img.shape[1]}x{img.shape[0]} pixels")
+                try:
+                    nparr = np.frombuffer(image_bytes, np.uint8)
+                    logger.debug(f"✅ Created numpy array from bytes: shape {nparr.shape}")
+                    
+                    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    if img is None:
+                        logger.error("❌ Could not decode image - cv2.imdecode returned None")
+                        raise ValueError("Could not decode image")
+                    
+                    logger.info(f"✅ Image decoded successfully: {img.shape[1]}x{img.shape[0]} pixels, channels: {img.shape[2] if len(img.shape) > 2 else 'N/A'}")
+                except Exception as decode_e:
+                    logger.error(f"❌ Error decoding image: {decode_e}")
+                    logger.exception("Image decoding exception details:")
+                    return None, []
                     
                 result_img = img.copy()
                 detected_students = []
@@ -345,9 +445,20 @@ class PredictionService:
                 
                 # Detect faces using YOLO
                 logger.info("🔍 Running YOLO face detection...")
-                results = self.yolo_model(img)
-                total_faces = len(results[0].boxes) if results and len(results) > 0 else 0
-                logger.info(f"👤 YOLO detected {total_faces} faces")
+                try:
+                    results = self.yolo_model(img)
+                    logger.info(f"✅ YOLO inference completed")
+                    
+                    total_faces = len(results[0].boxes) if results and len(results) > 0 else 0
+                    logger.info(f"👤 YOLO detected {total_faces} faces")
+                    
+                    if total_faces == 0:
+                        logger.warning("⚠️  No faces detected by YOLO")
+                    
+                except Exception as yolo_e:
+                    logger.error(f"❌ Error during YOLO face detection: {yolo_e}")
+                    logger.exception("YOLO detection exception details:")
+                    return None, []
                 
                 # Step 1: Get all faces and their embeddings
                 faces_data = []

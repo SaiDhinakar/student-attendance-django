@@ -344,27 +344,35 @@ async function processImages() {
   document.getElementById('processingStatus').classList.remove('hidden');
   
   try {
-    const formData = new FormData();
+    // Convert images to base64 for JSON payload
+    const imagesData = [];
+    for (const image of capturedImages) {
+      // Convert blob to base64
+      const base64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(image.blob);
+      });
+      imagesData.push(base64);
+    }
     
-    // Add images
-    capturedImages.forEach((image, index) => {
-      formData.append('images', image.blob, `image_${index}.jpg`);
-    });
+    // Prepare JSON data
+    const requestData = {
+      images_data: imagesData,
+      dept_name: currentSessionData.department,
+      batch_year: currentSessionData.batch_year,
+      subject_code: currentSessionData.subject,
+      sections: currentSessionData.sections.join(','),
+      threshold: parseFloat(threshold)
+    };
     
-    // Add session data
-    formData.append('department', currentSessionData.department);
-    formData.append('batch_year', currentSessionData.batch_year);
-    formData.append('sections', currentSessionData.sections.join(','));
-    formData.append('subject', currentSessionData.subject);
-    formData.append('time_slot', currentSessionData.time_slot);
-    formData.append('threshold', threshold);
-    
-    const response = await fetch('/api/process-attendance-images/', {
+    const response = await fetch('/api/prediction/process-images/', {
       method: 'POST',
-      body: formData,
       headers: {
+        'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')
-      }
+      },
+      body: JSON.stringify(requestData)
     });
     
     if (!response.ok) {
@@ -373,11 +381,11 @@ async function processImages() {
     
     const result = await response.json();
     
-    if (result.status === 'success') {
-      detectedStudentsData = result.students || [];
+    if (result.success) {
+      detectedStudentsData = result.detected_students || [];
       displayDetectedStudents(detectedStudentsData);
       displayProcessedImages(result.processed_images || []);
-      showNotification(`Processed ${capturedImages.length} images. Detected ${detectedStudentsData.filter(s => s.detected).length} students.`, 'success');
+      showNotification(`Processed ${capturedImages.length} images. Detected ${detectedStudentsData.filter(s => s.is_present).length} students.`, 'success');
     } else {
       throw new Error(result.message || 'Processing failed');
     }
@@ -403,31 +411,31 @@ function displayDetectedStudents(students) {
     `;
   } else {
     container.innerHTML = students.map(student => `
-      <div class="student-card bg-[var(--background-tertiary)] p-4 rounded-lg ${student.detected ? 'border-l-4 border-[var(--success)]' : 'border-l-4 border-[var(--text-secondary)]'}" 
-           data-student-id="${student.student_regno}">
+      <div class="student-card bg-[var(--background-tertiary)] p-4 rounded-lg ${student.is_present ? 'border-l-4 border-[var(--success)]' : 'border-l-4 border-[var(--text-secondary)]'}" 
+           data-student-id="${student.register_number}">
         <div class="flex items-center justify-between mb-3">
           <div>
             <h3 class="font-medium text-[var(--text-primary)]">${student.name}</h3>
-            <p class="text-sm text-[var(--text-secondary)]">${student.student_regno}</p>
+            <p class="text-sm text-[var(--text-secondary)]">${student.register_number}</p>
           </div>
           <div class="attendance-status">
-            ${student.detected ? 
+            ${student.is_present ? 
               '<i class="iconoir-check-circle text-[var(--success)] text-xl"></i>' : 
               '<i class="iconoir-cancel text-[var(--text-secondary)] text-xl"></i>'
             }
           </div>
         </div>
         <div class="flex space-x-2">
-          <button type="button" class="attendance-btn present flex-1 px-3 py-2 text-sm rounded transition-colors ${student.detected ? 'bg-[var(--success)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--success)] hover:text-white'}" 
-                  data-student-id="${student.student_regno}" data-status="present">
+          <button type="button" class="attendance-btn present flex-1 px-3 py-2 text-sm rounded transition-colors ${student.is_present ? 'bg-[var(--success)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--success)] hover:text-white'}" 
+                  data-student-id="${student.register_number}" data-status="present">
             <i class="iconoir-check mr-1"></i>Present
           </button>
-          <button type="button" class="attendance-btn absent flex-1 px-3 py-2 text-sm rounded transition-colors ${!student.detected ? 'bg-[var(--error)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--error)] hover:text-white'}" 
-                  data-student-id="${student.student_regno}" data-status="absent">
+          <button type="button" class="attendance-btn absent flex-1 px-3 py-2 text-sm rounded transition-colors ${!student.is_present ? 'bg-[var(--error)] text-white' : 'bg-[var(--background-secondary)] text-[var(--text-primary)] hover:bg-[var(--error)] hover:text-white'}" 
+                  data-student-id="${student.register_number}" data-status="absent">
             <i class="iconoir-cancel mr-1"></i>Absent
           </button>
         </div>
-        ${student.confidence ? 
+        ${student.confidence && student.confidence > 0 ? 
           `<div class="mt-2 text-xs text-[var(--text-secondary)]">Confidence: ${(student.confidence * 100).toFixed(1)}%</div>` : 
           ''
         }
