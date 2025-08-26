@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconoir@latest/css/iconoir.css">
     
     <!-- Glassmorphic Theme CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'css/glassmorphic-theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/glassmorphic-components.css' %}">
     <link rel="stylesheet" href="{% static 'css/advisor-unified-ui.css' %}">
@@ -96,15 +98,16 @@
                                 class="glassmorphic-input pl-10 pr-10 py-3 w-full"
                                 placeholder="Enter your admin password"
                             />
-                            <button 
+                            <!-- <button 
                                 type="button" 
                                 id="togglePassword"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center glassmorphic-text-secondary hover:text-primary focus:outline-none"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-primary focus:outline-none"
                                 aria-label="Toggle password visibility"
                             >
-                                <i id="eyeOpen" class="iconoir-eye-empty"></i>
-                                <i id="eyeClosed" class="iconoir-eye-off hidden"></i>
-                            </button>
+                                <i id="eyeOpen" class="fa-regular fa-eye"></i>
+                                <i id="eyeClosed" class="fa-regular fa-eye-slash hidden"></i>
+                            </button> -->
+
                         </div>
                     </div>
 
