@@ -317,6 +317,79 @@ class PredictionService:
             self._process_image_sync,
             image_bytes, threshold, combined_gallery, all_section_students
         )
+    
+    def process_image_sync(self, image_bytes: bytes, threshold: float = 0.45, 
+                          sections_data: List[Dict] = None) -> Tuple[str, List[Dict]]:
+        """Synchronous wrapper for image processing with support for multiple sections"""
+        logger.info(f"🖼️  Starting sync image processing (threshold: {threshold})")
+        
+        if not self.initialized:
+            logger.info("🔧 Service not initialized, initializing now...")
+            self.initialize()
+            
+        if not self.face_model or not self.yolo_model:
+            logger.warning("⚠️  Models not available, returning empty results")
+            return None, []
+            
+        # Process sections data to get combined gallery and student lists
+        combined_gallery = {}
+        all_section_students = set()
+        
+        logger.info(f"📋 Processing {len(sections_data) if sections_data else 0} section groups")
+        
+        if sections_data:
+            for i, section_info in enumerate(sections_data):
+                dept_name = section_info.get('department')
+                batch_year = section_info.get('batch_year')
+                section_names = section_info.get('section_names', [])
+                
+                logger.info(f"📊 Processing section group {i+1}: {dept_name} {batch_year} - {section_names}")
+                
+                if dept_name and batch_year:
+                    # Load gallery for this department/batch/sections synchronously
+                    gallery = self.load_gallery(dept_name, batch_year, section_names)
+                    combined_gallery.update(gallery)
+                    logger.info(f"📚 Added {len(gallery)} embeddings to combined gallery")
+                    
+                    # Get students for these sections synchronously
+                    for section_name in section_names:
+                        try:
+                            student_list = list(
+                                Student.objects.filter(
+                                    section__section_name=section_name,
+                                    section__batch__batch_year=batch_year,
+                                    section__batch__dept__dept_name=dept_name
+                                ).values_list('student_regno', flat=True)
+                            )
+                            all_section_students.update(student_list)
+                            logger.info(f"👥 Added {len(student_list)} students from section {section_name}")
+                        except Exception as e:
+                            logger.error(f"❌ Error fetching students for section {section_name}: {e}")
+        
+        # If no sections specified, get all students for the first department/batch
+        if not combined_gallery and sections_data:
+            first_section = sections_data[0]
+            dept_name = first_section.get('department')
+            batch_year = first_section.get('batch_year')
+            if dept_name and batch_year:
+                logger.info(f"📂 Loading all students for {dept_name} {batch_year}")
+                gallery = self.load_gallery(dept_name, batch_year, [])
+                combined_gallery.update(gallery)
+                
+                try:
+                    student_list = list(
+                        Student.objects.filter(
+                            section__batch__batch_year=batch_year,
+                            section__batch__dept__dept_name=dept_name
+                        ).values_list('student_regno', flat=True)
+                    )
+                    all_section_students.update(student_list)
+                    logger.info(f"👥 Added {len(student_list)} students from all sections")
+                except Exception as e:
+                    logger.error(f"❌ Error fetching all students: {e}")
+        
+        # Call the synchronous processing method directly
+        return self._process_image_sync(image_bytes, threshold, combined_gallery, all_section_students)
         
     def _process_image_sync(self, image_bytes: bytes, threshold: float, 
                            gallery: Dict[str, np.ndarray], section_students: Set[str]) -> Tuple[str, List[Dict]]:

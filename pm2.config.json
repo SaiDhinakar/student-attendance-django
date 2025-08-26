@@ -2,9 +2,9 @@
   "apps": [
     {
       "name": "student-attendance-django",
-      "script": "uvicorn",
-      "interpreter": "/mnt/sda1/student-attendance-django/.venv/bin/python3",
+      "script": "/home/mithun/PROJECT/student-attendance-django/.venv/bin/python3",
       "args": [
+        "-m", "uvicorn",
         "StudentAttendance.asgi:application",
         "--host", "0.0.0.0",
         "--port", "8000",

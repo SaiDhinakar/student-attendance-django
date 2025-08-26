@@ -118,9 +118,9 @@
                 <td class="px-4 py-4 whitespace-nowrap text-center">
                   {% if day in student_data.days %}
                     <div class="text-xs">
-                      <span class="text-green-600 font-bold">{{ student_data.days|get_item:day.present }}</span>
+                      <span class="text-green-600 font-bold">{{ student_data.days.day.present }}</span>
                       <span class="text-gray-400">/</span>
-                      <span class="text-gray-600">{{ student_data.days|get_item:day.total }}</span>
+                      <span class="text-gray-600">{{ student_data.days.day.total }}</span>
                     </div>
                   {% else %}
                     <span class="text-gray-300">-</span>

@@ -193,24 +193,46 @@ def process_images(request):
                 #     f.write(image_bytes)
                 # logger.info(f"💾 Saved original image to: {original_image_path}")
 
-                # Process image synchronously using thread pool
-                import concurrent.futures
-
-                def sync_process():
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                    try:
-                        result = loop.run_until_complete(
-                            prediction_service.process_image_async(
-                                image_bytes, threshold, sections_data
-                            )
-                        )
-                        return result
-                    finally:
-                        loop.close()
-
+                # Process image synchronously - avoid async entirely for this version
                 logger.info(f"🤖 Running ML prediction for image {i+1}...")
-                processed_image_b64, detected_students = sync_process()
+                
+                try:
+                    # Instead of using async, let's call a synchronous version
+                    processed_image_b64, detected_students = prediction_service.process_image_sync(
+                        image_bytes, threshold, sections_data
+                    )
+                    logger.info(f"✅ Image {i+1} processed, detected {len(detected_students)} students")
+                except Exception as e:
+                    logger.error(f"❌ Error in sync processing for image {i+1}: {e}")
+                    # Fallback: try the old method but with better error handling
+                    try:
+                        import concurrent.futures
+                        import threading
+
+                        def run_in_isolated_thread():
+                            # Create completely new thread with new event loop
+                            loop = asyncio.new_event_loop()
+                            asyncio.set_event_loop(loop)
+                            try:
+                                result = loop.run_until_complete(
+                                    prediction_service.process_image_async(
+                                        image_bytes, threshold, sections_data
+                                    )
+                                )
+                                return result
+                            finally:
+                                loop.close()
+                                asyncio.set_event_loop(None)
+                        
+                        # Run in a separate thread to avoid the CurrentThreadExecutor issue
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                            future = executor.submit(run_in_isolated_thread)
+                            processed_image_b64, detected_students = future.result(timeout=30)
+                            logger.info(f"✅ Image {i+1} processed via fallback, detected {len(detected_students)} students")
+                            
+                    except Exception as fallback_error:
+                        logger.error(f"❌ Fallback processing also failed for image {i+1}: {fallback_error}")
+                        processed_image_b64, detected_students = None, []
                 logger.info(f"✅ Image {i+1} processed, detected {len(detected_students)} students")
 
                 if processed_image_b64:
