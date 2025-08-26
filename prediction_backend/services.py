@@ -120,6 +120,7 @@ class PredictionService:
                     logger.info(f"🔍 LightCNN_29Layers_v2 is available: {LightCNN_29Layers_v2 is not None}")
                     
                     if os.path.exists(model_path) and LightCNN_29Layers_v2:
+                    # if os.path.exists(model_path):
                         with TimedLogger(logger, "Face model loading"):
                             logger.info("📄 Face model file found, loading...")
                             try:
@@ -220,6 +221,19 @@ class PredictionService:
             logger.info(f"🔍 Gallery file exists: {os.path.exists(gallery_path)}")
             logger.info(f"🔍 Gallery file size: {os.path.getsize(abs_gallery_path) if os.path.exists(abs_gallery_path) else 'N/A'} bytes")
             
+            # DEBUG: Show what files exist and what we're looking for
+            gallery_dir = os.path.dirname(abs_gallery_path)
+            if os.path.exists(gallery_dir):
+                available_files = [f for f in os.listdir(gallery_dir) if f.endswith('.pth')]
+                logger.debug(f"🔍 DEBUG - Available .pth files in {gallery_dir}: {available_files}")
+            else:
+                logger.debug(f"🔍 DEBUG - Gallery directory {gallery_dir} does not exist")
+            
+            logger.debug(f"🔍 DEBUG - Looking for gallery file: gallery_{department_name}_{batch_year}.pth")
+            logger.debug(f"🔍 DEBUG - Department name requested: '{department_name}'")
+            logger.debug(f"🔍 DEBUG - Batch year requested: '{batch_year}'")
+            logger.debug(f"🔍 DEBUG - Expected full filename: 'gallery_{department_name}_{batch_year}.pth'")
+            
             if not Path(abs_gallery_path).exists():
                 logger.error(f"❌ Gallery file {gallery_path} not found (abs: {abs_gallery_path})")
                 return {}
@@ -259,6 +273,11 @@ class PredictionService:
                 gallery = {}
                 logger.info("🔄 Processing gallery data entries...")
                 for k, v in gallery_data.items():
+                    # Convert keys to integers like test_detection.py
+                    try:
+                        idx = int(k)
+                    except Exception:
+                        idx = k  # fallback to string label
                     if isinstance(v, np.ndarray):
                         gallery[k] = v
                         logger.debug(f"✅ Added numpy array for {k}: shape {v.shape}")
@@ -284,9 +303,9 @@ class PredictionService:
             logger.exception("Gallery loading exception details:")
             return {}
 
-    def _filter_gallery_by_sections(self, gallery: Dict[str, np.ndarray], 
+    def _filter_gallery_by_sections(self, gallery: Dict, 
                                    department_name: str, batch_year: int, 
-                                   section_names: List[str] = None) -> Dict[str, np.ndarray]:
+                                   section_names: List[str] = None) -> Dict:
         """Filter gallery by specific sections"""
         logger.info(f"Filtering gallery by sections: {section_names}")
         
@@ -295,32 +314,11 @@ class PredictionService:
             return gallery
             
         try:
-            # Get student register numbers for the specified sections
-            section_students = set()
-            
-            for section_name in section_names:
-                logger.info(f"Getting students for section: {section_name}")
-                students = Student.objects.filter(
-                    section__section_name=section_name,
-                    section__batch__batch_year=batch_year,
-                    section__batch__dept__dept_name=department_name
-                ).values_list('student_regno', flat=True)
-                
-                student_list = list(students)
-                logger.info(f"Found {len(student_list)} students in section {section_name}: {student_list[:5]}...")
-                section_students.update(student_list)
-            
-            logger.info(f"Total unique students across all sections: {len(section_students)}")
-            
-            # Filter gallery to only include students from these sections
-            filtered_gallery = {
-                reg_num: embedding 
-                for reg_num, embedding in gallery.items() 
-                if reg_num in section_students
-            }
-            
-            logger.info(f"Filtered gallery from {len(gallery)} to {len(filtered_gallery)} students for sections {section_names}")
-            return filtered_gallery
+            # Since test_detection.py uses integer indices, we'll return the full gallery
+            # The section filtering logic would need to be adjusted based on how 
+            # integer class indices map to actual students
+            logger.info(f"Gallery filtering with integer keys - returning full gallery for now")
+            return gallery
             
         except Exception as e:
             logger.error(f"Error filtering gallery by sections: {e}")
@@ -467,19 +465,8 @@ class PredictionService:
                 for result in results:
                     for i, box in enumerate(result.boxes):
                         x1, y1, x2, y2 = map(int, box.xyxy[0])
-                        h, w = img.shape[:2]
                         
-                        # Add padding
-                        face_w, face_h = x2 - x1, y2 - y1
-                        pad_x, pad_y = int(face_w * 0.2), int(face_h * 0.2)
-                        x1, y1 = max(0, x1 - pad_x), max(0, y1 - pad_y)
-                        x2, y2 = min(w, x2 + pad_x), min(h, y2 + pad_y)
-                        
-                        # Skip too small faces
-                        if (x2 - x1) < 32 or (y2 - y1) < 32:
-                            logger.debug(f"⚠️  Skipping face {i+1} too small ({x2-x1}x{y2-y1})")
-                            continue
-                            
+                        # Crop and preprocess face (no padding like test_detection.py)
                         face = img[y1:y2, x1:x2]
                         if face.size == 0:
                             logger.warning(f"⚠️  Empty face crop at {x1},{y1},{x2},{y2}")
@@ -487,87 +474,101 @@ class PredictionService:
                         
                         valid_faces += 1
                         logger.debug(f"🔄 Processing face {valid_faces}: {x2-x1}x{y2-y1} pixels")
-                            
-                        # Extract embedding
+                        
+                        # Convert to grayscale and process like test_detection.py
+                        gray_face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+                        face_pil = Image.fromarray(gray_face)
+                        face_tensor = self.transform(face_pil).unsqueeze(0).to(self.device)
+                        
+                        # First approach: Cosine similarity with gallery (like test_detection.py)
+                        with torch.no_grad():
+                            _, embedding = self.face_model(face_tensor)
+                            face_embedding = embedding.cpu().squeeze().numpy()
+                        
+                        # Cosine similarity with gallery (all)
+                        similarities = []
+                        gallery_indices = list(gallery.keys())
+                        for class_idx in gallery_indices:
+                            gallery_emb = gallery[class_idx]
+                            sim = 1 - cosine(face_embedding, gallery_emb)
+                            similarities.append((class_idx, sim))
+                        similarities.sort(key=lambda x: x[1], reverse=True)
+                        pred_class_cosine, best_sim = similarities[0] if similarities else ("Unknown", 0)
+                        
+                        # Log top 3 cosine similarities like test_detection.py
+                        top_n = 3
+                        logger.info(f"Face {valid_faces}: bbox=({x1},{y1},{x2},{y2}), predicted class index (cosine)={pred_class_cosine}, best similarity={best_sim:.4f}, embedding[:5]={face_embedding[:5]}")
+                        logger.info(f"  Top {top_n} cosine similarities:")
+                        for rank, (class_idx, sim) in enumerate(similarities[:top_n], 1):
+                            logger.info(f"    {rank}. class {class_idx}: {sim:.4f}")
+                        
+                        faces_data.append({
+                            'coords': (x1, y1, x2, y2),
+                            'embedding': face_embedding,
+                            'best_match': pred_class_cosine,
+                            'best_score': best_sim
+                        })
+                        
+                        # Second approach: Softmax probabilities (duplicate processing like test_detection.py)
+                        # This duplicates the face processing exactly like test_detection.py
+                        face = img[y1:y2, x1:x2]  # Re-crop face
+                        if face.size == 0:
+                            logger.info(f"Face {valid_faces}: empty crop, skipping.")
+                            continue
                         gray_face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
                         face_pil = Image.fromarray(gray_face)
                         face_tensor = self.transform(face_pil).unsqueeze(0).to(self.device)
                         
                         with torch.no_grad():
-                            _, embedding = self.face_model(face_tensor)
+                            logits, embedding = self.face_model(face_tensor)
                             face_embedding = embedding.cpu().squeeze().numpy()
-                        
-                        logger.debug(f"🧠 Extracted embedding for face {valid_faces}")
+                            probs = torch.softmax(logits, dim=1).cpu().numpy().squeeze()
                             
-                        # Store all potential matches for this face
-                        matches = []
-                        gallery_checked = 0
-                        for identity, gallery_embedding in gallery.items():
-                            # Only consider matches for students in the selected sections
-                            if section_students and identity not in section_students:
-                                continue
-                            
-                            gallery_checked += 1
-                            similarity = 1 - cosine(face_embedding, gallery_embedding)
-                            if similarity > threshold:
-                                matches.append((identity, similarity))
-                                logger.debug(f"✅ Face {valid_faces} matches {identity}: {similarity:.3f}")
+                            # Restrict to class indices like test_detection.py
+                            class_start = 0
+                            class_end = 111
+                            restricted_probs = probs[class_start : class_end + 1]
+                            restricted_indices = np.arange(class_start, class_end + 1)
+                            pred_idx_in_restricted = int(np.argmax(restricted_probs))
+                            pred_class_softmax = int(restricted_indices[pred_idx_in_restricted])
                         
-                        logger.debug(f"🔍 Face {valid_faces}: checked {gallery_checked} gallery entries, found {len(matches)} matches")
-                                
-                        # Sort matches by similarity (highest first)
-                        matches.sort(key=lambda x: x[1], reverse=True)
-                        
-                        faces_data.append({
-                            'coords': (x1, y1, x2, y2),
-                            'embedding': face_embedding,
-                            'matches': matches,
-                            'best_match': "Unknown",
-                            'best_score': -1
-                        })
+                        # Print softmax results like test_detection.py
+                        top_indices_in_restricted = np.argsort(restricted_probs)[::-1][:top_n]
+                        logger.info(f"Face {valid_faces}: bbox=({x1},{y1},{x2},{y2}), predicted class index (restricted)={pred_class_softmax}, embedding[:5]={face_embedding[:5]}")
+                        logger.info(f"  Top {top_n} classes in [{class_start}-{class_end}]:")
+                        for rank, idx_in_restricted in enumerate(top_indices_in_restricted, 1):
+                            class_idx = int(restricted_indices[idx_in_restricted])
+                            prob = restricted_probs[idx_in_restricted]
+                            logger.info(f"    {rank}. class {class_idx}: {prob:.4f}")
                 
                 logger.info(f"🎯 Processed {valid_faces} valid faces from {total_faces} detected faces")
                 
-                # Step 2: Assign identities based on highest confidence without duplicates
-                used_identities = set()
-                
-                # First pass: assign identities to faces with highest confidence
-                logger.info("🎯 Assigning identities to faces...")
-                for face_idx, face in enumerate(sorted(faces_data, key=lambda x: max([m[1] for m in x['matches']]) if x['matches'] else 0, reverse=True)):
-                    for identity, score in face['matches']:
-                        if identity not in used_identities:
-                            face['best_match'] = identity
-                            face['best_score'] = score
-                            used_identities.add(identity)
-                            detected_ids.add(identity)
-                            logger.info(f"✅ Assigned {identity} to face {face_idx+1} (confidence: {score:.3f})")
-                            break
-                            
-                # Step 3: Draw the results and collect detected students
-                logger.info("📝 Collecting student information...")
+                # Simple assignment like test_detection.py (no duplicate prevention)
+                logger.info("🎯 Drawing results like test_detection.py...")
                 for face_idx, face in enumerate(faces_data):
                     x1, y1, x2, y2 = face['coords']
                     best_match = face['best_match']
                     best_score = face['best_score']
                     
-                    if best_match != "Unknown":
-                        # Get student info
+                    # Draw bounding box like test_detection.py
+                    cv2.rectangle(result_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(result_img, f"{best_match}", (x1, max(15, y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    
+                    # Add to detected students if it's a valid match
+                    if best_match != "Unknown" and best_score > threshold:
+                        # Try to map class index to student (this may need adjustment based on your gallery structure)
                         try:
-                            student = Student.objects.get(student_regno=best_match)
+                            # For now, we'll use the class index as register number
+                            # You may need to adjust this mapping based on your data
                             detected_students.append({
-                                'register_number': best_match,
-                                'name': student.name,
+                                'register_number': str(best_match),
+                                'name': f'Student_{best_match}',
                                 'confidence': best_score
                             })
-                            logger.info(f"👤 Added student: {best_match} ({student.name}) - confidence: {best_score:.3f}")
-                        except Student.DoesNotExist:
-                            logger.warning(f"⚠️  Student {best_match} not found in database")
-                            
-                    # Draw bounding box
-                    color = (0, 255, 0) if best_match != "Unknown" else (0, 0, 255)
-                    cv2.rectangle(result_img, (x1, y1), (x2, y2), color, 2)
-                    label = f"{best_match} ({best_score:.2f})" if best_match != "Unknown" else "Unknown"
-                    cv2.putText(result_img, label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                            detected_ids.add(str(best_match))
+                            logger.info(f"👤 Added student: {best_match} - confidence: {best_score:.3f}")
+                        except Exception as e:
+                            logger.warning(f"⚠️  Could not add student {best_match}: {e}")
                     
                 # Encode result image
                 _, buffer = cv2.imencode('.jpg', result_img)
