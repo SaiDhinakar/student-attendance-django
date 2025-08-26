@@ -22,6 +22,21 @@ if [ ! -f ssl/server.key ] || [ ! -f ssl/server.crt ]; then
 fi
 
 # Generate SSL and then start app with pm2
-echo -e "${GREEN}Starting app with pm2...${NC}"
-pm2 start pm2.config.json --env production
+
+echo -e "${GREEN}Stopping any existing pm2 instance for student-attendance-django...${NC}"
+pm2 delete student-attendance-django 2>/dev/null || true
+pm2 save
+
+# Ensure SSL certs exist
+if [ ! -f ssl/server.key ] || [ ! -f ssl/server.crt ]; then
+	echo -e "${GREEN}Generating SSL certificates...${NC}"
+	bash generate_ssl.sh
+fi
+
+# Export SSL env vars for Django
+export SSL_KEY_PATH="$(pwd)/ssl/server.key"
+export SSL_CERT_PATH="$(pwd)/ssl/server.crt"
+
+echo -e "${GREEN}Starting app with pm2 (HTTPS enabled)...${NC}"
+pm2 start pm2.config.json --env production --only student-attendance-django --update-env
 echo -e "${GREEN}App started with pm2. Use 'pm2 logs' to view logs.${NC}"
