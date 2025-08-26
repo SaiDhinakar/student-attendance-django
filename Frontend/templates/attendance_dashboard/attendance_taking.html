@@ -435,10 +435,6 @@ function displayDetectedStudents(students) {
             <i class="iconoir-cancel mr-1"></i>Absent
           </button>
         </div>
-        ${student.confidence && student.confidence > 0 ? 
-          `<div class="mt-2 text-xs text-[var(--text-secondary)]">Confidence: ${(student.confidence * 100).toFixed(1)}%</div>` : 
-          ''
-        }
       </div>
     `).join('');
     

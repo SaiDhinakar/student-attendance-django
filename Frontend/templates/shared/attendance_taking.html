@@ -544,12 +544,8 @@ class AttendanceTaking {
           <div class="flex-1">
             <h4 class="font-medium text-[var(--text-primary)]">${student.name}</h4>
             <p class="text-sm text-[var(--text-secondary)]">${student.register_number}</p>
-            <div class="confidence-bar">
-              <div class="confidence-fill" style="width: ${(student.confidence * 100).toFixed(1)}%"></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mt-1">
-              Confidence: ${(student.confidence * 100).toFixed(1)}% (${student.detectionCount} detection${student.detectionCount > 1 ? 's' : ''})
-            </p>
+     
+         
           </div>
           <div class="flex items-center space-x-2 ml-4">
             <button class="attendance-toggle-btn" onclick="attendanceTaking.toggleStudentStatus('${student.register_number}')">

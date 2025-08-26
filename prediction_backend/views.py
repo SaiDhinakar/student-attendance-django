@@ -59,7 +59,6 @@ def process_images(request):
     """API endpoint to process multiple uploaded images and predict student attendance"""
     start_time = datetime.now()
     logger.info(f"🚀 Starting image processing request at {start_time}")
-    logger.info(f"📋 Request method: {request.method}, Content-Type: {request.content_type}")
     
     try:
         # Generate unique session ID
@@ -67,36 +66,20 @@ def process_images(request):
         logger.info(f"📋 Generated session ID: {session_id}")
 
         # Parse request data
-        try:
-            data = (
-                json.loads(request.body)
-                if request.content_type == "application/json"
-                else request.POST
-            )
-            logger.info(f"📥 Successfully parsed request data with keys: {list(data.keys())}")
-        except json.JSONDecodeError as json_e:
-            logger.error(f"❌ Failed to parse JSON request body: {json_e}")
-            return JsonResponse({"error": f"Invalid JSON: {json_e}"}, status=400)
-        except Exception as parse_e:
-            logger.error(f"❌ Error parsing request data: {parse_e}")
-            logger.exception("Request parsing exception details:")
-            return JsonResponse({"error": f"Error parsing request: {parse_e}"}, status=400)
+        data = (
+            json.loads(request.body)
+            if request.content_type == "application/json"
+            else request.POST
+        )
+        logger.info(f"📥 Received request data: {list(data.keys())}")
 
         # Get image data (list of base64 encoded images)
         images_data = data.get("images_data", [])
         if not images_data:
-            logger.error("❌ No image data provided in request")
-            logger.info(f"📋 Available request keys: {list(data.keys())}")
+            logger.warning("❌ No image data provided in request")
             return JsonResponse({"error": "No image data provided"}, status=400)
         
         logger.info(f"📸 Received {len(images_data)} images for processing")
-        
-        # Validate image data
-        for i, img_data in enumerate(images_data):
-            if not img_data:
-                logger.error(f"❌ Empty image data at index {i}")
-                return JsonResponse({"error": f"Empty image data at index {i}"}, status=400)
-            logger.debug(f"📸 Image {i+1}: {len(img_data)} characters")
 
         # Get session parameters
         dept_name = data.get("dept_name")
@@ -108,9 +91,8 @@ def process_images(request):
         logger.info(f"📊 Session parameters: dept={dept_name}, batch={batch_year}, subject={subject_code}, sections={sections_str}, threshold={threshold}")
 
         if not all([dept_name, batch_year, subject_code]):
-            missing_params = [name for name, value in [("dept_name", dept_name), ("batch_year", batch_year), ("subject_code", subject_code)] if not value]
-            logger.error(f"❌ Missing required parameters: {missing_params}")
-            return JsonResponse({"error": f"Missing required parameters: {missing_params}"}, status=400)
+            logger.warning("❌ Missing required parameters")
+            return JsonResponse({"error": "Missing required parameters"}, status=400)
 
         # Parse sections (format: "Department-Section,Department-Section")
         sections_data = []
@@ -182,23 +164,13 @@ def process_images(request):
 
         # Initialize prediction service
         logger.info("🔧 Initializing prediction service...")
-        try:
-            prediction_service.initialize()
-            logger.info("✅ Prediction service initialized successfully")
-        except Exception as init_e:
-            logger.error(f"❌ Failed to initialize prediction service: {init_e}")
-            logger.exception("Prediction service initialization exception details:")
-            return JsonResponse({"error": f"Failed to initialize prediction service: {init_e}"}, status=500)
+        prediction_service.initialize()
+        logger.info("✅ Prediction service initialized")
 
         # Create temp directory for this session and cleanup old ones
-        try:
-            cleanup_old_temp_directories(hours_old=24)
-            session_temp_dir = get_session_temp_directory(session_id)
-            logger.info(f"📁 Created temp directory: {session_temp_dir}")
-        except Exception as temp_e:
-            logger.error(f"❌ Error setting up temp directory: {temp_e}")
-            logger.exception("Temp directory setup exception details:")
-            return JsonResponse({"error": f"Failed to setup temp directory: {temp_e}"}, status=500)
+        cleanup_old_temp_directories(hours_old=24)
+        session_temp_dir = get_session_temp_directory(session_id)
+        logger.info(f"📁 Created temp directory: {session_temp_dir}")
 
         # Process all images synchronously (avoid async issues)
         all_detected_students = {}  # Use dict to avoid duplicates
@@ -211,85 +183,52 @@ def process_images(request):
             try:
                 # Decode base64 image
                 if image_data.startswith("data:image"):
-                    logger.debug(f"📸 Image {i+1} has data URL prefix, extracting base64 part")
                     image_data = image_data.split(",")[1]
-                
-                try:
-                    image_bytes = base64.b64decode(image_data)
-                    logger.info(f"✅ Decoded image {i+1} ({len(image_bytes)} bytes)")
-                except Exception as decode_e:
-                    logger.error(f"❌ Error decoding base64 for image {i+1}: {decode_e}")
-                    continue
+                image_bytes = base64.b64decode(image_data)
+                logger.info(f"✅ Decoded image {i+1} ({len(image_bytes)} bytes)")
 
                 # Save original image to temp folder
-                original_image_path = os.path.join(session_temp_dir, f"original_image_{i+1}.jpg")
-                try:
-                    with open(original_image_path, 'wb') as f:
-                        f.write(image_bytes)
-                    logger.info(f"💾 Saved original image to: {original_image_path}")
-                except Exception as save_e:
-                    logger.error(f"❌ Error saving original image {i+1}: {save_e}")
-                    continue
+                # original_image_path = os.path.join(session_temp_dir, f"original_image_{i+1}.jpg")
+                # with open(original_image_path, 'wb') as f:
+                #     f.write(image_bytes)
+                # logger.info(f"💾 Saved original image to: {original_image_path}")
 
                 # Process image synchronously using thread pool
                 import concurrent.futures
 
                 def sync_process():
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
                     try:
-                        loop = asyncio.new_event_loop()
-                        asyncio.set_event_loop(loop)
-                        logger.debug(f"🔄 Created new event loop for image {i+1}")
-                        
                         result = loop.run_until_complete(
                             prediction_service.process_image_async(
                                 image_bytes, threshold, sections_data
                             )
                         )
-                        logger.debug(f"✅ Async processing completed for image {i+1}")
                         return result
-                    except Exception as sync_e:
-                        logger.error(f"❌ Error in sync_process for image {i+1}: {sync_e}")
-                        logger.exception("Sync process exception details:")
-                        return None, []
                     finally:
-                        if 'loop' in locals():
-                            loop.close()
-                            logger.debug(f"🔄 Event loop closed for image {i+1}")
+                        loop.close()
 
                 logger.info(f"🤖 Running ML prediction for image {i+1}...")
-                try:
-                    processed_image_b64, detected_students = sync_process()
-                    logger.info(f"✅ Image {i+1} processed, detected {len(detected_students)} students")
-                except Exception as ml_e:
-                    logger.error(f"❌ Error during ML processing for image {i+1}: {ml_e}")
-                    logger.exception("ML processing exception details:")
-                    continue
+                processed_image_b64, detected_students = sync_process()
+                logger.info(f"✅ Image {i+1} processed, detected {len(detected_students)} students")
 
                 if processed_image_b64:
-                    # Save processed image to temp folder
-                    processed_image_path = os.path.join(session_temp_dir, f"processed_image_{i+1}.jpg")
-                    try:
-                        processed_image_bytes = base64.b64decode(processed_image_b64)
-                        with open(processed_image_path, 'wb') as f:
-                            f.write(processed_image_bytes)
-                        logger.info(f"💾 Saved processed image to: {processed_image_path}")
-                    except Exception as save_processed_e:
-                        logger.error(f"❌ Error saving processed image {i+1}: {save_processed_e}")
-                        logger.exception("Save processed image exception details:")
-                        continue
+                    # # Save processed image to temp folder
+                    # processed_image_path = os.path.join(session_temp_dir, f"processed_image_{i+1}.jpg")
+                    # processed_image_bytes = base64.b64decode(processed_image_b64)
+                    # with open(processed_image_path, 'wb') as f:
+                    #     f.write(processed_image_bytes)
+                    # logger.info(f"💾 Saved processed image to: {processed_image_path}")
 
-                    # Create database record with file paths instead of image data
-                    try:
-                        ProcessedImage.objects.create(
-                            session_id=session_id,
-                            image_data=processed_image_path,  # Store file path instead of base64
-                            detected_faces_count=len(detected_students),
-                            original_filename=f"original_image_{i+1}.jpg",
-                        )
-                        logger.info(f"💾 Saved processed image {i+1} record to database")
-                    except Exception as db_e:
-                        logger.error(f"❌ Error saving processed image record to database: {db_e}")
-                        logger.exception("Database save exception details:")
+                    # # Create database record with file paths instead of image data
+                    # ProcessedImage.objects.create(
+                    #     session_id=session_id,
+                    #     image_data=processed_image_path,  # Store file path instead of base64
+                    #     detected_faces_count=len(detected_students),
+                    #     original_filename=f"original_image_{i+1}.jpg",
+                    # )
+                    # logger.info(f"💾 Saved processed image {i+1} record to database")
 
                     # Still add base64 to response for frontend display
                     processed_images.append(processed_image_b64)
@@ -304,8 +243,6 @@ def process_images(request):
                         ):
                             all_detected_students[reg_num] = student_data
                             logger.info(f"👤 Added/updated student {reg_num} (confidence: {student_data['confidence']:.3f})")
-                else:
-                    logger.warning(f"⚠️  No processed image returned for image {i+1}")
 
             except Exception as e:
                 logger.error(f"❌ Error processing image {i+1}: {e}")
