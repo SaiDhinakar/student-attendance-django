@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "student-attendance-django",
-      "script": "/home/mithun/PROJECT/student-attendance-django/.venv/bin/python3",
+      "script": ".venv/bin/python3",
       "args": [
         "-m", "uvicorn",
         "StudentAttendance.asgi:application",
