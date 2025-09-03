@@ -71,10 +71,10 @@ fi
 # Step 5: Check for checkpoints
 
 
-if [ -d "prediction_backend/checkpoints" ] && [ "$(ls -A prediction_backend/checkpoints)" ]; then
-    print_success "[OK] Checkpoints found in prediction_backend/checkpoints."
+if [ -d "backend/checkpoints" ] && [ "$(ls -A backend/checkpoints)" ]; then
+    print_success "[OK] Checkpoints found in backend/checkpoints."
 else
-    print_failure "[X] Required checkpoints missing in prediction_backend/checkpoints. Please add them."
+    print_failure "[X] Required checkpoints missing in backend/checkpoints. Please add them."
     exit 1
 fi
 

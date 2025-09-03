@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Update Dashboard</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { background-color: #0056b3; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+        .status-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        #updateLog {
+            background: #000;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Server Update Dashboard</h1>
+    
+    <div class="card">
+        <h2>Current Status</h2>
+        <button class="btn" onclick="checkStatus()">Check Status</button>
+        <div id="statusInfo" class="status-box">
+            <p>Click "Check Status" to see current server and git status.</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Update Server</h2>
+        <p><strong>Warning:</strong> This will update the server from git and restart it. The server will be briefly unavailable.</p>
+        <button id="updateBtn" class="btn btn-danger" onclick="updateServer()">Update & Restart Server</button>
+        <div id="updateStatus"></div>
+        <div id="updateLog"></div>
+    </div>
+
+    <script>
+        async function checkStatus() {
+            try {
+                const response = await fetch('/admin/status/');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const statusDiv = document.getElementById('statusInfo');
+                    const hasUpdates = data.git_status.updates_available;
+                    const hasLocalChanges = data.git_status.local_changes;
+                    
+                    statusDiv.innerHTML = `
+                        <h4>Git Status:</h4>
+                        <p><strong>Updates Available:</strong> <span class="${hasUpdates ? 'warning' : 'success'}">${hasUpdates ? 'Yes' : 'No'}</span></p>
+                        <p><strong>Local Changes:</strong> <span class="${hasLocalChanges ? 'warning' : 'success'}">${hasLocalChanges ? 'Yes' : 'None'}</span></p>
+                        ${hasUpdates ? '<p class="warning">Remote updates: ' + data.git_status.remote_updates + '</p>' : ''}
+                        <h4>Server Status:</h4>
+                        <pre style="font-size: 12px; overflow-x: auto;">${data.server_status}</pre>
+                    `;
+                } else {
+                    document.getElementById('statusInfo').innerHTML = 
+                        '<p class="error">Error checking status: ' + data.error + '</p>';
+                }
+            } catch (error) {
+                document.getElementById('statusInfo').innerHTML = 
+                    '<p class="error">Network error: ' + error.message + '</p>';
+            }
+        }
+        
+        async function updateServer() {
+            const updateBtn = document.getElementById('updateBtn');
+            const updateStatus = document.getElementById('updateStatus');
+            const updateLog = document.getElementById('updateLog');
+            
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            updateStatus.innerHTML = '<p class="warning">Starting update process...</p>';
+            updateLog.textContent = 'Starting server update...\n';
+            
+            try {
+                const response = await fetch('/admin/update/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus.innerHTML = '<p class="success">✓ Server updated and restarted successfully!</p>';
+                    updateLog.textContent += '\n=== UPDATE COMPLETED SUCCESSFULLY ===\n';
+                    updateLog.textContent += 'Git fetch output:\n' + (data.git_output.fetch || 'No output') + '\n\n';
+                    updateLog.textContent += 'Git pull output:\n' + (data.git_output.pull || 'No output') + '\n\n';
+                    updateLog.textContent += 'Server has been restarted.\n';
+                } else {
+                    updateStatus.innerHTML = '<p class="error">✗ Update failed at step: ' + data.step + '</p>';
+                    updateLog.textContent += '\n=== UPDATE FAILED ===\n';
+                    updateLog.textContent += 'Error: ' + data.error + '\n';
+                    updateLog.textContent += 'Failed at step: ' + data.step + '\n';
+                }
+            } catch (error) {
+                updateStatus.innerHTML = '<p class="error">✗ Network error during update: ' + error.message + '</p>';
+                updateLog.textContent += '\n=== NETWORK ERROR ===\n' + error.message + '\n';
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update & Restart Server';
+            }
+        }
+        
+        // Auto-check status on page load
+        document.addEventListener('DOMContentLoaded', checkStatus);
+    </script>
+</body>
+</html>
