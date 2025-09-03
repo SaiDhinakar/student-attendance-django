@@ -13,6 +13,7 @@ class AttendancePrediction(models.Model):
     detection_method = models.CharField(max_length=50, default='camera')
     predicted_at = models.DateTimeField(auto_now_add=True)
     image_data = models.TextField(blank=True)  # Base64 encoded image for reference
+    time_slot_info = models.TextField(blank=True)  # JSON string containing time slot information
     
     class Meta:
         db_table = 'attendance_predictions'
@@ -30,6 +31,7 @@ class AttendanceSubmission(models.Model):
     original_prediction = models.BooleanField(null=True, blank=True)  # Store original prediction
     submitted_by = models.CharField(max_length=100)  # Staff/advisor username
     submitted_at = models.DateTimeField(auto_now_add=True)
+    submission_date = models.DateField(auto_now_add=True)  # Date of submission
     notes = models.TextField(blank=True)
     
     class Meta:

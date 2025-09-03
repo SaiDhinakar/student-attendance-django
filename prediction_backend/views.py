@@ -18,6 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.db import models
 
 from core.models import Student, Subject, Section, Department, Batch, Attendance, Timetable
 from .models import AttendancePrediction, AttendanceSubmission, ProcessedImage
@@ -86,9 +87,10 @@ def process_images(request):
         batch_year = int(data.get("batch_year")) if data.get("batch_year") else None
         subject_code = data.get("subject_code")
         sections_str = data.get("sections", "")
+        time_slot = data.get("time_slot")  # Extract time slot information
         threshold = float(data.get("threshold", 0.45))
         
-        logger.info(f"📊 Session parameters: dept={dept_name}, batch={batch_year}, subject={subject_code}, sections={sections_str}, threshold={threshold}")
+        logger.info(f"📊 Session parameters: dept={dept_name}, batch={batch_year}, subject={subject_code}, sections={sections_str}, time_slot={time_slot}, threshold={threshold}")
 
         if not all([dept_name, batch_year, subject_code]):
             logger.warning("❌ Missing required parameters")
@@ -318,6 +320,7 @@ def process_images(request):
             )
 
             # Create prediction in database
+            time_slot_json = json.dumps({"time_slot": time_slot}) if time_slot else ""
             prediction = AttendancePrediction.objects.create(
                 session_id=session_id,
                 student=student,
@@ -326,6 +329,7 @@ def process_images(request):
                 predicted_present=is_present,
                 confidence_score=confidence,
                 detection_method="camera",
+                time_slot_info=time_slot_json,
             )
 
             predictions.append(
@@ -411,21 +415,111 @@ def submit_attendance(request):
         
         logger.info(f"📚 Session info: {session_subject} for {session_section}")
 
-        # Create or get timetable entry for today
+        # Create or get timetable entry for today with time block validation
         from django.utils import timezone
+        from core.models import TimeBlock
+        from datetime import datetime, time as datetime_time
+        
         today = timezone.now().date()
         current_time = timezone.now().time()
         
-        # Find existing timetable or create a new one
-        timetable_entry, created = Timetable.objects.get_or_create(
+        # Get the current time block for the batch
+        batch = session_section.batch
+        batch_year = batch.batch_year
+        
+        # Try to get time block from submission data first (for camera-based attendance)
+        current_time_block = None
+        time_slot_from_session = None
+        
+        # Check if we have time slot info from the session (stored in prediction data if available)
+        session_predictions = AttendancePrediction.objects.filter(session_id=session_id).first()
+        if session_predictions and hasattr(session_predictions, 'time_slot_info'):
+            try:
+                import json as json_module
+                time_slot_from_session = json_module.loads(session_predictions.time_slot_info).get('time_slot')
+            except:
+                time_slot_from_session = None
+        
+        # Find appropriate time block
+        time_blocks = TimeBlock.objects.filter(
+            models.Q(batch_year=batch_year) | models.Q(batch_year=0)
+        ).order_by('batch_year', 'block_number')
+        
+        # If we have time slot number from session, use it
+        if time_slot_from_session:
+            try:
+                current_time_block = time_blocks.filter(block_number=int(time_slot_from_session)).first()
+                logger.info(f"🎯 Using time block from session: Block {time_slot_from_session}")
+            except (ValueError, TypeError):
+                logger.warning(f"⚠️  Invalid time slot from session: {time_slot_from_session}")
+        
+        # Otherwise, find the most appropriate time block based on current time
+        if not current_time_block:
+            for block in time_blocks:
+                # Check if current time falls within this block (with some tolerance)
+                if block.start_time <= current_time <= block.end_time:
+                    current_time_block = block
+                    break
+                elif block.batch_year == batch_year:  # Exact batch match gets priority
+                    current_time_block = block
+            
+            # If no specific block found, use the first available block for the batch
+            if not current_time_block:
+                current_time_block = time_blocks.filter(batch_year=batch_year).first()
+                if not current_time_block:
+                    current_time_block = time_blocks.filter(batch_year=0).first()
+        
+        if current_time_block:
+            block_start = current_time_block.start_time
+            block_end = current_time_block.end_time
+            logger.info(f"🕒 Using time block {current_time_block.block_number}: {block_start}-{block_end}")
+        else:
+            # Fallback if no time blocks are defined
+            block_start = current_time
+            block_end = current_time
+            logger.warning("⚠️  No time blocks found, using current time")
+        
+        # Check for existing timetable entry for this section, subject, date, and time block
+        existing_timetables = Timetable.objects.filter(
             section=session_section,
             subject=session_subject,
             date=today,
-            defaults={
-                'start_time': current_time,
-                'end_time': current_time,
-            }
+            start_time=block_start,
+            end_time=block_end
         )
+        
+        if existing_timetables.exists():
+            timetable_entry = existing_timetables.first()
+            logger.info(f"📅 Found existing timetable entry: {timetable_entry}")
+            
+            # Check if attendance has already been submitted for this timetable
+            existing_attendance = Attendance.objects.filter(timetable=timetable_entry)
+            if existing_attendance.exists():
+                logger.warning(f"⚠️  Attendance already exists for this time block! Found {existing_attendance.count()} records")
+                
+                # Return an error to prevent duplicate submissions
+                time_block_desc = f"Block {current_time_block.block_number} ({block_start}-{block_end})" if current_time_block else f"{block_start}-{block_end}"
+                return JsonResponse({
+                    "error": f"Attendance has already been submitted for {session_subject} - {session_section} at {time_block_desc} on {today}. "
+                            f"Found {existing_attendance.count()} existing attendance records. "
+                            f"Please contact administrator if you need to update attendance.",
+                    "error_type": "duplicate_submission",
+                    "existing_count": existing_attendance.count(),
+                    "timetable_id": timetable_entry.timetable_id,
+                    "time_block": time_block_desc
+                }, status=409)  # 409 Conflict status
+        else:
+            # Create new timetable entry
+            timetable_entry = Timetable.objects.create(
+                section=session_section,
+                subject=session_subject,
+                date=today,
+                start_time=block_start,
+                end_time=block_end,
+            )
+            logger.info(f"✅ Created new timetable entry: {timetable_entry}")
+        
+        created = not existing_timetables.exists()
         
         if created:
             logger.info(f"✅ Created new timetable entry: {timetable_entry}")

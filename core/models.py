@@ -227,6 +227,7 @@ class Timetable(TimestampedModel):
         db_table = 'Timetable'
         verbose_name = 'Timetable Entry'
         verbose_name_plural = 'Timetable Entries'
+        unique_together = ['section', 'subject', 'date', 'start_time', 'end_time']
     
     def __str__(self):
         return f"{self.section} - {self.subject} on {self.date}"

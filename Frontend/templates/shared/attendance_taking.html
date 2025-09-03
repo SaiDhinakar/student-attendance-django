@@ -422,6 +422,7 @@ class AttendanceTaking {
         batch_year: this.sessionData.batchYear,
         subject_code: this.sessionData.subject,
         sections: this.sessionData.sections,
+        time_slot: this.sessionData.timeSlot,
         threshold: 0.45
       };
       
@@ -664,12 +665,17 @@ class AttendanceTaking {
       
       this.debug.log(`Submission response: Status ${response.status}`, 'debug');
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
       const result = await response.json();
       this.debug.log(`Submission result: ${JSON.stringify(result)}`, 'debug');
+      
+      if (!response.ok) {
+        // Handle specific error types
+        if (response.status === 409 && result.error_type === 'duplicate_submission') {
+          throw new Error(`Duplicate submission: ${result.error}`);
+        } else {
+          throw new Error(result.error || `HTTP error! status: ${response.status}`);
+        }
+      }
       
       if (result.success) {
         this.debug.log('Attendance submitted successfully', 'success');
@@ -704,7 +710,16 @@ class AttendanceTaking {
       
     } catch (error) {
       this.debug.log(`Submission error: ${error.message}`, 'error');
-      this.showNotification('Error submitting attendance. Please try again.', 'error');
+      
+      // Check if this is a duplicate submission error
+      if (error.message && error.message.includes('Duplicate submission:')) {
+        const errorMsg = error.message.replace('Duplicate submission: ', '');
+        this.showNotification(`⚠️ ${errorMsg}`, 'warning');
+      } else if (error.message && error.message.includes('already been submitted')) {
+        this.showNotification('⚠️ Attendance has already been submitted for this time slot. Cannot submit duplicate attendance.', 'warning');
+      } else {
+        this.showNotification('❌ Error submitting attendance. Please try again.', 'error');
+      }
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
