@@ -117,6 +117,12 @@ student-attendance-django/
 
 - [ ] Daily attendance report automation to send it to WhatsApp for daily student report to the parent group.
 - [ ] Some more improvements coming soon!
+- [ ] Backup DB - Mith
+- [ ] update(git fetch) - sidd
+- [ ] remove duplicates - sai
+- [ ] give access to advisor to add staff
+- [ ] Subject wise attendace percentage
+- [ ] make pop up for 2 sec - mith
 
 ---
 

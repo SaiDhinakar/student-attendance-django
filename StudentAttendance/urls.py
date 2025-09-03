@@ -28,7 +28,7 @@ def home_redirect(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("admin/", include("admin_management.urls")),  # Admin management endpoints
+    path("admin_manager/", include("admin_management.urls")),  # Admin management endpoints
     path("", home_redirect, name="home"),  # Role-based redirect
     path("auth/", include("Authentication.urls")),  # Keep auth URLs for login
     path("staff/", include("attendance_dashboard.urls")),  # Staff attendance dashboard
