@@ -10,9 +10,12 @@ import csv
 import io
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
 
 from core.models import Student, Department, Batch, Section, Subject, Attendance, Timetable
-from .models import Advisor
+from .models import Advisor, StaffCreator
 from prediction_backend.models import AttendancePrediction, AttendanceSubmission
 
 def get_advisor_profile(user):
@@ -1504,5 +1507,212 @@ def subject_list(request):
         'total_departments': total_departments,
         'total_batches': total_batches,
     }
+
+
+# Staff Management Views
+@login_required
+def staff_list(request):
+    """View to list all staff users"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect('auth:login')
+    
+    # Get all staff users (either in Staffs group or with is_staff=True but not in Advisors group)
+    staffs_group = Group.objects.filter(name='Staffs').first()
+    advisors_group = Group.objects.filter(name='Advisors').first()
+    
+    if staffs_group:
+        staff_users = User.objects.filter(
+            Q(groups=staffs_group) | 
+            (Q(is_staff=True) & ~Q(groups=advisors_group) & ~Q(is_superuser=True))
+        ).distinct().order_by('username')
+    else:
+        staff_users = User.objects.filter(
+            is_staff=True, 
+            is_superuser=False
+        ).exclude(
+            groups=advisors_group
+        ).order_by('username')
+    
+    # Get the creator information for each staff user
+    staff_creators = {
+        sc.staff_user_id: sc 
+        for sc in StaffCreator.objects.filter(
+            staff_user__in=staff_users
+        ).select_related('created_by')
+    }
+    
+    context = {
+        'staff_users': staff_users,
+        'staff_creators': staff_creators,
+        'title': 'Staff Management',
+    }
+    return render(request, 'advisor_dashboard/staff_list.html', context)
+
+
+class StaffUserForm(forms.ModelForm):
+    """Form for creating and updating staff users"""
+    password = forms.CharField(widget=forms.PasswordInput(), required=False,
+                              help_text="Leave empty to keep current password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput(), required=False)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'is_active']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        
+        if password and password != confirm_password:
+            self.add_error('confirm_password', 'Passwords do not match')
+        
+        return cleaned_data
+
+
+@login_required
+def staff_create(request):
+    """View to create a new staff user"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect('auth:login')
+    
+    if request.method == 'POST':
+        form = StaffUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            if password:
+                user.set_password(password)
+            user.is_staff = True
+            user.save()
+            
+            # Add user to Staffs group
+            staffs_group, created = Group.objects.get_or_create(name='Staffs')
+            user.groups.add(staffs_group)
+            
+            # Create a StaffCreator record to track who created this staff
+            StaffCreator.objects.create(
+                staff_user=user,
+                created_by=request.user
+            )
+            
+            messages.success(request, f"Staff user '{user.username}' created successfully")
+            return redirect('advisor_dashboard:staff_list')
+    else:
+        form = StaffUserForm()
+    
+    context = {
+        'form': form,
+        'title': 'Create Staff User',
+        'submit_text': 'Create Staff',
+    }
+    return render(request, 'advisor_dashboard/staff_form.html', context)
+
+
+@login_required
+def staff_edit(request, user_id):
+    """View to edit a staff user"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect('auth:login')
+    
+    try:
+        staff_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "Staff user not found")
+        return redirect('advisor_dashboard:staff_list')
+    
+    # Check if this is an advisor or superuser
+    if staff_user.groups.filter(name='Advisors').exists() or staff_user.is_superuser:
+        messages.error(request, "Cannot edit advisor or admin users through this interface")
+        return redirect('advisor_dashboard:staff_list')
+    
+    if request.method == 'POST':
+        form = StaffUserForm(request.POST, instance=staff_user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            if password:
+                user.set_password(password)
+            user.is_staff = True  # Ensure they remain staff
+            user.save()
+            
+            # Ensure they're in Staffs group
+            staffs_group, created = Group.objects.get_or_create(name='Staffs')
+            user.groups.add(staffs_group)
+            
+            messages.success(request, f"Staff user '{user.username}' updated successfully")
+            return redirect('advisor_dashboard:staff_list')
+    else:
+        form = StaffUserForm(instance=staff_user)
+    
+    context = {
+        'form': form,
+        'staff_user': staff_user,
+        'title': f'Edit Staff User: {staff_user.username}',
+        'submit_text': 'Update Staff',
+    }
+    return render(request, 'advisor_dashboard/staff_form.html', context)
+
+
+@login_required
+def staff_delete(request, user_id):
+    """View to delete a staff user"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect('auth:login')
+    
+    try:
+        staff_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "Staff user not found")
+        return redirect('advisor_dashboard:staff_list')
+    
+    # Check if this is an advisor or superuser
+    if staff_user.groups.filter(name='Advisors').exists() or staff_user.is_superuser:
+        messages.error(request, "Cannot delete advisor or admin users through this interface")
+        return redirect('advisor_dashboard:staff_list')
+    
+    if request.method == 'POST':
+        username = staff_user.username
+        staff_user.delete()
+        messages.success(request, f"Staff user '{username}' deleted successfully")
+        return redirect('advisor_dashboard:staff_list')
+    
+    context = {
+        'staff_user': staff_user,
+        'title': f'Delete Staff User: {staff_user.username}',
+        'confirmation_message': f'Are you sure you want to delete the staff user "{staff_user.username}"?',
+    }
+    return render(request, 'advisor_dashboard/staff_delete_confirm.html', context)
+
+
+@login_required
+def staff_toggle_active(request, user_id):
+    """AJAX view to toggle a staff user's active status"""
+    if not check_advisor_permission(request.user) or request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    
+    try:
+        staff_user = User.objects.get(id=user_id)
+        
+        # Check if this is an advisor or superuser
+        if staff_user.groups.filter(name='Advisors').exists() or staff_user.is_superuser:
+            return JsonResponse({'success': False, 'error': 'Cannot modify advisor or admin users'}, status=403)
+        
+        staff_user.is_active = not staff_user.is_active
+        staff_user.save()
+        
+        return JsonResponse({
+            'success': True, 
+            'is_active': staff_user.is_active,
+            'message': f"User {staff_user.username} {'activated' if staff_user.is_active else 'deactivated'} successfully"
+        })
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
     return render(request, 'advisor_dashboard/subject_list.html', context)

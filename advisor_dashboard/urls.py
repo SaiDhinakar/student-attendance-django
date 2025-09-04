@@ -41,4 +41,11 @@ urlpatterns = [
     
     # API endpoints
     path('api/sections/', views.get_advisor_sections_api, name='api_sections'),
+    
+    # Staff management
+    path('staff/', views.staff_list, name='staff_list'),
+    path('staff/create/', views.staff_create, name='staff_create'),
+    path('staff/<int:user_id>/edit/', views.staff_edit, name='staff_edit'),
+    path('staff/<int:user_id>/delete/', views.staff_delete, name='staff_delete'),
+    path('staff/<int:user_id>/toggle-active/', views.staff_toggle_active, name='staff_toggle_active'),
 ]

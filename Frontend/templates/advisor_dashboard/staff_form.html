@@ -1,0 +1,156 @@
+{% extends "advisor_dashboard/advisor_base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <!-- Advisor-Style Welcome Header -->
+  <div class="solid-advisor-welcome-section mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1>{{ title }}</h1>
+        <p>{% if staff_user %}Update{% else %}Create{% endif %} staff user account</p>
+      </div>
+      <div>
+        <a href="{% url 'advisor_dashboard:staff_list' %}" class="btn-advisor-secondary">
+          <i class="iconoir-nav-arrow-left mr-2"></i>Back to Staff List
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Panel -->
+  <div class="max-w-3xl mx-auto bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="p-4 mb-4 bg-red-100 dark:bg-red-900 rounded-lg">
+          <div class="flex">
+            <i class="iconoir-warning-triangle text-red-600 dark:text-red-400 mr-3 mt-0.5"></i>
+            <div>
+              {% for error in form.non_field_errors %}
+                <p class="text-red-600 dark:text-red-400">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Username -->
+        <div>
+          <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            Username <span class="text-red-500">*</span>
+          </label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
+          {% endif %}
+          {% if form.username.help_text %}
+            <p class="mt-1 text-xs text-[var(--text-tertiary)]">{{ form.username.help_text }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            Email
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- First Name -->
+        <div>
+          <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            First Name
+          </label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.first_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            Last Name
+          </label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.last_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            Password {% if staff_user %}(leave blank to keep current){% else %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password.errors.0 }}</p>
+          {% endif %}
+          {% if form.password.help_text %}
+            <p class="mt-1 text-xs text-[var(--text-tertiary)]">{{ form.password.help_text }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label for="{{ form.confirm_password.id_for_label }}" class="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            Confirm Password
+          </label>
+          {{ form.confirm_password }}
+          {% if form.confirm_password.errors %}
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.confirm_password.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Active Status -->
+      <div class="flex items-center">
+        {{ form.is_active }}
+        <label for="{{ form.is_active.id_for_label }}" class="ml-2 block text-sm text-[var(--text-secondary)]">
+          Active Account
+        </label>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="flex justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+        <a href="{% url 'advisor_dashboard:staff_list' %}" class="btn-advisor-outline">
+          <i class="iconoir-cancel mr-2"></i>Cancel
+        </a>
+        <button type="submit" class="btn-advisor-primary">
+          <i class="iconoir-save-floppy mr-2"></i>{{ submit_text|default:"Save" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Style form fields
+    const formInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+    formInputs.forEach(input => {
+      input.classList.add('block', 'w-full', 'rounded-md', 'border-gray-300', 'dark:border-gray-700', 
+                         'bg-white', 'dark:bg-gray-800', 'shadow-sm', 'text-[var(--text-primary)]',
+                         'focus:border-purple-500', 'focus:ring-purple-500');
+    });
+
+    // Style checkbox
+    const checkbox = document.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.classList.add('h-4', 'w-4', 'rounded', 'border-gray-300', 'dark:border-gray-600',
+                            'text-purple-600', 'focus:ring-purple-500', 'dark:focus:ring-purple-400');
+    }
+  });
+</script>
+{% endblock %}

@@ -2,6 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 from core.models import Department, Batch, Section
 
+
+class StaffCreator(models.Model):
+    """
+    Model to track which advisor created a staff user
+    """
+    staff_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='created_by_advisor')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_staff_users')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'StaffCreators'
+        verbose_name = 'Staff Creator'
+        verbose_name_plural = 'Staff Creators'
+    
+    def __str__(self):
+        return f"{self.staff_user.username} created by {self.created_by.username if self.created_by else 'Unknown'}"
+
 class Advisor(models.Model):
     """
     Model representing advisors and their assigned departments/batches/sections

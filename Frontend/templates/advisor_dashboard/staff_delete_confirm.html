@@ -1,0 +1,77 @@
+{% extends "advisor_dashboard/advisor_base.html" %}
+{% load static %}
+
+{% block title %}Delete Staff User{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <!-- Advisor-Style Welcome Header -->
+  <div class="solid-advisor-welcome-section mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1>{{ title }}</h1>
+        <p>Confirm deletion of this staff account</p>
+      </div>
+      <div>
+        <a href="{% url 'advisor_dashboard:staff_list' %}" class="btn-advisor-secondary">
+          <i class="iconoir-nav-arrow-left mr-2"></i>Back to Staff List
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Panel -->
+  <div class="max-w-2xl mx-auto bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+    <div class="text-center">
+      <div class="mx-auto w-20 h-20 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mb-4">
+        <i class="iconoir-trash text-3xl text-red-600 dark:text-red-400"></i>
+      </div>
+      <h2 class="text-xl font-semibold text-[var(--text-primary)] mb-2">Confirm Deletion</h2>
+      <p class="text-[var(--text-secondary)] mb-6">{{ confirmation_message }}</p>
+      
+      <div class="bg-amber-50 dark:bg-amber-900 border-l-4 border-amber-500 p-4 mb-6 text-left">
+        <div class="flex">
+          <i class="iconoir-warning-triangle text-amber-600 dark:text-amber-400 mr-3 mt-0.5"></i>
+          <div>
+            <p class="text-amber-700 dark:text-amber-300">Warning</p>
+            <p class="text-amber-600 dark:text-amber-400 text-sm">
+              This action cannot be undone. All data associated with this account will be permanently deleted.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- User Details -->
+      <div class="mb-6">
+        <div class="grid grid-cols-2 gap-2 text-sm border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div class="text-left font-medium text-[var(--text-secondary)]">Username:</div>
+          <div class="text-left text-[var(--text-primary)]">{{ staff_user.username }}</div>
+          
+          <div class="text-left font-medium text-[var(--text-secondary)]">Full Name:</div>
+          <div class="text-left text-[var(--text-primary)]">{{ staff_user.get_full_name|default:"-" }}</div>
+          
+          <div class="text-left font-medium text-[var(--text-secondary)]">Email:</div>
+          <div class="text-left text-[var(--text-primary)]">{{ staff_user.email|default:"-" }}</div>
+          
+          <div class="text-left font-medium text-[var(--text-secondary)]">Status:</div>
+          <div class="text-left">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if staff_user.is_active %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300{% endif %}">
+              {{ staff_user.is_active|yesno:"Active,Inactive" }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <form method="post" class="flex justify-center gap-4">
+        {% csrf_token %}
+        <a href="{% url 'advisor_dashboard:staff_list' %}" class="btn-advisor-outline">
+          <i class="iconoir-cancel mr-2"></i>Cancel
+        </a>
+        <button type="submit" class="btn-advisor-danger">
+          <i class="iconoir-trash mr-2"></i>Delete Staff User
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
