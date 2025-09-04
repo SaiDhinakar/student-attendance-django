@@ -23,14 +23,13 @@ def get_advisor_profile(user):
         return None
 
 def check_advisor_permission(user):
-    """Check if user is an advisor - check both group membership and staff status"""
-    # Check if user is in Advisors group OR is staff (for development)
+    """Check if user is an advisor - only check group membership, not staff status"""
+    # Check if user is in Advisors group OR is superuser (staff users are not allowed)
     is_in_advisor_group = user.groups.filter(name='Advisors').exists()
-    is_staff_user = user.is_staff
     
-    print(f"DEBUG: User {user.username} - is_in_advisor_group: {is_in_advisor_group}, is_staff: {is_staff_user}")
+    print(f"DEBUG: User {user.username} - is_in_advisor_group: {is_in_advisor_group}")
     
-    return is_in_advisor_group or is_staff_user or user.is_superuser
+    return is_in_advisor_group or user.is_superuser
 
 @login_required
 def advisor_dashboard(request):

@@ -144,6 +144,7 @@ def camera_attendance_view(request):
     context = {
         'user': request.user,
         'user_role': user_role,
+        'is_staff': request.user.is_staff and not request.user.groups.filter(name='Advisors').exists(),
         'base_template': base_template,
         'user_department': None,  # Can access all departments
         'user_group': user_group,

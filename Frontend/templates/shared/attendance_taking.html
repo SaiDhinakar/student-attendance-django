@@ -22,9 +22,11 @@
         </p>
       </div>
       <div class="flex items-center space-x-4">
+        {% if user_role != 'staff' %}
         <button id="backBtn" class="btn-advisor-secondary">
           <i class="iconoir-arrow-left mr-2"></i>Back
         </button>
+        {% endif %}
         <div class="hidden md:block">
           <i class="iconoir-camera advisor-welcome-icon"></i>
         </div>
@@ -294,7 +296,10 @@ class AttendanceTaking {
     document.getElementById('retryCamera')?.addEventListener('click', () => this.initCamera());
     
     // Navigation
-    document.getElementById('backBtn')?.addEventListener('click', () => this.goBack());
+    const userRole = '{{ user_role }}';
+    if (userRole !== 'staff') {
+      document.getElementById('backBtn')?.addEventListener('click', () => this.goBack());
+    }
     
     // Image processing
     document.getElementById('processAllImagesBtn')?.addEventListener('click', () => this.processAllImages());
@@ -728,7 +733,13 @@ class AttendanceTaking {
   
   goBack() {
     this.debug.log('Navigating back to previous page', 'info');
-    window.history.back();
+    // For staff users, redirect to the attendance form
+    const userRole = '{{ user_role }}';
+    if (userRole === 'staff') {
+      window.location.href = '{% url "attendance_dashboard:attendance" %}';
+    } else {
+      window.history.back();
+    }
   }
   
   toggleDebugConsole() {
