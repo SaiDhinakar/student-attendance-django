@@ -4,7 +4,7 @@
  */
 
 // Custom notification function to replace alert()
-function showNotification(message, type = 'info', duration = 3000) {
+function showNotification(message, type = 'info', duration = 1000) {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `fixed top-4 right-4 max-w-sm p-4 rounded-lg shadow-lg z-[9999] transform transition-all duration-300 translate-x-full opacity-0`;
@@ -63,7 +63,7 @@ function showNotification(message, type = 'info', duration = 3000) {
 // Replace the native alert function
 window.originalAlert = window.alert;
 window.alert = function(message) {
-    showNotification(message, 'info', 3000);
+    showNotification(message, 'info', 1000);
 };
 
 // Function to auto-hide Django messages
@@ -102,27 +102,27 @@ function autoDismissDjangoMessages() {
                     }
                 }, 300);
             }
-        }, 3000);
+        }, 1000);
     });
 }
 
 // Function to show success notifications
-window.showSuccess = function(message, duration = 3000) {
+window.showSuccess = function(message, duration = 1000) {
     return showNotification(message, 'success', duration);
 };
 
 // Function to show error notifications
-window.showError = function(message, duration = 3000) {
+window.showError = function(message, duration = 1000) {
     return showNotification(message, 'error', duration);
 };
 
 // Function to show warning notifications
-window.showWarning = function(message, duration = 3000) {
+window.showWarning = function(message, duration = 1000) {
     return showNotification(message, 'warning', duration);
 };
 
 // Function to show info notifications
-window.showInfo = function(message, duration = 3000) {
+window.showInfo = function(message, duration = 1000) {
     return showNotification(message, 'info', duration);
 };
 
