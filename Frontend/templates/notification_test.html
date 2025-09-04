@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Test - Student Attendance{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="card">
+        <h1 class="text-3xl font-bold text-primary mb-6">🔔 Notification System Test</h1>
+        
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-primary mb-4">Test Different Notification Types</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button onclick="showSuccess('This is a success message!')" 
+                        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                    Success
+                </button>
+                
+                <button onclick="showError('This is an error message!')" 
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                    Error
+                </button>
+                
+                <button onclick="showWarning('This is a warning message!')" 
+                        class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                    Warning
+                </button>
+                
+                <button onclick="showInfo('This is an info message!')" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    Info
+                </button>
+            </div>
+        </div>
+        
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-primary mb-4">Test Alert Replacement</h2>
+            <button onclick="alert('This alert is now replaced with custom notification!')" 
+                    class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                Test Alert() Function
+            </button>
+        </div>
+        
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-primary mb-4">Django Messages Demo</h2>
+            <p class="text-gray-600 mb-4">Django messages (if any) will automatically disappear after 3 seconds:</p>
+            
+            {% if not messages %}
+            <div class="rounded-lg border p-4 bg-green-50 border-green-200 text-green-800" data-django-messages>
+                <div class="flex">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">🎉 Demo Success Message - This will auto-hide in 3 seconds!</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">✅ Features:</h3>
+            <ul class="space-y-2 text-gray-600">
+                <li>• All notifications auto-dismiss after <strong>3 seconds</strong></li>
+                <li>• Django messages automatically get close buttons</li>
+                <li>• Custom notifications slide in from the right</li>
+                <li>• Manual close buttons available on all notifications</li>
+                <li>• Replaced native alert() function with custom notifications</li>
+                <li>• Smooth animations and transitions</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Simulate Django message auto-hide for demo
+document.addEventListener('DOMContentLoaded', function() {
+    // Manually trigger the auto-dismiss for demo message
+    setTimeout(function() {
+        const demoMessage = document.querySelector('[data-django-messages] .rounded-lg');
+        if (demoMessage) {
+            demoMessage.style.transition = 'all 0.3s ease-out';
+            demoMessage.style.opacity = '0';
+            demoMessage.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                if (demoMessage.parentElement) {
+                    demoMessage.remove();
+                }
+            }, 300);
+        }
+    }, 3000);
+});
+</script>
+{% endblock %}

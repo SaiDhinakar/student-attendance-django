@@ -75,35 +75,53 @@
     </h3>
     <div class="advisor-actions-grid">
       <!-- Student Management -->
-      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+      <div class="bg-[var(--bg-primary)] rounded-lg p-3 sm:p-4 hover:shadow-lg transition-shadow">
         <div class="text-center">
-          <i class="iconoir-group text-3xl text-[var(--primary)] mb-3"></i>
-          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Student Management</h4>
+          <i class="iconoir-group text-2xl sm:text-3xl text-[var(--primary)] mb-2 sm:mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2 text-sm sm:text-base">Student Management</h4>
           <div class="space-y-2">
             <a href="{% url 'advisor_dashboard:student_list' %}" 
-               class="block w-full bg-[var(--primary)] text-white py-2 px-3 rounded-md text-sm hover:bg-purple-700 transition-colors">
+               class="block w-full bg-[var(--primary)] text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-purple-700 transition-colors">
               View All Students
             </a>
             <a href="{% url 'advisor_dashboard:student_create' %}" 
-               class="block w-full bg-green-600 text-white py-2 px-3 rounded-md text-sm hover:bg-green-700 transition-colors">
+               class="block w-full bg-green-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-green-700 transition-colors">
               Add New Student
             </a>
           </div>
         </div>
       </div>
 
-      <!-- Attendance Management -->
-      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+      <!-- Subject Management -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-3 sm:p-4 hover:shadow-lg transition-shadow">
         <div class="text-center">
-          <i class="iconoir-check-circle text-3xl text-blue-600 mb-3"></i>
-          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Attendance</h4>
+          <i class="iconoir-book text-2xl sm:text-3xl text-[var(--primary)] mb-2 sm:mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2 text-sm sm:text-base">Subject Management</h4>
+          <div class="space-y-2">
+            <a href="{% url 'advisor_dashboard:subject_list' %}" 
+               class="block w-full bg-blue-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-blue-700 transition-colors">
+              <i class="iconoir-list mr-1 sm:mr-2"></i>View Subjects
+            </a>
+            <a href="{% url 'advisor_dashboard:subject_create' %}" 
+               class="block w-full bg-[var(--primary)] text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-purple-700 transition-colors">
+              <i class="iconoir-plus mr-1 sm:mr-2"></i>Add New Subject
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Management -->
+      <div class="bg-[var(--bg-primary)] rounded-lg p-3 sm:p-4 hover:shadow-lg transition-shadow">
+        <div class="text-center">
+          <i class="iconoir-check-circle text-2xl sm:text-3xl text-blue-600 mb-2 sm:mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2 text-sm sm:text-base">Attendance</h4>
           <div class="space-y-2">
             <a href="{% url 'advisor_dashboard:attendance_list' %}" 
-               class="block w-full bg-blue-600 text-white py-2 px-3 rounded-md text-sm hover:bg-blue-700 transition-colors">
+               class="block w-full bg-blue-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-blue-700 transition-colors">
               View Records
             </a>
             <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
-               class="block w-full bg-orange-600 text-white py-2 px-3 rounded-md text-sm hover:bg-orange-700 transition-colors">
+               class="block w-full bg-orange-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-orange-700 transition-colors">
               Take Attendance
             </a>
           </div>
@@ -111,17 +129,17 @@
       </div>
 
       <!-- Reports & Analytics -->
-      <div class="bg-[var(--bg-primary)] rounded-lg p-4 hover:shadow-lg transition-shadow">
+      <div class="bg-[var(--bg-primary)] rounded-lg p-3 sm:p-4 hover:shadow-lg transition-shadow">
         <div class="text-center">
-          <i class="iconoir-graph-up text-3xl text-green-600 mb-3"></i>
-          <h4 class="font-semibold text-[var(--text-primary)] mb-2">Reports</h4>
+          <i class="iconoir-graph-up text-2xl sm:text-3xl text-green-600 mb-2 sm:mb-3"></i>
+          <h4 class="font-semibold text-[var(--text-primary)] mb-2 text-sm sm:text-base">Reports</h4>
           <div class="space-y-2">
             <a href="{% url 'advisor_dashboard:department_attendance' %}" 
-               class="block w-full bg-green-600 text-white py-2 px-3 rounded-md text-sm hover:bg-green-700 transition-colors">
+               class="block w-full bg-green-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-green-700 transition-colors">
               Department Stats
             </a>
             <a href="{% url 'advisor_dashboard:reports' %}" 
-               class="block w-full bg-indigo-600 text-white py-2 px-3 rounded-md text-sm hover:bg-indigo-700 transition-colors">
+               class="block w-full bg-indigo-600 text-white py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm hover:bg-indigo-700 transition-colors">
               Generate Reports
             </a>
           </div>

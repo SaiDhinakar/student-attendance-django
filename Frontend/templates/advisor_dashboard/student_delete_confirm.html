@@ -128,12 +128,12 @@ function confirmDeletion() {
     const expectedName = '{{ student.name }}';
     
     if (!checkbox.checked) {
-        alert('Please confirm that you understand this action is permanent.');
+        showWarning('Please confirm that you understand this action is permanent.');
         return false;
     }
     
     if (nameInput.value !== expectedName) {
-        alert('Please enter the student\'s name exactly as shown.');
+        showError('Please enter the student\'s name exactly as shown.');
         nameInput.focus();
         return false;
     }

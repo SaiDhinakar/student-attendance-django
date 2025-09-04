@@ -1,0 +1,261 @@
+{% extends 'advisor_dashboard/advisor_base.html' %}
+
+{% block title %}Add Subject - Advisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+    <div>
+      <h1 class="text-2xl lg:text-3xl font-bold text-[var(--text-primary)]">Add New Subject</h1>
+      <p class="text-[var(--text-secondary)] mt-1">Create a new subject for your assigned batches</p>
+    </div>
+    <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
+      <a href="{% url 'advisor_dashboard:subject_list' %}" 
+         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center">
+        <i class="iconoir-list mr-2"></i>View Subjects
+      </a>
+      <a href="{% url 'advisor_dashboard:dashboard' %}" 
+         class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors text-center">
+        <i class="iconoir-arrow-left mr-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Subject Form -->
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-4 lg:p-6">
+    <form method="POST" class="space-y-6">
+      {% csrf_token %}
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Subject Code -->
+        <div>
+          <label for="subject_code" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+            Subject Code <span class="text-red-500">*</span>
+          </label>
+          <input type="text" 
+                 id="subject_code" 
+                 name="subject_code" 
+                 required
+                 placeholder="e.g., CS301, ME201, EE101"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]">
+          <p class="text-xs text-gray-500 mt-1">Enter a unique subject code</p>
+        </div>
+
+        <!-- Subject Name -->
+        <div>
+          <label for="subject_name" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+            Subject Name <span class="text-red-500">*</span>
+          </label>
+          <input type="text" 
+                 id="subject_name" 
+                 name="subject_name" 
+                 required
+                 placeholder="e.g., Data Structures, Machine Design"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]">
+          <p class="text-xs text-gray-500 mt-1">Enter the full subject name</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Department Selection -->
+        <div>
+          <label for="departments" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+            Department(s) <span class="text-red-500">*</span>
+          </label>
+          
+          <div class="relative">
+            <div id="departmentDropdown" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] cursor-pointer bg-white">
+              <span id="departmentPlaceholder" class="text-gray-500">Select Department(s)</span>
+              <i class="iconoir-nav-arrow-down float-right mt-1"></i>
+            </div>
+            
+            <div id="departmentOptions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto hidden">
+              {% for department in departments %}
+              <label class="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                <input type="checkbox" name="departments" value="{{ department.dept_id }}" class="mr-2">
+                <span>{{ department.dept_name }}</span>
+              </label>
+              {% empty %}
+              <div class="px-3 py-2 text-gray-500 text-sm">No departments available for your assigned students</div>
+              {% endfor %}
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Select departments offering this subject</p>
+        </div>
+
+        <!-- Batch Selection -->
+        <div>
+          <label for="batch" class="block text-sm font-medium text-[var(--text-primary)] mb-2">
+            Batch <span class="text-red-500">*</span>
+          </label>
+          <select id="batch" 
+                  name="batch" 
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]">
+            <option value="">Select Batch</option>
+            {% for batch in batches %}
+            <option value="{{ batch.batch_id }}" data-dept="{{ batch.dept.dept_id }}">{{ batch.dept.dept_name }} - {{ batch.display_year }}</option>
+            {% empty %}
+            <option value="" disabled>No batches available</option>
+            {% endfor %}
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Only batches with your assigned students are shown</p>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4 sm:justify-end pt-4 border-t border-gray-200">
+        <a href="{% url 'advisor_dashboard:subject_list' %}" 
+           class="px-6 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors text-center">
+          Cancel
+        </a>
+        <button type="submit" 
+                class="px-6 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-purple-700 transition-colors">
+          <i class="iconoir-plus mr-2"></i>Add Subject
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Info Section -->
+  {% if not batches %}
+  <div class="bg-yellow-50 rounded-xl p-6">
+    <h3 class="text-lg font-semibold text-yellow-900 mb-2">
+      <i class="iconoir-warning-triangle mr-2"></i>No Batches Available
+    </h3>
+    <p class="text-yellow-800">
+      No batches are available for subject creation. This might be because you don't have any assigned students yet, 
+      or no students are assigned to any sections under your supervision.
+    </p>
+  </div>
+  {% else %}
+  <div class="bg-blue-50 rounded-xl p-6">
+    <h3 class="text-lg font-semibold text-blue-900 mb-4">
+      <i class="iconoir-info-circle mr-2"></i>Subject Creation Guidelines
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+      <div>
+        <h4 class="font-medium mb-2">Subject Code:</h4>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Use department prefix + number (e.g., CS301)</li>
+          <li>Must be unique across all subjects</li>
+          <li>Keep it short and descriptive</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-medium mb-2">Subject Assignment:</h4>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Only batches with your assigned students are shown</li>
+          <li>Select relevant departments for the subject</li>
+          <li>Subject will be available for attendance marking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Custom dropdown for departments
+    const departmentDropdown = document.getElementById('departmentDropdown');
+    const departmentOptions = document.getElementById('departmentOptions');
+    const departmentPlaceholder = document.getElementById('departmentPlaceholder');
+    const departmentCheckboxes = document.querySelectorAll('input[name="departments"]');
+    
+    // Toggle dropdown
+    departmentDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        departmentOptions.classList.toggle('hidden');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        departmentOptions.classList.add('hidden');
+    });
+    
+    // Prevent dropdown from closing when clicking inside options
+    departmentOptions.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    // Update placeholder text when departments are selected
+    function updateDepartmentPlaceholder() {
+        const selected = Array.from(departmentCheckboxes).filter(cb => cb.checked);
+        if (selected.length === 0) {
+            departmentPlaceholder.textContent = 'Select Department(s)';
+            departmentPlaceholder.className = 'text-gray-500';
+        } else if (selected.length === 1) {
+            departmentPlaceholder.textContent = selected[0].nextElementSibling.textContent;
+            departmentPlaceholder.className = 'text-gray-900';
+        } else {
+            departmentPlaceholder.textContent = `${selected.length} departments selected`;
+            departmentPlaceholder.className = 'text-gray-900';
+        }
+    }
+    
+    // Add event listeners to checkboxes
+    departmentCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', updateDepartmentPlaceholder);
+    });
+    
+    // Batch filtering based on selected departments
+    const batchSelect = document.getElementById('batch');
+    const allBatchOptions = Array.from(batchSelect.options);
+    
+    function filterBatches() {
+        const selectedDepts = Array.from(departmentCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+        
+        // Clear current options except the first one (placeholder)
+        batchSelect.innerHTML = '<option value="">Select Batch</option>';
+        
+        if (selectedDepts.length > 0) {
+            allBatchOptions.slice(1).forEach(function(option) {
+                const batchDept = option.getAttribute('data-dept');
+                if (selectedDepts.includes(batchDept)) {
+                    batchSelect.appendChild(option.cloneNode(true));
+                }
+            });
+        } else {
+            // If no departments selected, show all batches
+            allBatchOptions.slice(1).forEach(function(option) {
+                batchSelect.appendChild(option.cloneNode(true));
+            });
+        }
+    }
+    
+    // Filter batches when departments change
+    departmentCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', filterBatches);
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const subjectCode = document.getElementById('subject_code').value.trim();
+        const subjectName = document.getElementById('subject_name').value.trim();
+        const selectedDepartments = Array.from(departmentCheckboxes).filter(cb => cb.checked);
+        const batch = document.getElementById('batch').value;
+        
+        if (!subjectCode || !subjectName || selectedDepartments.length === 0 || !batch) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        // Validate subject code format (optional)
+        const codePattern = /^[A-Z]{2,4}\d{2,4}$/i;
+        if (!codePattern.test(subjectCode)) {
+            const confirm = window.confirm('Subject code format seems unusual. Standard format is like "CS301" or "MECH201". Continue anyway?');
+            if (!confirm) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

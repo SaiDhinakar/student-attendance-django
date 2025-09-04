@@ -7,19 +7,21 @@
 {% block content %}
 <div class="space-y-6">
   <!-- Header -->
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
     <div>
-      <h1 class="text-3xl font-bold text-[var(--text-primary)]">
+      <h1 class="text-2xl lg:text-3xl font-bold text-[var(--text-primary)]">
         {% if is_edit %}Edit Student{% else %}Add New Student{% endif %}
       </h1>
       <p class="text-[var(--text-secondary)] mt-1">
         {% if is_edit %}Update student information{% else %}Add a new student to your assigned sections{% endif %}
       </p>
     </div>
-    <a href="{% url 'advisor_dashboard:student_list' %}" 
-       class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
-      <i class="iconoir-arrow-left mr-2"></i>Back
-    </a>
+    <div class="flex">
+      <a href="{% url 'advisor_dashboard:student_list' %}" 
+         class="bg-gray-500 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-gray-600 transition-colors text-center w-full sm:w-auto">
+        <i class="iconoir-arrow-left mr-2"></i>Back
+      </a>
+    </div>
   </div>
 
   <!-- Form -->
@@ -86,9 +88,9 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+      <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4 sm:justify-end pt-6 border-t border-gray-200">
         <a href="{% url 'advisor_dashboard:student_list' %}" 
-           class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-colors">
+           class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition-colors text-center">
           Cancel
         </a>
         <button type="submit" 

@@ -27,6 +27,10 @@ urlpatterns = [
     path('students/<str:student_regno>/edit/', views.student_edit, name='student_edit'),
     path('students/<str:student_regno>/delete/', views.student_delete, name='student_delete'),
     
+    # Subject operations
+    path('subjects/', views.subject_list, name='subject_list'),
+    path('subjects/create/', views.subject_create, name='subject_create'),
+    
     # Attendance CRUD operations
     path('attendance-records/', views.attendance_list, name='attendance_list'),
     path('attendance-records/<int:attendance_id>/edit/', views.attendance_edit, name='attendance_edit'),

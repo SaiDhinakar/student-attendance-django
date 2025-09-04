@@ -1364,3 +1364,146 @@ def export_attendance_csv(attendance_records, filename):
         ])
     
     return response
+
+
+@login_required
+def subject_create(request):
+    """Create new subject for advisor's department/batch"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect("auth:login")
+    
+    advisor = get_advisor_profile(request.user)
+    
+    # Get batches from advisor's assigned students
+    advisor_batches = []
+    advisor_departments = []
+    
+    if advisor and advisor.can_view_all_attendance:
+        # If advisor can view all attendance, get all batches
+        advisor_batches = Batch.objects.all().order_by('dept__dept_name', 'batch_year')
+        advisor_departments = Department.objects.all().order_by('dept_name')
+    elif advisor:
+        # Get batches based on advisor's assigned students
+        student_batches = Student.objects.filter(
+            section__in=advisor.assigned_sections.all()
+        ).values_list('batch', flat=True).distinct()
+        
+        advisor_batches = Batch.objects.filter(batch_id__in=student_batches).order_by('dept__dept_name', 'batch_year')
+        
+        # Get departments from these batches
+        dept_ids = advisor_batches.values_list('dept', flat=True).distinct()
+        advisor_departments = Department.objects.filter(dept_id__in=dept_ids).order_by('dept_name')
+    else:
+        # For staff users without advisor profile, allow access to all
+        advisor_batches = Batch.objects.all().order_by('dept__dept_name', 'batch_year')
+        advisor_departments = Department.objects.all().order_by('dept_name')
+    
+    if request.method == 'POST':
+        subject_code = request.POST.get('subject_code', '').strip()
+        subject_name = request.POST.get('subject_name', '').strip()
+        department_ids = request.POST.getlist('departments')  # Multiple departments
+        batch_id = request.POST.get('batch', '').strip()
+        
+        # Validation
+        if not subject_code or not subject_name or not department_ids or not batch_id:
+            messages.error(request, "All fields are required.")
+        elif Subject.objects.filter(subject_code=subject_code).exists():
+            messages.error(request, f"Subject with code '{subject_code}' already exists.")
+        elif Subject.objects.filter(subject_name=subject_name).exists():
+            messages.error(request, f"Subject with name '{subject_name}' already exists.")
+        else:
+            try:
+                with transaction.atomic():
+                    # Get the batch
+                    batch = get_object_or_404(Batch, batch_id=batch_id)
+                    
+                    # Verify advisor has permission for this batch
+                    if not advisor or not advisor.can_view_all_attendance:
+                        if batch not in advisor_batches:
+                            messages.error(request, "You don't have permission to create subjects for this batch.")
+                            return render(request, 'advisor_dashboard/subject_create.html', {
+                                'departments': advisor_departments,
+                                'batches': advisor_batches,
+                                'advisor': advisor,
+                            })
+                    
+                    # Create the subject
+                    subject = Subject.objects.create(
+                        subject_code=subject_code,
+                        subject_name=subject_name,
+                        batch=batch
+                    )
+                    
+                    # Add selected departments
+                    departments = Department.objects.filter(dept_id__in=department_ids)
+                    subject.departments.set(departments)
+                    
+                    messages.success(request, f"Subject '{subject_name}' created successfully!")
+                    return redirect('advisor_dashboard:subject_list')
+            except Exception as e:
+                messages.error(request, f"Error creating subject: {str(e)}")
+    
+    context = {
+        'departments': advisor_departments,
+        'batches': advisor_batches,
+        'advisor': advisor,
+    }
+    
+    return render(request, 'advisor_dashboard/subject_create.html', context)
+
+
+@login_required
+def subject_list(request):
+    """List subjects assigned to advisor's students"""
+    if not check_advisor_permission(request.user):
+        messages.error(request, "Access denied. You don't have advisor permissions.")
+        return redirect("auth:login")
+    
+    advisor = get_advisor_profile(request.user)
+    
+    # Get subjects based on advisor's assigned students
+    if advisor and advisor.can_view_all_attendance:
+        # If advisor can view all attendance, get all subjects
+        subjects = Subject.objects.all().order_by('batch__dept__dept_name', 'batch__batch_year', 'subject_code')
+    elif advisor:
+        # Get subjects for batches that have students assigned to this advisor
+        student_batches = Student.objects.filter(
+            section__in=advisor.assigned_sections.all()
+        ).values_list('batch', flat=True).distinct()
+        
+        subjects = Subject.objects.filter(
+            batch__batch_id__in=student_batches
+        ).order_by('batch__dept__dept_name', 'batch__batch_year', 'subject_code')
+    else:
+        # For staff users without advisor profile, show all subjects
+        subjects = Subject.objects.all().order_by('batch__dept__dept_name', 'batch__batch_year', 'subject_code')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        subjects = subjects.filter(
+            Q(subject_code__icontains=search_query) |
+            Q(subject_name__icontains=search_query) |
+            Q(departments__dept_name__icontains=search_query)
+        ).distinct()
+    
+    # Pagination
+    paginator = Paginator(subjects, 20)
+    page_number = request.GET.get('page')
+    subjects_paginated = paginator.get_page(page_number)
+    
+    # Calculate statistics
+    all_subjects = subjects  # Keep the queryset for statistics
+    total_departments = all_subjects.values('departments').distinct().count()
+    total_batches = all_subjects.values('batch').distinct().count()
+    
+    context = {
+        'subjects': subjects_paginated,
+        'search_query': search_query,
+        'advisor': advisor,
+        'total_departments': total_departments,
+        'total_batches': total_batches,
+    }
+    
+    return render(request, 'advisor_dashboard/subject_list.html', context)

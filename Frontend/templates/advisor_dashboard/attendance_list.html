@@ -5,27 +5,27 @@
 {% block content %}
 <div class="space-y-6">
   <!-- Header -->
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
     <div>
-      <h1 class="text-3xl font-bold text-[var(--text-primary)]">Attendance Records</h1>
+      <h1 class="text-2xl lg:text-3xl font-bold text-[var(--text-primary)]">Attendance Records</h1>
       <p class="text-[var(--text-secondary)] mt-1">View and manage attendance for your students</p>
     </div>
-    <div class="flex space-x-3">
+    <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
       <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
-         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors text-center">
         <i class="iconoir-plus mr-2"></i>Take Attendance
       </a>
       <!-- <a href="{% url 'advisor_dashboard:bulk_attendance_edit' %}" 
-         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-center">
         <i class="iconoir-edit-pencil mr-2"></i>Bulk Edit
       </a> -->
     </div>
   </div>
 
   <!-- Search and Filters -->
-  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-6">
+  <div class="bg-[var(--bg-secondary)] rounded-xl shadow-md p-4 lg:p-6">
     <form method="GET" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Student Filter (only assigned students) -->
         <div>
           <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Student</label>
@@ -67,8 +67,8 @@
         </div>
       </div>
 
-      <!-- Status Filter (separate row) -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Status Filter (separate row for mobile) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Status</label>
           <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
@@ -79,11 +79,11 @@
         </div>
       </div>
 
-      <div class="flex space-x-4">
+      <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
         <button type="submit" class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
           <i class="iconoir-search mr-2"></i>Filter
         </button>
-        <a href="{% url 'advisor_dashboard:attendance_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">
+        <a href="{% url 'advisor_dashboard:attendance_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-center">
           <i class="iconoir-refresh mr-2"></i>Clear Filters
         </a>
       </div>
@@ -99,7 +99,8 @@
     </div>
 
     {% if attendance_records %}
-    <div class="overflow-x-auto">
+    <!-- Desktop Table View -->
+    <div class="hidden lg:block overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -162,11 +163,69 @@
       </table>
     </div>
 
+    <!-- Mobile Card View -->
+    <div class="lg:hidden divide-y divide-gray-200">
+      {% for record in attendance_records %}
+      <div class="p-4 bg-white hover:bg-gray-50">
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0">
+            <div class="h-12 w-12 rounded-full bg-[var(--primary)] flex items-center justify-center">
+              <span class="text-white font-medium text-lg">{{ record.student.name.0 }}</span>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ record.student.name }}</p>
+                <p class="text-xs text-gray-500">{{ record.student.student_regno }}</p>
+              </div>
+              <div class="flex space-x-1">
+                {% if record.is_present %}
+                  <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                    <i class="iconoir-check-circle mr-1"></i>Present
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                    <i class="iconoir-xmark-circle mr-1"></i>Absent
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mt-2 space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-500">Date:</span>
+                <span class="text-gray-900 font-medium">{{ record.timetable.date|date:"M j, Y" }}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-500">Subject:</span>
+                <span class="text-gray-900">{{ record.timetable.subject.subject_name }}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-500">Section:</span>
+                <span class="text-gray-900">{{ record.timetable.section.section_name }}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-500">Time:</span>
+                <span class="text-gray-900">{{ record.timetable.start_time|time:"g:i A" }} - {{ record.timetable.end_time|time:"g:i A" }}</span>
+              </div>
+            </div>
+            <div class="mt-3 flex space-x-2">
+              <a href="{% url 'advisor_dashboard:attendance_edit' record.attendance_id %}" 
+                 class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 bg-blue-50 rounded-full">
+                <i class="iconoir-edit mr-1"></i>Edit
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
     <!-- Pagination -->
     {% if attendance_records.has_other_pages %}
-    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+    <div class="bg-white px-4 py-3 border-t border-gray-200 lg:px-6">
       <div class="flex items-center justify-between">
-        <div class="flex-1 flex justify-between sm:hidden">
+        <div class="flex-1 flex justify-between lg:hidden">
           {% if attendance_records.has_previous %}
           <a href="?page={{ attendance_records.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
             Previous
@@ -178,7 +237,7 @@
           </a>
           {% endif %}
         </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div class="hidden lg:flex-1 lg:flex lg:items-center lg:justify-between">
           <div>
             <p class="text-sm text-gray-700">
               Showing <span class="font-medium">{{ attendance_records.start_index }}</span> to <span class="font-medium">{{ attendance_records.end_index }}</span> of
@@ -201,14 +260,20 @@
           </div>
         </div>
       </div>
+      <!-- Mobile pagination info -->
+      <div class="mt-3 lg:hidden">
+        <p class="text-xs text-gray-500 text-center">
+          Showing {{ attendance_records.start_index }}-{{ attendance_records.end_index }} of {{ attendance_records.paginator.count }} records
+        </p>
+      </div>
     </div>
     {% endif %}
 
     {% else %}
-    <div class="text-center py-12">
-      <i class="iconoir-calendar text-6xl text-gray-400 mb-4"></i>
+    <div class="text-center py-12 px-4">
+      <i class="iconoir-calendar text-4xl lg:text-6xl text-gray-400 mb-4"></i>
       <h3 class="text-lg font-medium text-gray-900 mb-2">No attendance records found</h3>
-      <p class="text-gray-500 mb-4">
+      <p class="text-gray-500 mb-4 text-sm lg:text-base">
         {% if filters.student_regno or filters.section_id or filters.subject_id or filters.date_from or filters.date_to or filters.status %}
           Try adjusting your search criteria or filters.
         {% else %}
@@ -216,7 +281,7 @@
         {% endif %}
       </p>
       <a href="{% url 'advisor_dashboard:staff_attendance' %}" 
-         class="bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+         class="inline-block bg-[var(--primary)] text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
         Take Attendance
       </a>
     </div>
