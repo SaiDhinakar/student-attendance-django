@@ -44,11 +44,13 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ['subject_code', 'subject_name', 'batch', 'get_departments_display']
-    list_filter = ['batch__dept', 'batch__batch_year', 'departments']
-    search_fields = ['subject_code', 'subject_name', 'departments__dept_name', 'batch__batch_year']
+    list_display = ['subject_code', 'subject_name', 'batch', 'created_by', 'get_departments_display']
+    list_filter = ['batch__dept', 'batch__batch_year', 'created_by', 'departments']
+    search_fields = ['subject_code', 'subject_name', 'created_by__dept_name', 'departments__dept_name', 'batch__batch_year']
     ordering = ['batch__batch_year', 'subject_code']
     filter_horizontal = ['departments']  # Makes it easier to select multiple departments
+    # Include created_by in the form for manual assignment
+    fields = ['subject_code', 'subject_name', 'created_by', 'batch', 'departments']
     
     def get_departments_display(self, obj):
         """Display departments as comma-separated list"""

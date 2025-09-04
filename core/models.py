@@ -124,6 +124,16 @@ class Subject(TimestampedModel):
     subject_id = models.AutoField(primary_key=True)
     subject_code = models.CharField(max_length=20, unique=True)
     subject_name = models.CharField(max_length=200, unique=True)
+    # Department that originally created/owns this subject
+    created_by = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='created_subjects',
+        help_text="Department that created/owns this subject"
+    )
+    # Departments that can access or offer this subject
     departments = models.ManyToManyField(
         Department,
         related_name='subjects',
