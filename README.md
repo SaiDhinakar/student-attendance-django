@@ -57,32 +57,6 @@ chmod +x setup.sh run_server.sh stop_server.sh
 
 ---
 
-## 🏗️ Project Structure
-
-```text
-student-attendance-django/
-├── advisor_dashboard/
-├── attendance_dashboard/
-├── Authentication/
-├── backend/
-├── core/
-├── docs/
-├── Frontend/
-├── gallery/
-├── logs/
-├── prediction_backend/
-├── static/
-├── StudentAttendance/
-├── main.py
-├── manage.py
-├── setup.sh
-├── run_server.sh
-├── stop_server.sh
-└── README.md
-```
-
----
-
 ## 👨‍💻 Authors
 
 <table>
@@ -116,20 +90,16 @@ student-attendance-django/
 📝 TODO
 
 - [ ] Daily attendance report automation to send it to WhatsApp for daily student report to the parent group.
-- [ ] Some more improvements coming soon!
-<!-- - [ ] Backup DB - Mith -->
 - [ ] update(git fetch) - sidd
-<!-- - [ ] remove duplicates - sai -->
-- [ ] give access to advisor to add staff
 - [ ] Subject wise attendace percentage
-<!-- - [ ] make pop up for 2 sec - mith -->
 
 ---
 
 ## 📚 Documentation
 
-- 📐 [Architecture](docs/ARCHITECTURE.md)
-- 📖 [References](docs/REFERENCES.md)
+- 📐 [System Architecture](docs/ARCHITECTURE.md) - Comprehensive technical architecture documentation
+- 🧠 [Image Processing Flow](docs/IMAGE_FLOW.md) - Detailed explanation of image flow through the recognition model
+- 🔗 [References](docs/REFERENCES.md) - Additional references and resources
 
 <div align="center">
 	<br><br>
